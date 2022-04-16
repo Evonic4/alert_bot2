@@ -1,0 +1,2 @@
+﻿#почтовая отправка
+XXXXXXXX@XXXXXXX.XXXXX
