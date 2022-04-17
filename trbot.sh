@@ -308,7 +308,7 @@ for (( i=1;i<=$mi_col;i++)); do
 
 	[ -z "$mi" ] && mi=0
 	
-	logger "parce ffufuf mess_id="$mess_id", mi="$mi
+	[ "$lev_log" == "1" ] && logger "parce ffufuf mess_id="$mess_id", mi="$mi
 	if [ "$mess_id" -ge "$mi" ] || [ "$mi" -eq "0" ] || [ "$mi" == "null" ]; then
 		ffufuf=1
 		else
