@@ -20,7 +20,7 @@ or STDOUT
   
 alertmanager conf  
 receivers:  
-  - name: prometheus_bot  
+  - name: abot2  
     webhook_configs:  
     - send_resolved: True  
       url: http://IP:9087/alert  

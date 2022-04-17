@@ -20,6 +20,7 @@ function Init2()
 [ "$lev_log" == "1" ] && logger "Start Init"
 chat_id1=$(sed -n 2"p" $ftb"settings.conf" | tr -d '\r')
 regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
+echo $regim > $ftb"amode.txt"
 sec4=$(sed -n 4"p" $ftb"settings.conf" | tr -d '\r')
 sec4=$((sec4/1000))
 sec=$(sed -n 6"p" $ftb"settings.conf" | tr -d '\r')
@@ -72,6 +73,7 @@ otv=$fhome"regim.txt"
 send;
 
 echo $regim > $ftb"amode.txt"
+logger "regim="$regim
 
 cp -f $ftb"settings1.conf" $ftb"settings.conf"
 }
@@ -95,7 +97,28 @@ if [ "$text" = "/j" ] || [ "$text" = "/job" ]; then
 fi
 
 if [ "$text" = "/ss" ] || [ "$text" = "/status" ]; then
-	$ftb"ss.sh"
+	regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
+	[ "$regim" -eq "1" ] && echo "Alerting mode ON" > $fhome"ss.txt"
+	[ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $fhome"ss.txt"
+	nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
+	if [ $(cat $fhome"autohcheck.txt" | grep -c succeeded) -gt "0" ]; then 
+		echo "Bot API DOWN" >> $fhome"ss.txt"
+	else
+		echo "Bot API UP" >> $fhome"ss.txt"
+	fi
+	if [ $(ps axu | grep -c abot2.sh) -gt "1" ]; then 
+		echo "Handler started" >> $fhome"ss.txt"
+	else
+		echo "Handler stoped" >> $fhome"ss.txt"
+	fi
+	if [ $(cat $fhome"delete.txt" | wc -l) -gt "0" ]; then 
+		echo "Fingerprints deleted:" >> $fhome"ss.txt"
+		#cat $fhome"delete.txt" | tr '\015\012' ' ' >> $fhome"ss.txt"
+		cat $fhome"delete.txt" >> $fhome"ss.txt"
+	else
+		echo "No remote fingerprints" >> $fhome"ss.txt"
+	fi
+	
 	otv=$fhome"ss.txt"
 	send;
 fi
@@ -103,6 +126,12 @@ fi
 if [[ "$text" == */d* ]]; then
 	$ftb"del.sh" $text
 	otv=$fhome"del.txt"
+	send;
+fi
+
+if [[ "$text" == */cd ]]; then
+	rm -f $ftb"delete.txt"
+	otv=$fhome"cd.txt"
 	send;
 fi
 
@@ -123,7 +152,7 @@ logger "roborob otv="$otv
 send1 () 
 {
 
-logger "send1 start"
+[ "$lev_log" == "1" ] && logger "send1 start"
 
 echo $chat_id > $cuf"send.txt"
 echo $otv >> $cuf"send.txt"
@@ -152,17 +181,17 @@ else
 	fi
 fi
 
-logger "send1 exit"
+[ "$lev_log" == "1" ] && logger "send1 exit"
 
 }
 
 send ()
 {
-logger "send start"
+[ "$lev_log" == "1" ] && logger "send start"
 rm -f $cuf"send.txt"
 
 chat_id=$(sed -n 2"p" $ftb"settings.conf" | sed 's/z/-/g' | tr -d '\r')
-[ "$lev_log" == "1" ] && logger "chat_id="$chat_id
+[ "$lev_log" == "1" ] && logger "send chat_id="$chat_id
 
 dl=$(wc -m $otv | awk '{ print $1 }')
 echo "dl="$dl
@@ -204,7 +233,7 @@ done
 
 input ()  		
 {
-logger "input start"
+[ "$lev_log" == "1" ] && logger "input start"
 
 rm -f $cuf"in.txt"
 file=$cuf"in.txt";
@@ -232,7 +261,7 @@ else
 	fi
 fi
 
-logger "input exit"
+[ "$lev_log" == "1" ] && logger "input exit"
 }
 
 starten_furer ()  				
@@ -266,7 +295,7 @@ fi
 
 parce ()
 {
-logger "parce"
+[ "$lev_log" == "1" ] && logger "parce"
 date1=`date '+ %d.%m.%Y %H:%M:%S'`
 mi_col=$(cat $ftb"in.txt" | grep -c message_id | tr -d '\r')
 logger "parce col mi_col ="$mi_col
@@ -280,7 +309,7 @@ for (( i=1;i<=$mi_col;i++)); do
 	[ -z "$mi" ] && mi=0
 	
 	logger "parce ffufuf mess_id="$mess_id", mi="$mi
-	if [ "$mess_id" -ge "$mi" ] || [ "$mi" -eq "0" ]; then
+	if [ "$mess_id" -ge "$mi" ] || [ "$mi" -eq "0" ] || [ "$mi" == "null" ]; then
 		ffufuf=1
 		else
 		ffufuf=0
@@ -321,8 +350,6 @@ logger ""
 logger "start abot"
 Init2;
 starten_furer;
-
-echo $regim > $ftb"amode.txt"
 
 [ "$send_up_start" == "1" ] && ! [ -z "$chat_id1" ] && otv=$fhome"start.txt" && send
 

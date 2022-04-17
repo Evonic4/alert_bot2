@@ -10,11 +10,13 @@ log="/var/log/trbot/trbot.log"
 lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
 ftb=$fhome
 cuf=$fhome
+fPID=$fhome"abot2_pid.txt"
+
 
 
 function Init2() 
 {
-logger "Init2"
+[ "$lev_log" == "1" ] && logger "Init2"
 chat_id1=$(sed -n 2"p" $fhome"settings.conf" | sed 's/z/-/g' | tr -d '\r')
 regim=$(sed -n 3"p" $fhome"settings.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $fhome"settings.conf" | tr -d '\r')
@@ -23,7 +25,7 @@ zap=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
 bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
-lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
+lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
 kkik=0
 }
 
@@ -44,17 +46,17 @@ fi
 function alert_bot()
 {
 
-logger "api checks"
+[ "$lev_log" == "1" ] && logger "api checks"
 
 #chmod +rx -R $fcache1
 find $fcache1 -maxdepth 1 -type f -name '*.xt' | sort > $fhome"a.txt"
 str_col=$(grep -cv "^---" $fhome"a.txt")
-[ "$lev_log" == "1" ] && logger "str_col="$str_col
+[ "$lev_log" == "1" ] && logger "bot api str_col="$str_col
 
 for (( i=1;i<=$str_col;i++)); do
 test=`basename $(sed -n $i"p" $fhome"a.txt" | tr -d '\r')`
 head -n 7 $fcache1$test | tail -n 1 | jq '' > $fcache2$test
-logger $fcache2$test" ok"
+[ "$lev_log" == "1" ] && logger $fcache2$test" ok"
 cat $fcache2$test
 
 rm -f $fcache1$test
@@ -64,7 +66,7 @@ redka;
 rm -f $fcache2$test
 done
 
-logger "api checks ok"
+[ "$lev_log" == "1" ] && logger "api checks ok"
 
 }
 
@@ -79,14 +81,14 @@ echo $newid > $fhome"id.txt"
 
 function redka() #выдергиваем проблемы из сообщений менеджера
 {
-logger "start redka"
+[ "$lev_log" == "1" ] && logger "start redka"
 logger $fcache2$test
 logger "num_alerts="$num_alerts
 
 rm -f $f_send
 
 for (( i1=$((num_alerts-1));i1>=0;i1--)); do
-desc=`cat $fcache2$test | jq '.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/MSK/g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
+desc=`cat $fcache2$test | jq '.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 status=`cat $fcache2$test | jq '.alerts['${i1}'].status' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 finger=`cat $fcache2$test | jq '.alerts['${i1}'].fingerprint' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 severity=`cat $fcache2$test | jq '.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
@@ -101,7 +103,7 @@ logger $severity
 
 
 num=$(grep -n "$finger" $fhome"alerts.txt" | awk -F":" '{print $1}')
-logger "num="$num
+logger "alerts.txt num="$num
 
 #if ! [ "$(grep "$finger" $fhome"alerts.txt")" ]; then
 if [ -z "$num" ]; then
@@ -109,8 +111,8 @@ if [ -z "$num" ]; then
 	if ! [ "$(grep $finger $fhome"delete.txt")" ]; then
 	if [ "$status" == "firing" ]; then
 		[ "$lev_log" == "1" ] && logger "-1"
-		echo "$finger" >> $fhome"alerts.txt"
 		gen_id_alert;
+		echo $newid" "$finger >> $fhome"alerts.txt"
 		echo $newid" "$desc >> $fhome"alerts2.txt"
 		echo "[ALERT] "$newid" "$desc >> $f_send
 		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid", severity: "$severity > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc >> $fhome"mail.txt" && $ftb"sendmail.sh"
@@ -134,7 +136,7 @@ else
 		tail -n $((str_col2-num)) $fhome"alerts2.txt" >> $fhome"alerts2_tmp.txt"
 		cp -f $fhome"alerts2_tmp.txt" $fhome"alerts2.txt"
 		
-		grep -v "$finger" $fhome"alerts.txt" > $fhome"alerts_tmp.txt"
+		grep -v $finger $fhome"alerts.txt" > $fhome"alerts_tmp.txt"
 		cp -f $fhome"alerts_tmp.txt" $fhome"alerts.txt"
 		
 		echo "[OK] "$desc1 >> $f_send
@@ -153,10 +155,12 @@ done
 
 function to_send() 
 {
-logger "start to_send"
+[ "$lev_log" == "1" ] && logger "start to_send"
+
+regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
 
 if [ -f $f_send ]; then
-	if [ "$regim" -eq "1" ]; then
+	if [ "$regim" == "1" ]; then
 		logger "Regim ON"
 		! [ -z "$chat_id1" ] && otv=$f_send && send && rm -f $f_send
 	fi
@@ -168,7 +172,7 @@ fi
 send1 () 
 {
 
-logger "send1 start"
+[ "$lev_log" == "1" ] && logger "send1 start"
 
 echo $chat_id > $cuf"send.txt"
 echo $otv >> $cuf"send.txt"
@@ -197,7 +201,7 @@ else
 	fi
 fi
 
-logger "send1 exit"
+[ "$lev_log" == "1" ] && logger "send1 exit"
 
 }
 
@@ -205,7 +209,7 @@ logger "send1 exit"
 
 send ()
 {
-logger "send start"
+[ "$lev_log" == "1" ] && logger "send start"
 rm -f $cuf"send.txt"
 
 chat_id=$(sed -n 2"p" $ftb"settings.conf" | sed 's/z/-/g' | tr -d '\r')
@@ -251,9 +255,14 @@ done
 autohcheck ()
 {
 
-nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
+ach=0
+for (( i1=1;i<=3;i++)); do
+	nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
+	[ $(cat $fhome"autohcheck.txt" | grep -c succeeded) -gt "0" ] && ach=$((ach+1))
+	sleep 1
+done
 
-if [ $(cat $fhome"autohcheck.txt" | grep -c succeeded) -gt "0" ]; then
+if [ "$ach" -gt "0" ]; then
 	logger "autohcheck OK"
 else
 	logger "autohcheck NO_OK"
@@ -268,6 +277,8 @@ fi
 }
 
 
+PID=$$
+echo $PID > $fPID
 logger "start"
 Init2;
 
@@ -285,5 +296,5 @@ done
 
 
 
-
+rm -f $fPID
 
