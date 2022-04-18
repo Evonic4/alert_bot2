@@ -2,7 +2,7 @@
 
 fhome=/usr/share/abot2/
 fcache=$fhome"cache/1/"
-chmod +rx -R $fhome
+#chmod +rx -R $fhome
 
 tm=0
 k=0;
@@ -36,7 +36,7 @@ k=$((k+1))
 tm=$((tm+1))
 echo $tm > $fhome"tm.txt"
 nc -l -p 9087 > $fcache$tm".xt"
-chmod +rx -R $fcache
+#chmod +rx -R $fcache
 [ "$lev_log" == "1" ] && logger "---->"$tm".xt"
 sleep 1
 
