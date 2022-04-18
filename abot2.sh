@@ -26,6 +26,8 @@ bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
+tst=$(sed -n 16"p" $fhome"settings.conf" | tr -d '\r')
+
 kkik=0
 }
 
@@ -100,7 +102,12 @@ logger $desc
 logger $status
 logger $severity
 
-
+if [ "$tst" == "1" ]; then
+desc1=$(echo $desc | awk -F", timestamp:" '{print $1}')
+desc2=$(echo $desc | awk -F", timestamp:" '{print $2}'| awk -F"." '{print $1}')
+desc=$desc1", timestamp:"$desc2
+logger "new desc="$desc
+fi
 
 num=$(grep -n "$finger" $fhome"alerts.txt" | awk -F":" '{print $1}')
 logger "alerts.txt num="$num
