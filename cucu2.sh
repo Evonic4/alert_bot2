@@ -25,9 +25,9 @@ echo "chat_id="$chat_id
 echo $text
 
 if [ -z "$proxy" ]; then
-curl -L -X POST https://api.telegram.org/bot$token/sendMessage -F chat_id="$chat_id" -F text=$text > $ftb"out0.txt"
+curl -s -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -F chat_id="$chat_id" -F text=$text > $ftb"out0.txt"
 else
-curl --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -F chat_id="$chat_id" -F text=$text > $ftb"out0.txt"
+curl -s -m 13 --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -F chat_id="$chat_id" -F text=$text > $ftb"out0.txt"
 fi
 
 mv $ftb"out0.txt" $ftb"out.txt"
