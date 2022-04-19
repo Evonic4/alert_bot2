@@ -100,8 +100,8 @@ if [ "$text" = "/ss" ] || [ "$text" = "/status" ]; then
 	regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
 	[ "$regim" -eq "1" ] && echo "Alerting mode ON" > $fhome"ss.txt"
 	[ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $fhome"ss.txt"
-	nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
-	if [ $(cat $fhome"autohcheck.txt" | grep -cE "succeeded|open") -gt "0" ]; then 
+	#nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
+	if [ $(nc -zv 127.0.0.1 9087 2>&1 | grep -cE "succeeded|open") -gt "0" ]; then 
 		echo "Bot API DOWN" >> $fhome"ss.txt"
 	else
 		echo "Bot API UP" >> $fhome"ss.txt"

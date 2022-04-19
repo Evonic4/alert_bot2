@@ -264,15 +264,15 @@ autohcheck ()
 
 ach=0
 for (( i1=1;i<=3;i++)); do
-	nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
-	[ $(cat $fhome"autohcheck.txt" | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
+	#nc -zv 127.0.0.1 9087 2>&1 > $fhome"autohcheck.txt"
+	[ $(nc -zv 127.0.0.1 9087 2>&1 | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
 	sleep 1
 done
 
 if [ "$ach" -gt "0" ]; then
-	logger "autohcheck OK"
+	logger "autohcheck 9087 OK"
 else
-	logger "autohcheck NO_OK"
+	logger "autohcheck 9087 NO_OK"
 	ab1_pid=$(sed -n 1"p" $fhome"abot1_pid.txt" | tr -d '\r')
 	killall abot1.sh
 	kill -9 $ab1_pid
