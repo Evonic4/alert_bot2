@@ -265,7 +265,7 @@ autohcheck ()
 ach=0
 for (( i1=1;i<=3;i++)); do
 	nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
-	[ $(cat $fhome"autohcheck.txt" | grep -c succeeded) -gt "0" ] && ach=$((ach+1))
+	[ $(cat $fhome"autohcheck.txt" | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
 	sleep 1
 done
 
