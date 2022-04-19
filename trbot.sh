@@ -145,6 +145,14 @@ if [ "$text" = "/off" ]; then
 	regstat;
 fi
 
+if [ "$text" = "/testmail" ]; then
+	echo "Test abot2 "$date1 > $fhome"mail.txt"
+	echo "Testing send to mail" >> $fhome"mail.txt"
+	$fhome"sendmail.sh"
+	otv=$fhome"tmail.txt"
+	send;
+fi
+
 logger "roborob otv="$otv
 }
 

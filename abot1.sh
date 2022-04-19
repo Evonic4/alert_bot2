@@ -37,7 +37,7 @@ tm=$((tm+1))
 echo $tm > $fhome"tm.txt"
 nc -l -p 9087 > $fcache$tm".xt"
 #chmod +rx -R $fcache
-[ "$lev_log" == "1" ] && logger "---->"$tm".xt"
+logger "---->"$tm".xt"
 sleep 1
 
 done

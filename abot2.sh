@@ -53,13 +53,13 @@ function alert_bot()
 #chmod +rx -R $fcache1
 find $fcache1 -maxdepth 1 -type f -name '*.xt' | sort > $fhome"a.txt"
 str_col=$(grep -cv "^---" $fhome"a.txt")
-[ "$lev_log" == "1" ] && logger "bot api str_col="$str_col
+logger "bot api str_col="$str_col
 
 for (( i=1;i<=$str_col;i++)); do
 test=`basename $(sed -n $i"p" $fhome"a.txt" | tr -d '\r')`
 head -n 7 $fcache1$test | tail -n 1 | jq '' > $fcache2$test
 [ "$lev_log" == "1" ] && logger $fcache2$test" ok"
-cat $fcache2$test
+[ "$lev_log" == "1" ] && cat $fcache2$test
 
 rm -f $fcache1$test
 num_alerts=`grep -c description $fcache2$test`
@@ -84,8 +84,8 @@ echo $newid > $fhome"id.txt"
 function redka() #выдергиваем проблемы из сообщений менеджера
 {
 [ "$lev_log" == "1" ] && logger "start redka"
-logger $fcache2$test
-logger "num_alerts="$num_alerts
+[ "$lev_log" == "1" ] && logger $fcache2$test
+logger "redka num_alerts="$num_alerts
 
 rm -f $f_send
 
@@ -96,40 +96,46 @@ finger=`cat $fcache2$test | jq '.alerts['${i1}'].fingerprint' | sed 's/"/ /g' | 
 severity=`cat $fcache2$test | jq '.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 #datest=`cat $fcache2$test | jq '.alerts['${i1}'].labels.datest' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 
-logger $i1
-logger $finger
-logger $desc
-logger $status
-logger $severity
 
-if [ "$tst" == "1" ]; then
-desc1=$(echo $desc | awk -F", timestamp:" '{print $1}')
-desc2=$(echo $desc | awk -F", timestamp:" '{print $2}'| awk -F"." '{print $1}')
-desc=$desc1", timestamp:"$desc2
-logger "new desc="$desc
+[ "$lev_log" == "1" ] && logger "redka i1="$i1
+[ "$lev_log" == "1" ] && logger "redka finger="$finger
+[ "$lev_log" == "1" ] && logger "redka desc="$desc
+[ "$lev_log" == "1" ] && logger "redka status="$status
+[ "$lev_log" == "1" ] && logger "redka severity="$severity
+
+desc3=""
+if ! [ -z "$tst" ]; then
+desc1=$(echo $desc | awk -F", ${tst}:" '{print $1}')
+desc2=$(echo $desc | awk -F", ${tst}:" '{print $2}'| awk -F"." '{print $1}')
+desc=$desc1
+desc3=", "$tst":"$desc2
+[ "$lev_log" == "1" ] && logger "redka new desc="$desc
 fi
 
+logger "redka finger="$finger", status="$status", desc="$desc
+
+
 num=$(grep -n "$finger" $fhome"alerts.txt" | awk -F":" '{print $1}')
-logger "alerts.txt num="$num
+logger "redka detection in alerts.txt num="$num
 
 #if ! [ "$(grep "$finger" $fhome"alerts.txt")" ]; then
 if [ -z "$num" ]; then
-	[ "$lev_log" == "1" ] && logger "-"
+	logger "-"
 	if ! [ "$(grep $finger $fhome"delete.txt")" ]; then
 	if [ "$status" == "firing" ]; then
 		[ "$lev_log" == "1" ] && logger "-1"
 		gen_id_alert;
 		echo $newid" "$finger >> $fhome"alerts.txt"
 		echo $newid" "$desc >> $fhome"alerts2.txt"
-		echo "[ALERT] "$newid" "$desc >> $f_send
-		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid", severity: "$severity > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
+		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid", severity: "$severity > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		to_send;
 	fi
 	else
-	[ "$lev_log" == "1" ] && logger "finger "$finger" already removed earlier"
+	logger "finger "$finger" already removed earlier"
 	fi
 else
-	[ "$lev_log" == "1" ] && logger "+"
+	logger "+"
 	if [ "$status" == "resolved" ]; then
 		[ "$lev_log" == "1" ] && logger "+1"
 		
@@ -137,7 +143,7 @@ else
 		[ "$lev_log" == "1" ] && logger "str_col2="$str_col2
 		
 		
-		desc1=$(sed -n $num"p" $fhome"alerts2.txt" | tr -d '\r')
+		desc4=$(sed -n $num"p" $fhome"alerts2.txt" | tr -d '\r')
 		
 		head -n $((num-1)) $fhome"alerts2.txt" > $fhome"alerts2_tmp.txt"
 		tail -n $((str_col2-num)) $fhome"alerts2.txt" >> $fhome"alerts2_tmp.txt"
@@ -146,9 +152,9 @@ else
 		grep -v $finger $fhome"alerts.txt" > $fhome"alerts_tmp.txt"
 		cp -f $fhome"alerts_tmp.txt" $fhome"alerts.txt"
 		
-		echo "[OK] "$desc1 >> $f_send
+		echo "[OK] "$desc4$desc3 >> $f_send
 		idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk '{print $2}')
-		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob", severity: "$severity > $fhome"mail.txt" && echo "[OK] "$idprob" "$desc >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob", severity: "$severity > $fhome"mail.txt" && echo "[OK] "$idprob" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		to_send;
 	fi
 fi
@@ -169,7 +175,13 @@ regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
 if [ -f $f_send ]; then
 	if [ "$regim" == "1" ]; then
 		logger "Regim ON"
-		! [ -z "$chat_id1" ] && otv=$f_send && send && rm -f $f_send
+		if ! [ -z "$chat_id1" ]; then
+			otv=$f_send
+			send
+			rm -f $f_send
+			else
+			logger "No chat_id1"
+		fi
 	fi
 fi
 
