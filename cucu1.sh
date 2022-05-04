@@ -13,9 +13,9 @@ if ! [ -f $fPID ]; then
 	proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
 
 	if [ -z "$proxy" ]; then
-		curl -s -L -m 13 https://api.telegram.org/bot$token/getUpdates > $ftb"in0.txt"
+		curl -k -s -L -m 13 https://api.telegram.org/bot$token/getUpdates > $ftb"in0.txt"
 	else
-		curl -s -m 13 --proxy $proxy -L https://api.telegram.org/bot$token/getUpdates > $ftb"in0.txt"
+		curl -k -s -m 13 --proxy $proxy -L https://api.telegram.org/bot$token/getUpdates > $ftb"in0.txt"
 	fi
 
 	mv $ftb"in0.txt" $ftb"in.txt"
