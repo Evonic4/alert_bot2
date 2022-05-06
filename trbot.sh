@@ -146,7 +146,7 @@ if [ "$text" = "/off" ]; then
 fi
 
 if [ "$text" = "/testmail" ]; then
-	echo "Test abot2 "$date1 > $fhome"mail.txt"
+	echo "Test abot2-"$bui" "$date1 > $fhome"mail.txt"
 	echo "Testing send to mail" >> $fhome"mail.txt"
 	$fhome"sendmail.sh"
 	otv=$fhome"tmail.txt"
@@ -359,7 +359,7 @@ logger "start abot"
 Init2;
 starten_furer;
 
-[ "$send_up_start" == "1" ] && ! [ -z "$chat_id1" ] && otv=$fhome"start.txt" && send
+[ "$send_up_start" == "1" ] && ! [ -z "$chat_id1" ] && echo "Start abot2-"$bui > $fhome"start.txt" && otv=$fhome"start.txt" && send
 
 $fhome"abot1.sh" &
 $fhome"abot2.sh" &
