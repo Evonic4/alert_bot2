@@ -32,6 +32,7 @@ last_id=0
 progons=$(sed -n 13"p" $ftb"settings.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
 send_up_start=$(sed -n 15"p" $ftb"settings.conf" | tr -d '\r')
+portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
 kkik=0
 }
 
@@ -101,10 +102,10 @@ if [ "$text" = "/ss" ] || [ "$text" = "/status" ]; then
 	[ "$regim" -eq "1" ] && echo "Alerting mode ON" > $fhome"ss.txt"
 	[ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $fhome"ss.txt"
 	#nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
-	if [ $(nc -zv 127.0.0.1 9087 2>&1 | grep -cE "succeeded|open") -gt "0" ]; then 
-		echo "Bot API DOWN" >> $fhome"ss.txt"
+	if [ $(nc -zv 127.0.0.1 $portapi 2>&1 | grep -cE "succeeded|open") -gt "0" ]; then 
+		echo "Bot AlertAPI DOWN" >> $fhome"ss.txt"
 	else
-		echo "Bot API UP" >> $fhome"ss.txt"
+		echo "Bot AlertAPI UP" >> $fhome"ss.txt"
 	fi
 	if [ $(ps axu | grep -c abot2.sh) -gt "1" ]; then 
 		echo "Handler started" >> $fhome"ss.txt"

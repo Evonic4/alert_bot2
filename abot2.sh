@@ -27,6 +27,7 @@ ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
 tst=$(sed -n 16"p" $fhome"settings.conf" | tr -d '\r')
+portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
 
 kkik=0
 }
@@ -277,14 +278,14 @@ autohcheck ()
 ach=0
 for (( i1=1;i<=3;i++)); do
 	#nc -zv 127.0.0.1 9087 2>&1 > $fhome"autohcheck.txt"
-	[ $(nc -zv 127.0.0.1 9087 2>&1 | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
+	[ $(nc -zv 127.0.0.1 $portapi 2>&1 | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
 	sleep 1
 done
 
 if [ "$ach" -gt "0" ]; then
-	logger "autohcheck 9087 OK"
+	logger "autohcheck "$portapi" OK"
 else
-	logger "autohcheck 9087 NO_OK"
+	logger "autohcheck "$portapi" NO_OK"
 	ab1_pid=$(sed -n 1"p" $fhome"abot1_pid.txt" | tr -d '\r')
 	killall abot1.sh
 	kill -9 $ab1_pid

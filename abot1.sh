@@ -16,6 +16,7 @@ echo $PID > $fPID
 zap=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
 bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
+portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
 
 
 function logger()
@@ -35,7 +36,7 @@ do
 k=$((k+1))
 tm=$((tm+1))
 echo $tm > $fhome"tm.txt"
-nc -l -p 9087 > $fcache$tm".xt"
+nc -l -p $portapi > $fcache$tm".xt"
 #chmod +rx -R $fcache
 logger "---->"$tm".xt"
 sleep 1
