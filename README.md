@@ -12,7 +12,7 @@ and
 and configure mutt /etc/Muttrc.d/smime.rc  
   
 start  
-cd /usr/share/abot2 && ./trbot.sh  
+cd /usr/share/abot2 && ./setup.sh && ./trbot.sh  
   
 log  
 /var/log/trbot/trbot.log  
@@ -25,6 +25,8 @@ receivers:
     - send_resolved: True  
       url: http://IP:9087/alert  
   
-docker image  
-evonic/abot2:latest  
+  
+  
+docker    
+docker pull evonic/abot2:latest  
   
