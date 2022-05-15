@@ -28,7 +28,7 @@ progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
 tst=$(sed -n 16"p" $fhome"settings.conf" | tr -d '\r')
 portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
-
+ipapi=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
 kkik=0
 }
 
@@ -278,7 +278,7 @@ autohcheck ()
 ach=0
 for (( i1=1;i<=3;i++)); do
 	#nc -zv 127.0.0.1 9087 2>&1 > $fhome"autohcheck.txt"
-	[ $(nc -zv 127.0.0.1 $portapi 2>&1 | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
+	[ $(nc -zv $ipapi $portapi 2>&1 | grep -cE "succeeded|open") -gt "0" ] && ach=$((ach+1))
 	sleep 1
 done
 
