@@ -103,9 +103,9 @@ if [ "$text" = "/ss" ] || [ "$text" = "/status" ]; then
 	[ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $fhome"ss.txt"
 	#nc -zv 127.0.0.1 9087 > $fhome"autohcheck.txt"
 	if [ $(nc -zv 127.0.0.1 $portapi 2>&1 | grep -cE "succeeded|open") -gt "0" ]; then 
-		echo "Bot AlertAPI DOWN" >> $fhome"ss.txt"
-	else
 		echo "Bot AlertAPI UP" >> $fhome"ss.txt"
+	else
+		echo "Bot AlertAPI DOWN" >> $fhome"ss.txt"
 	fi
 	if [ $(ps axu | grep -c abot2.sh) -gt "1" ]; then 
 		echo "Handler started" >> $fhome"ss.txt"
