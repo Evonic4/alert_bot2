@@ -34,6 +34,7 @@ lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
 send_up_start=$(sed -n 15"p" $ftb"settings.conf" | tr -d '\r')
 portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
 ipapi=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
+sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
 kkik=0
 }
 
@@ -88,7 +89,8 @@ date1=`date '+ %d.%m.%Y %H:%M:%S'`
 otv=""
 
 if [ "$text" = "/start" ] || [ "$text" = "/?" ] || [ "$text" = "/help" ] || [ "$text" = "/h" ]; then
-	otv=$fhome"help.txt"
+	[ "$sty" == "0" ] && otv=$fhome"help.txt"
+	[ "$sty" == "1" ] || [ "$sty" == "2" ] && otv=$fhome"help1.txt"
 	send;
 fi
 

@@ -29,7 +29,12 @@ lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
 tst=$(sed -n 16"p" $fhome"settings.conf" | tr -d '\r')
 portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
 ipapi=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
+bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
+sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
+
 kkik=0
+bic="0"
+styc="0"
 }
 
 
@@ -91,6 +96,10 @@ logger "redka num_alerts="$num_alerts
 rm -f $f_send
 
 for (( i1=$((num_alerts-1));i1>=0;i1--)); do
+bic="0"
+styc="0"
+code2=""
+
 desc=`cat $fcache2$test | jq '.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 status=`cat $fcache2$test | jq '.alerts['${i1}'].status' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 finger=`cat $fcache2$test | jq '.alerts['${i1}'].fingerprint' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
@@ -102,14 +111,20 @@ severity=`cat $fcache2$test | jq '.alerts['${i1}'].labels.severity' | sed 's/"/ 
 [ "$lev_log" == "1" ] && logger "redka finger="$finger
 [ "$lev_log" == "1" ] && logger "redka desc="$desc
 [ "$lev_log" == "1" ] && logger "redka status="$status
-[ "$lev_log" == "1" ] && logger "redka severity="$severity
+logger "redka severity="$severity
+
+
+if [ "$severity" != "keepalive" ]; then
+
+
 
 desc3=""
 if ! [ -z "$tst" ]; then
 desc1=$(echo $desc | awk -F", ${tst}:" '{print $1}')
 desc2=$(echo $desc | awk -F", ${tst}:" '{print $2}'| awk -F"." '{print $1}')
 desc=$desc1
-desc3=", "$tst":"$desc2
+desc3=", "$tst":"$desc2 #Started at 
+desc4=", Started at "$desc2
 [ "$lev_log" == "1" ] && logger "redka new desc="$desc
 fi
 
@@ -126,8 +141,17 @@ if [ -z "$num" ]; then
 	if [ "$status" == "firing" ]; then
 		[ "$lev_log" == "1" ] && logger "-1"
 		gen_id_alert;
+		[ "$bicons" == "1" ] && bic="1"
+		if [ "$sty" == "1" ] || [ "$sty" == "2" ]; then
+			[ "$severity" == "info" ] && styc="1" && code2="<b>&#9898;</b>"
+			[ "$severity" == "warning" ] && styc="2" && code2="<b>&#x1F7E1;</b>"
+			[ "$severity" == "average" ] && styc="3" && code2="<b>&#x1F7E0;</b>"
+			[ "$severity" == "high" ] && styc="4" && code2="<b>&#128308;</b>"
+			[ "$severity" == "disaster" ] && styc="5" && code2="<b>&#128996;</b>"
+		fi
 		echo $newid" "$finger >> $fhome"alerts.txt"
-		echo $newid" "$desc >> $fhome"alerts2.txt"
+		[ "$sty" == "1" ] || [ "$sty" == "2" ] && echo $newid" "$code2$desc$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "0" ] && echo $newid" "$desc", severity: "$severity$desc4 >> $fhome"alerts2.txt"
 		echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
 		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid", severity: "$severity > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		to_send;
@@ -139,7 +163,14 @@ else
 	logger "+"
 	if [ "$status" == "resolved" ]; then
 		[ "$lev_log" == "1" ] && logger "+1"
-		
+		[ "$bicons" == "1" ] && bic="2"
+		if [ "$sty" == "2" ]; then
+			[ "$severity" == "info" ] && styc="1"
+			[ "$severity" == "warning" ] && styc="2"
+			[ "$severity" == "average" ] && styc="3"
+			[ "$severity" == "high" ] && styc="4"
+			[ "$severity" == "disaster" ] && styc="5"
+		fi
 		str_col2=$(grep -cv "^#" $fhome"alerts.txt")
 		[ "$lev_log" == "1" ] && logger "str_col2="$str_col2
 		
@@ -158,6 +189,7 @@ else
 		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob", severity: "$severity > $fhome"mail.txt" && echo "[OK] "$idprob" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		to_send;
 	fi
+fi
 fi
 
 done
@@ -199,7 +231,7 @@ echo $otv >> $cuf"send.txt"
 
 rm -f $cuf"out.txt"
 file=$cuf"out.txt"; 
-$ftb"cucu2.sh" &
+$ftb"cucu2.sh" $bic $styc &
 pauseloop;
 
 if [ -f $cuf"out.txt" ]; then
