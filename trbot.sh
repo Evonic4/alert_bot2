@@ -19,6 +19,9 @@ function Init2()
 {
 [ "$lev_log" == "1" ] && logger "Start Init"
 chat_id1=$(sed -n 2"p" $ftb"settings.conf" | tr -d '\r')
+echo $chat_id1 | tr " " "\n" > $ftb"chats.txt"
+chat_id1=$(sed -n 1"p" $ftb"chats.txt" | tr -d '\r')
+
 regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
 echo $regim > $ftb"amode.txt"
 sec4=$(sed -n 4"p" $ftb"settings.conf" | tr -d '\r')
@@ -282,11 +285,13 @@ starten_furer ()
 input;
 if [ "$starten" -eq "1" ]; then
 	[ "$lev_log" == "1" ] && logger "starten_furer"
-	mess_id=$(cat $ftb"in.txt" | jq ".result[].message.message_id" | tail -1 | tr -d '\r')
-	if ! [ -z "$mess_id" ]; then
-		echo $mess_id > $ftb"lastid.txt"
+	upd_id=$(cat $ftb"in.txt" | jq ".result[].update_id" | tail -1 | tr -d '\r')
+	if ! [ -z "$upd_id" ]; then
+		echo $upd_id > $ftb"lastid.txt"
+		else
+		echo "0" > $ftb"lastid.txt"
 	fi
-	logger "starten_furer mess_id="$mess_id
+	logger "starten_furer upd_id="$upd_id
 	starten=0
 fi
 
@@ -294,39 +299,29 @@ fi
 
 
 
-lastidrass ()  				
-{
-if [ "$last_id" -le "$mi" ]; then
-	last_id=$((mi+1))
-	echo $last_id > $ftb"lastid.txt"
-	logger "new last_id="$last_id
-fi
-
-}
-
 
 parce ()
 {
 [ "$lev_log" == "1" ] && logger "parce"
 date1=`date '+ %d.%m.%Y %H:%M:%S'`
-mi_col=$(cat $ftb"in.txt" | grep -c message_id | tr -d '\r')
-logger "parce col mi_col ="$mi_col
-mess_id=$(sed -n 1"p" $ftb"lastid.txt" | tr -d '\r')
+mi_col=$(cat $cuf"in.txt" | grep -c update_id | tr -d '\r')
+logger "parce col upd_id ="$mi_col
+upd_id=$(sed -n 1"p" $ftb"lastid.txt" | tr -d '\r')
 
 for (( i=1;i<=$mi_col;i++)); do
 	i1=$((i-1))
-	mi=$(cat $ftb"in.txt" | jq ".result[$i1].message.message_id" | tr -d '\r')
-	[ "$lev_log" == "1" ] && logger "parce mi="$mi
+	mi=$(cat $ftb"in.txt" | jq ".result[$i1].update_id" | tr -d '\r')
+	[ "$lev_log" == "1" ] && logger "parce update_id="$mi
 
 	[ -z "$mi" ] && mi=0
 	
-	[ "$lev_log" == "1" ] && logger "parce ffufuf mess_id="$mess_id", mi="$mi
-	if [ "$mess_id" -ge "$mi" ] || [ "$mi" -eq "0" ] || [ "$mi" == "null" ]; then
+	[ "$lev_log" == "1" ] && logger "parce cycle upd_id="$upd_id", i="$i", mi="$mi
+	if [ "$upd_id" -ge "$mi" ] || [ "$mi" -eq "0" ] || [ "$mi" == "null" ]; then
 		ffufuf=1
 		else
 		ffufuf=0
 	fi
-	[ "$lev_log" == "1" ] && logger "parce ffufuf ffufuf="$ffufuf
+	[ "$lev_log" == "1" ] && logger "parce cycle ffufuf="$ffufuf
 	
 	
 	if [ "$ffufuf" -eq "0" ]; then
@@ -361,6 +356,7 @@ echo $PID > $fPID
 logger ""
 logger "start abot"
 Init2;
+logger "chat_id1="$chat_id1
 starten_furer;
 
 [ "$send_up_start" == "1" ] && ! [ -z "$chat_id1" ] && echo "Start abot2-"$bui > $fhome"start.txt" && otv=$fhome"start.txt" && send

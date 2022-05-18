@@ -17,7 +17,8 @@ fPID=$fhome"abot2_pid.txt"
 function Init2() 
 {
 [ "$lev_log" == "1" ] && logger "Init2"
-chat_id1=$(sed -n 2"p" $fhome"settings.conf" | sed 's/z/-/g' | tr -d '\r')
+chat_id1=$(sed -n 1"p" $fhome"chats.txt" | sed 's/z/-/g' | tr -d '\r')
+
 regim=$(sed -n 3"p" $fhome"settings.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $fhome"settings.conf" | tr -d '\r')
 em=$(sed -n 8"p" $fhome"settings.conf" | tr -d '\r')
