@@ -18,11 +18,11 @@ echo $text
 
 if [ -z "$proxy" ]; then
 [ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -s -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text > $ftb"out0.txt"
-[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -s -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1$code2</b>"$text > $ftb"out0.txt"
+[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -s -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text > $ftb"out0.txt"
 
 else
 [ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -s -m 13 --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text > $ftb"out0.txt"
-[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -s -m 13 --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1$code2</b>"$text > $ftb"out0.txt"
+[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -s -m 13 --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text > $ftb"out0.txt"
 
 fi
 
@@ -43,16 +43,10 @@ bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
 sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
 
 [ "$bicons" == "1" ] && Z1=$1
-[ "$sty" == "1" ] || [ "$sty" == "2" ] && Z2=$2
+[ "$sty" == "1" ] && Z2=$2
 
 [ "$Z1" == "1" ] && code1="&#10060;"
 [ "$Z1" == "2" ] && code1="&#9989"
-[ "$Z2" == "1" ] && code2="&#9898;"
-[ "$Z2" == "2" ] && code2="&#x1F7E1;"
-[ "$Z2" == "3" ] && code2="&#x1F7E0;"
-[ "$Z2" == "4" ] && code2="&#128308;"
-[ "$Z2" == "5" ] && code2="&#128996;"
-
 
 str_col=$(grep -cv "^#" $ftb"chats.txt")
 #echo "str_col="$str_col

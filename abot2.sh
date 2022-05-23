@@ -117,6 +117,14 @@ logger "redka severity="$severity
 
 if [ "$severity" != "keepalive" ]; then
 
+[ "$severity" == "info" ] && styc="1" && code2="<b>&#9898;</b>"
+[ "$severity" == "warning" ] && styc="2" && code2="<b>&#x1F7E1;</b>"
+[ "$severity" == "average" ] && styc="3" && code2="<b>&#x1F7E0;</b>"
+[ "$severity" == "high" ] && styc="4" && code2="<b>&#128308;</b>"
+[ "$severity" == "disaster" ] && styc="5" && code2="<b>&#128996;</b>"
+
+severity1=""
+[ "$sty" == "2" ] && severity1=", severity: "$severity
 
 
 desc3=""
@@ -143,18 +151,20 @@ if [ -z "$num" ]; then
 		[ "$lev_log" == "1" ] && logger "-1"
 		gen_id_alert;
 		[ "$bicons" == "1" ] && bic="1"
-		if [ "$sty" == "1" ] || [ "$sty" == "2" ]; then
-			[ "$severity" == "info" ] && styc="1" && code2="<b>&#9898;</b>"
-			[ "$severity" == "warning" ] && styc="2" && code2="<b>&#x1F7E1;</b>"
-			[ "$severity" == "average" ] && styc="3" && code2="<b>&#x1F7E0;</b>"
-			[ "$severity" == "high" ] && styc="4" && code2="<b>&#128308;</b>"
-			[ "$severity" == "disaster" ] && styc="5" && code2="<b>&#128996;</b>"
-		fi
 		echo $newid" "$finger >> $fhome"alerts.txt"
-		[ "$sty" == "1" ] || [ "$sty" == "2" ] && echo $newid" "$code2$desc$desc4 >> $fhome"alerts2.txt"
-		[ "$sty" == "0" ] && echo $newid" "$desc", severity: "$severity$desc4 >> $fhome"alerts2.txt"
-		echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
-		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid", severity: "$severity > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		[ "$sty" == "0" ] && echo $newid" "$desc$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "1" ] && echo $code2$newid" "$desc$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "2" ] && echo $newid" "$desc$severity1$desc4 >> $fhome"alerts2.txt"
+		
+		[ "$bicons" == "0" ] && [ "$sty" == "0" ] && echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
+		[ "$bicons" == "0" ] && [ "$sty" == "1" ] && echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
+		[ "$bicons" == "0" ] && [ "$sty" == "2" ] && echo "[ALERT] "$newid" "$desc$severity1$desc3 >> $f_send
+		[ "$bicons" == "1" ] && [ "$sty" == "0" ] && echo $newid" "$desc$desc3 >> $f_send
+		[ "$bicons" == "1" ] && [ "$sty" == "1" ] && echo $code2$newid" "$desc$desc3 >> $f_send
+		[ "$bicons" == "1" ] && [ "$sty" == "2" ] && echo $newid" "$desc$severity1$desc3 >> $f_send
+
+		
+		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid$severity1 > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		to_send;
 	fi
 	else
@@ -165,13 +175,7 @@ else
 	if [ "$status" == "resolved" ]; then
 		[ "$lev_log" == "1" ] && logger "+1"
 		[ "$bicons" == "1" ] && bic="2"
-		if [ "$sty" == "2" ]; then
-			[ "$severity" == "info" ] && styc="1"
-			[ "$severity" == "warning" ] && styc="2"
-			[ "$severity" == "average" ] && styc="3"
-			[ "$severity" == "high" ] && styc="4"
-			[ "$severity" == "disaster" ] && styc="5"
-		fi
+
 		str_col2=$(grep -cv "^#" $fhome"alerts.txt")
 		[ "$lev_log" == "1" ] && logger "str_col2="$str_col2
 		
@@ -185,9 +189,11 @@ else
 		grep -v $finger $fhome"alerts.txt" > $fhome"alerts_tmp.txt"
 		cp -f $fhome"alerts_tmp.txt" $fhome"alerts.txt"
 		
-		echo "[OK] "$desc4$desc3 >> $f_send
+		[ "$bicons" == "0" ] && echo "[OK] "$desc4$desc3 >> $f_send
+		[ "$bicons" != "0" ] && echo $desc4$desc3 >> $f_send
+		
 		idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk '{print $2}')
-		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob", severity: "$severity > $fhome"mail.txt" && echo "[OK] "$idprob" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob$severity1 > $fhome"mail.txt" && echo "[OK] "$idprob" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		to_send;
 	fi
 fi
