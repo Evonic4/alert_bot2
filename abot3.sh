@@ -20,6 +20,7 @@ function Init()
 chat_id1=$(sed -n 1"p" $fhome"chats.txt" | sed 's/z/-/g' | tr -d '\r')
 
 regim=$(sed -n 3"p" $fhome"settings.conf" | tr -d '\r')
+proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $fhome"settings.conf" | tr -d '\r')
 em=$(sed -n 8"p" $fhome"settings.conf" | tr -d '\r')
 zap=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
@@ -67,7 +68,11 @@ function alert_bot()
 
 autohcheck;
 if [ "$autohcheck_rez" -eq "0" ]; then
-curl -k -s -m 13 "$promapi" | jq '.' > $fhome"a3.txt"
+	if [ -z "$proxy" ]; then
+		curl -k -s -m 13 "$promapi" | jq '.' > $fhome"a3.txt"
+	else
+		curl -k -s -m 13 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
+	fi
 [ "$lev_log" == "1" ] && cat $fhome"a3.txt"
 if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
 logger "status success"
