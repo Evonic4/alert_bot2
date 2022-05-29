@@ -51,11 +51,11 @@ function logger()
 {
 local date1=`date '+ %Y-%m-%d %H:%M:%S'`
 
-if [ "$zap" == "1" ]; then
-	echo $date1" trbot_"$bui": "$1
-else
-	echo $date1" trbot_"$bui": "$1 >> $log
-fi
+#if [ "$zap" == "1" ]; then
+#	echo $date1" trbot_"$bui": "$1
+#else
+#	echo $date1" trbot_"$bui": "$1 >> $log
+#fi
 }
 
 
