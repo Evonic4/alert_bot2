@@ -401,7 +401,8 @@ sleep $sec4
 ffufuf1=0
 
 
-[ "$opov" == "0" ] && input && parce;
+[ "$opov" == "0" ] && input;
+[ "$opov" == "0" ] && parce;
 
 
 kkik=$(($kkik+1))
