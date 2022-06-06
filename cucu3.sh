@@ -16,6 +16,8 @@ echo "token="$token
 echo "chat_id="$chat_id
 echo $text
 
+if ! [ -z "$text" ]; then
+
 if [ -z "$proxy" ]; then
 [ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text 2>&1 > $ftb"out0.txt"
 [ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text 2>&1 > $ftb"out0.txt"
@@ -26,7 +28,9 @@ else
 
 fi
 
+cat $ftb"out0.txt"
 mv $ftb"out0.txt" $ftb"out.txt"
+fi
 
 }
 

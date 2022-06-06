@@ -266,11 +266,6 @@ for (( i=1;i<=$str_col;i++)); do
 		#silent_mode
 		silent_mode;
 		if [ "$silent_mode" == "on" ]; then
-		#smt1=""; smt2=""; smt3=""; smt4=""
-		#smt1=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "&#128996;" )
-		#smt2=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "&#128308;" )
-		#smt3=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "severity: high" )
-		#smt4=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "severity: disaster" )
 		logger "resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
 		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && to_send;
 		else
