@@ -374,14 +374,16 @@ fi
 
 
 
-if ! [ -f $fPID ]; then
+
 PID=$$
 echo $PID > $fPID
 
 logger ""
-logger "start abot"
+logger "start abot2"
 Init2;
-echo $startid > $fhome"id.txt"
+
+! [ -f $ftb"id.txt" ] && echo $startid > $fhome"id.txt"
+
 logger "chat_id1="$chat_id1
 starten_furer;
 
@@ -411,14 +413,6 @@ kkik=$(($kkik+1))
 [ "$kkik" -ge "$progons" ] && Init2
 
 done
-
-
-else 
-	logger "pid up exit"
-
-fi
-
-
 rm -f $fPID
 
 
