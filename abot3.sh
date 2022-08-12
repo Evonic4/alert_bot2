@@ -82,8 +82,9 @@ if [ "$str_col" -gt "6" ]; then
 num_alerts=$(grep -c 'alertname' $fhome"a3.txt" )
 echo "" > $fhome"newalerts.txt"
 redka;
-comm_vessels;
 fi
+comm_vessels;
+
 fi
 fi
 
