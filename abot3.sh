@@ -248,28 +248,36 @@ for (( i=1;i<=$str_col;i++)); do
 		testid=$(sed -n $i"p" $fhome"alerts_old.txt" | awk '{print $1}' | tr -d '\r')
 		num1=$(grep -n "$test" $fhome"alerts.txt" | awk -F":" '{print $1}')
 		num2=$(grep -n "$testid" $fhome"alerts2.txt" | awk -F":" '{print $1}')
+		[ "$lev_log" == "1" ] && logger "comm_vessels testid="$testid
+		[ "$lev_log" == "1" ] && logger "comm_vessels num1="$num1
+		[ "$lev_log" == "1" ] && logger "comm_vessels num2="$num2
 		
 		#---resolved
 		[ "$bicons" == "1" ] && bic="2"
+		[ "$lev_log" == "1" ] && logger "comm_vessels resolved bic="$bic
 		
 		desc4=$(sed -n $num2"p" $fhome"alerts2.txt" | tr -d '\r')
+		[ "$lev_log" == "1" ] && logger "comm_vessels resolved desc4="$desc4
 		local date2=`date '+ %Y-%m-%d %H:%M:%S'`
 		desc3=", timestamp: "$date2
 		[ "$bicons" == "0" ] && echo "[OK] "$desc4$desc3 >> $f_send && idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk '{print $2}')
 		[ "$bicons" != "0" ] && echo $desc4$desc3 >> $f_send && idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk -F"</b>" '{print $2}' | awk '{print $1}')
-		logger "resolved idprob="$idprob" finger="$test
+		logger "comm_vessels resolved idprob="$idprob" finger="$test
 		
 		resolv_sever2;
+		[ "$lev_log" == "1" ] && logger "comm_vessels resolv_sever2"
 		desc4=$(sed -n $num2"p" $fhome"alerts2.txt" | tr -d '\r' | awk -F"</b>" '{print $2}')
+		[ "$lev_log" == "1" ] && logger "comm_vessels resolved desc4="$desc4
 		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob$severity2 > $fhome"mail.txt" && echo "[OK] "$desc4$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		
 		
 		#silent_mode
 		silent_mode;
 		if [ "$silent_mode" == "on" ]; then
-		logger "resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
+		logger "comm_vessels resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
 		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && to_send;
 		else
+			[ "$lev_log" == "1" ] && logger "comm_vessels to_send"
 			to_send;
 		fi
 		
