@@ -78,12 +78,12 @@ if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
 logger "status success"
 str_col=$(grep -cv "^---" $fhome"a3.txt")
 logger "bot api str_col="$str_col
-if [ "$str_col" -gt "6" ]; then
+if [ "$str_col" -gt "5" ]; then
 num_alerts=$(grep -c 'alertname' $fhome"a3.txt" )
 echo "" > $fhome"newalerts.txt"
 redka;
-fi
 comm_vessels;
+fi
 
 fi
 fi
@@ -242,6 +242,8 @@ for (( i=1;i<=$str_col;i++)); do
 	rm -f $f_send
 	test=$(sed -n $i"p" $fhome"alerts_old.txt" | awk '{print $2}' | tr -d '\r')
 	num=$(grep -n "$test" $fhome"newalerts.txt" | awk -F":" '{print $1}')
+	[ "$lev_log" == "1" ] && logger "comm_vessels test="$test
+	[ "$lev_log" == "1" ] && logger "comm_vessels num="$num
 	if [ -z "$num" ]; then
 		[ "$lev_log" == "1" ] && logger "comm_vessels check "$test" in newalerts.txt not found"
 		
