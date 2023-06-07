@@ -115,6 +115,9 @@ bic="0"
 styc="0"
 code2=""
 
+state=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].state' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
+if [ "$state" == "firing" ]; then
+
 alertname=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.alertname' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 groupp1=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${label1}'' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 inst=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.instance' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
@@ -198,6 +201,9 @@ else
 logger "finger "$finger" is already in alerts"
 fi
 fi
+
+fi	#state=firing
+
 
 done
 
