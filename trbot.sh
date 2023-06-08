@@ -43,7 +43,17 @@ sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
 promapi=$(sed -n 21"p" $ftb"settings.conf" | tr -d '\r')
 label1=$(sed -n 22"p" $ftb"settings.conf" | tr -d '\r')
 groupp=$(sed -n 23"p" $ftb"settings.conf" | tr -d '\r')
+
+com_help=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+com_job=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+com_status=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r')
+com_del=$(sed -n 31"p" $ftb"settings.conf" | tr -d '\r')
+com_cd=$(sed -n 32"p" $ftb"settings.conf" | tr -d '\r')
+com_on=$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')
+com_off=$(sed -n 34"p" $ftb"settings.conf" | tr -d '\r')
+com_testmail=$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')
 kkik=0
+tohelpness;
 }
 
 
@@ -60,9 +70,45 @@ fi
 }
 
 
+function tohelpness()
+{
+#help.txt
+echo "/"$com_job" - Unresolved problems" > $fhome"help.txt"
+echo "/"$com_status" - Server status" >> $fhome"help.txt"
+echo "/"$com_del" - Delete event notification (/"$com_job" 12345678)" >> $fhome"help.txt"
+echo "After deletion, the notification about the specified event will not come in the future" >> $fhome"help.txt"
+echo "/"$com_cd" - Clearing the list of deleted notifications" >> $fhome"help.txt"
+echo "/"$com_on" /"$com_off" - Alerting mode (quiet mode)" >> $fhome"help.txt"
+#help1.txt
+cp -f $fhome"help.txt" $fhome"help1.txt"
+echo "Conventions:" >> $fhome"help1.txt"
+echo "<b>&#10060;</b> Problem" >> $fhome"help1.txt"
+echo "<b>&#9989</b> Resolved problem" >> $fhome"help1.txt"
+#help2.txt
+cp -f $fhome"help.txt" $fhome"help2.txt"
+echo "Severity:" >> $fhome"help2.txt"
+echo "<b>&#9898;</b> info" >> $fhome"help2.txt"
+echo "<b>&#x1F7E1;</b> warning" >> $fhome"help2.txt"
+echo "<b>&#x1F7E0;</b> average" >> $fhome"help2.txt"
+echo "<b>&#128308;</b> high" >> $fhome"help2.txt"
+echo "<b>&#128996;</b> disaster" >> $fhome"help2.txt"
+#help3.txt
+cp -f $fhome"help.txt" $fhome"help3.txt"
+echo "Conventions:" >> $fhome"help3.txt"
+echo "<b>&#10060;</b> Problem" >> $fhome"help3.txt"
+echo "<b>&#9989</b> Resolved problem" >> $fhome"help3.txt"
+echo "Severity:" >> $fhome"help3.txt"
+echo "<b>&#9898;</b> info" >> $fhome"help3.txt"
+echo "<b>&#x1F7E1;</b> warning" >> $fhome"help3.txt"
+echo "<b>&#x1F7E0;</b> average" >> $fhome"help3.txt"
+echo "<b>&#128308;</b> high" >> $fhome"help3.txt"
+echo "<b>&#128996;</b> disaster" >> $fhome"help3.txt"
+
+}
 
 
-regstat()	
+
+regstat()
 {
 str_col=$(grep -cv "^T" $ftb"settings.conf")
 [ "$lev_log" == "1" ] && logger "str_col="$str_col
@@ -96,7 +142,7 @@ date1=`date '+ %d.%m.%Y %H:%M:%S'`
 [ "$lev_log" == "1" ] && logger "text="$text
 otv=""
 
-if [ "$text" = "/start" ] || [ "$text" = "/?" ] || [ "$text" = "/help" ] || [ "$text" = "/h" ]; then
+if [ "$text" = "/$com_help" ] ; then
 	[ "$bicons" == "0" ] && [ "$sty" != "1" ] && otv=$fhome"help.txt"
 	[ "$bicons" == "0" ] && [ "$sty" == "1" ] && otv=$fhome"help2.txt"
 	[ "$bicons" == "1" ] && [ "$sty" != "1" ] && otv=$fhome"help1.txt"
@@ -104,13 +150,13 @@ if [ "$text" = "/start" ] || [ "$text" = "/?" ] || [ "$text" = "/help" ] || [ "$
 	send;
 fi
 
-if [ "$text" = "/j" ] || [ "$text" = "/job" ]; then
+if [ "$text" = "/$com_job" ]; then
 	$ftb"job.sh"
 	otv=$fhome"job.txt"
 	send;
 fi
 
-if [ "$text" = "/ss" ] || [ "$text" = "/status" ]; then
+if [ "$text" = "/$com_status" ]; then
 	regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
 	[ "$regim" -eq "1" ] && echo "Alerting mode ON" > $fhome"ss.txt"
 	[ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $fhome"ss.txt"
@@ -144,24 +190,24 @@ if [ "$text" = "/ss" ] || [ "$text" = "/status" ]; then
 	send;
 fi
 
-if [[ "$text" == */d* ]]; then
-	$ftb"del.sh" $text
+if [[ "$text" == "/$com_del"* ]]; then
+	$ftb"del.sh" $text	
 	otv=$fhome"del.txt"
 	send;
 fi
 
-if [[ "$text" == */cd ]]; then
-	rm -f $ftb"delete.txt"
+if [[ "$text" == "/$com_cd" ]]; then
+	echo > $ftb"delete.txt"
 	otv=$fhome"cd.txt"
 	send;
 fi
 
-if [ "$text" = "/on" ]; then
+if [ "$text" = "/$com_on" ]; then
 	regim=1;
 	regstat;
 fi
 
-if [ "$text" = "/off" ]; then
+if [ "$text" = "/$com_off" ]; then
 	regim=0;
 	regstat;
 fi
