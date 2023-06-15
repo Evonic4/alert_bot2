@@ -75,7 +75,7 @@ function tohelpness()
 #help.txt
 echo "/"$com_job" - Unresolved problems" > $fhome"help.txt"
 echo "/"$com_status" - Server status" >> $fhome"help.txt"
-echo "/"$com_del" - Delete event notification (/"$com_job" 12345678)" >> $fhome"help.txt"
+echo "/"$com_del" - Delete event notification (/"$com_del" 12345678)" >> $fhome"help.txt"
 echo "After deletion, the notification about the specified event will not come in the future" >> $fhome"help.txt"
 echo "/"$com_cd" - Clearing the list of deleted notifications" >> $fhome"help.txt"
 echo "/"$com_on" /"$com_off" - Alerting mode (quiet mode)" >> $fhome"help.txt"
