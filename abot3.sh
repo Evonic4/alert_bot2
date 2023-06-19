@@ -39,6 +39,10 @@ label1=$(sed -n 22"p" $ftb"settings.conf" | tr -d '\r')
 groupp=$(sed -n 23"p" $ftb"settings.conf" | tr -d '\r')
 
 sm=$(sed -n 24"p" $ftb"settings.conf" | tr -d '\r')
+pappi=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
+pappi1=0	#1-уже сработал, 0-не сработал
+pappiOK=0	#сообщение о восстановлении pappi
+
 mdt_start=$(sed -n 26"p" $ftb"settings.conf" | sed 's/\://g' | tr -d '\r')
 mdt_end=$(sed -n 27"p" $ftb"settings.conf" | sed 's/\://g' | tr -d '\r')
 
@@ -443,8 +447,48 @@ autohcheck_rez=$(curl -I -k -m 13 "$promapi" 2>&1 | grep -cE 'Failed')
 
 if [ "$autohcheck_rez" -eq "1" ]; then
 	logger "autohcheck prom api Failed"
+  if [ "$pappi" -gt "0" ]; then
+	logger "pappi>0"
+	if [ "$pappi1" -eq "0" ]; then
+		dtna=`date -d "$RTIME 5 min" '+ %Y%m%d%H%M%S'`
+		echo $dtna > $fhome"napip.txt"
+		pappi1=1
+		logger "pappi1=1"
+	else
+		logger "pappi1>0"
+		dtna1=$(echo $(date '+ %Y%m%d%H%M%S') | sed 's/z/-/g' | tr -d '\r')
+		#echo $(date '+ %Y%m%d%H%M%S') > $fhome"napip1.txt"
+		#dtna1=$(sed -n 1"p" $fhome"napip1.txt" | sed 's/z/-/g' | tr -d '\r')
+		dtna=$(sed -n 1"p" $fhome"napip.txt" | sed 's/z/-/g' | tr -d '\r')
+		logger "dtna="$dtna
+		logger "dtna1="$dtna1
+	
+		if [ "$dtna1" -gt "$dtna" ]; then
+			logger "dtna1="$dtna1" > dtna="$dtna
+			echo "Prom API down "$pappi" min" > $fhome"pappi.txt"
+			pappi1=0
+			logger "pappi1=0"
+			echo > $fhome"alerts.txt"
+			echo > $fhome"alerts2.txt"
+			otv=$fhome"pappi.txt"
+			bic="1"
+			send;
+			pappiOK=1
+		else 
+			logger ">"
+		fi
+	fi
+  fi
 else
 	logger "autohcheck prom api OK"
+	pappi1=0
+	if [ "$pappiOK" -eq "1" ]; then
+		echo "Prom API up" > $fhome"pappi.txt"
+		otv=$fhome"pappi.txt"
+		bic="2"
+		send;
+		pappiOK=0
+	fi
 fi
 
 }
