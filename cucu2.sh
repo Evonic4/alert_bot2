@@ -18,17 +18,18 @@ echo $text
 
 if ! [ -z "$text" ]; then
 if [ -z "$proxy" ]; then
-[ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text 2>&1 > $ftb"out0.txt"
-[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -m 13 -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text  2>&1 > $ftb"out0.txt"
+[ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -m $ssec -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text 1>$ftb"out02.txt" 2>$ftb"out02_err.txt"
+[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -m $ssec -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text 1>$ftb"out02.txt" 2>$ftb"out02_err.txt"
 
 else
-[ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -m 13 --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text 2>&1 > $ftb"out0.txt"
-[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -m 13 --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text 2>&1 > $ftb"out0.txt"
+[ "$Z1" == "0" ] && [ "$Z2" == "0" ] && curl -k -m $ssec --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text="$text 1>$ftb"out02.txt" 2>$ftb"out02_err.txt"
+[ "$Z1" != "0" ] || [ "$Z2" != "0" ] && curl -k -m $ssec --proxy $proxy -L -X POST https://api.telegram.org/bot$token/sendMessage -d chat_id="$chat_id" -d 'parse_mode=HTML' --data-urlencode "text=<b>$code1</b>"$text 1>$ftb"out02.txt" 2>$ftb"out02_err.txt"
 
 fi
 
-cat $ftb"out0.txt"
-mv $ftb"out0.txt" $ftb"out.txt"
+#cat $ftb"out0.txt"
+mv $ftb"out02.txt" $ftb"out2.txt"
+mv $ftb"out02_err.txt" $ftb"out2_err.txt"
 fi
 
 
@@ -45,6 +46,7 @@ f_text=$(sed -n "2p" $ftb"send.txt" | tr -d '\r')
 proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
 bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
 sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
+ssec=$(sed -n 12"p" $ftb"settings.conf" | tr -d '\r')
 
 [ "$bicons" == "1" ] && Z1=$1
 [ "$sty" == "1" ] && Z2=$2

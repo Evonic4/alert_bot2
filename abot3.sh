@@ -2,16 +2,19 @@
 
 #переменные
 fhome=/usr/share/abot2/
-fcache1=$fhome"cache/1/"
-fcache2=$fhome"cache/2/"
-fPIDcu2=$fhome"cu2_pid.txt"
+fhsender=/usr/share/abot2/sender/
+fhsender1=$fhsender"1/"
+fhsender2=$fhsender"2/"
+#fcache1=$fhome"cache/1/"
+#fcache2=$fhome"cache/2/"
+#fPIDcu2=$fhome"cu2_pid.txt"
 f_send=$fhome"send_abot3.txt"
 log="/var/log/trbot/trbot.log"
 lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
 ftb=$fhome
 cuf=$fhome
 fPID=$fhome"abot3_pid.txt"
-
+sender_id=$fhome"sender_id.txt"
 
 
 function Init() 
@@ -29,8 +32,8 @@ ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
 tst=$(sed -n 16"p" $fhome"settings.conf" | tr -d '\r')
-portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
-ipapi=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
+#portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
+#ipapi=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
 bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
 sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
 
@@ -42,13 +45,17 @@ sm=$(sed -n 24"p" $ftb"settings.conf" | tr -d '\r')
 pappi=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
 pappi1=0	#1-уже сработал, 0-не сработал
 pappiOK=0	#сообщение о восстановлении pappi
+special_mute=0
 
 mdt_start=$(sed -n 26"p" $ftb"settings.conf" | sed 's/\://g' | tr -d '\r')
 mdt_end=$(sed -n 27"p" $ftb"settings.conf" | sed 's/\://g' | tr -d '\r')
 
 kkik=0
+kkik1=0
 bic="0"
 styc="0"
+
+snu=0	#номер файла sender_queue
 }
 
 
@@ -68,14 +75,14 @@ fi
 function alert_bot()
 {
 
-[ "$lev_log" == "1" ] && logger "prom api checks"
+#[ "$lev_log" == "1" ] && logger "prom api checks"
 
 autohcheck;
 if [ "$autohcheck_rez" -eq "0" ]; then
 	if [ -z "$proxy" ]; then
-		curl -k -s -m 13 "$promapi" | jq '.' > $fhome"a3.txt"
+		curl -k -s -m 4 "$promapi" | jq '.' > $fhome"a3.txt"
 	else
-		curl -k -s -m 13 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
+		curl -k -s -m 4 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
 	fi
 [ "$lev_log" == "1" ] && cat $fhome"a3.txt"
 if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
@@ -94,7 +101,7 @@ fi
 fi
 
 
-[ "$lev_log" == "1" ] && logger "prom api checks ok"
+#[ "$lev_log" == "1" ] && logger "prom api checks end"
 
 }
 
@@ -104,11 +111,14 @@ function gen_id_alert()
 oldid=$(sed -n 1"p" $fhome"id.txt" | tr -d '\r')
 newid=$((oldid+1))
 echo $newid > $fhome"id.txt"
+newid1=$newid
+#! [ "$urler" == "no" ] && newid1='<b><a href="'$urler'" target="_blank">'$newid'</a></b>'
 
 }
 
 function redka()
 {
+special_mute=1
 [ "$lev_log" == "1" ] && logger "start redka"
 logger "redka num_alerts="$num_alerts
 
@@ -127,6 +137,8 @@ groupp1=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${label1}'' | se
 inst=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.instance' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 jober=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.job' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 severity=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
+#urler=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
+#urlerpref=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.urlpref' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 desc=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 unic=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum'`
 
@@ -173,28 +185,30 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		[ "$lev_log" == "1" ] && logger "-1"
 		gen_id_alert;
 		[ "$bicons" == "1" ] && bic="1"
-		echo $newid" "$finger >> $fhome"alerts.txt"
-		logger "redka newid="$newid
+		echo $newid1" "$finger >> $fhome"alerts.txt"
+		logger "redka newid1="$newid1
 		
-		[ "$sty" == "0" ] && echo $newid" "$desc$desc4 >> $fhome"alerts2.txt"
-		[ "$sty" == "1" ] && echo $code2$newid" "$desc$desc4 >> $fhome"alerts2.txt"
-		[ "$sty" == "2" ] && echo $newid" "$desc$severity1$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "0" ] && echo $newid1" "$desc$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc4 >> $fhome"alerts2.txt"
 		
-		[ "$bicons" == "0" ] && [ "$sty" == "0" ] && echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
-		[ "$bicons" == "0" ] && [ "$sty" == "1" ] && echo "[ALERT] "$newid" "$desc$desc3 >> $f_send
-		[ "$bicons" == "0" ] && [ "$sty" == "2" ] && echo "[ALERT] "$newid" "$desc$severity1$desc3 >> $f_send
-		[ "$bicons" == "1" ] && [ "$sty" == "0" ] && echo $newid" "$desc$desc3 >> $f_send
-		[ "$bicons" == "1" ] && [ "$sty" == "1" ] && echo $code2$newid" "$desc$desc3 >> $f_send
-		[ "$bicons" == "1" ] && [ "$sty" == "2" ] && echo $newid" "$desc$severity1$desc3 >> $f_send
+		[ "$bicons" == "0" ] && [ "$sty" == "0" ] && echo "[ALERT] "$newid1" "$desc$desc3 >> $f_send
+		[ "$bicons" == "0" ] && [ "$sty" == "1" ] && echo "[ALERT] "$newid1" "$desc$desc3 >> $f_send
+		[ "$bicons" == "0" ] && [ "$sty" == "2" ] && echo "[ALERT] "$newid1" "$desc$severity1$desc3 >> $f_send
+		[ "$bicons" == "1" ] && [ "$sty" == "0" ] && echo $newid1" "$desc$desc3 >> $f_send
+		[ "$bicons" == "1" ] && [ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc3 >> $f_send
+		[ "$bicons" == "1" ] && [ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc3 >> $f_send
 		
-		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid$severity2 > $fhome"mail.txt" && echo "[ALERT] "$newid" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid1$severity2 > $fhome"mail.txt" && echo "[ALERT] "$newid1" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		
 		#silent_mode
 		silent_mode;
 		if [ "$silent_mode" == "on" ]; then
-		[ "$severity" == "high" ] && to_send;
-		[ "$severity" == "disaster" ] && to_send;
+		[ "$severity" == "high" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;		#s_url=$urler
+		[ "$severity" == "disaster" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;	#s_url=$urler
 		else
+		s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r')
+		#s_url=$urler
 		to_send;
 		fi
 		
@@ -245,6 +259,7 @@ smt0=""; smt0=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "severity: average" )
 
 comm_vessels()
 {
+special_mute=2
 [ "$lev_log" == "1" ] && logger "comm_vessels checks"
 cp -f $fhome"alerts.txt" $fhome"alerts_old.txt"
 str_col=$(grep -cv "^---" $fhome"alerts_old.txt")
@@ -288,10 +303,12 @@ for (( i=1;i<=$str_col;i++)); do
 		silent_mode;
 		if [ "$silent_mode" == "on" ]; then
 		logger "comm_vessels resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
-		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && to_send;
+		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && s_mute=$(sed -n 31"p" $ftb"settings.conf" | tr -d '\r') && to_send;
 		else
 			[ "$lev_log" == "1" ] && logger "comm_vessels to_send"
-			to_send;
+			s_mute=$(sed -n 31"p" $ftb"settings.conf" | tr -d '\r')
+			! [ -z "$testid" ] && to_send
+			#to_send;
 		fi
 		
 		#resolved---
@@ -336,73 +353,65 @@ logger "silent_mode="$silent_mode
 
 
 
-function to_send() 
+function to_send()
 {
 [ "$lev_log" == "1" ] && logger "start to_send"
 
-regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
+regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
 
 if [ -f $f_send ]; then
 	if [ "$regim" == "1" ]; then
 		logger "Regim ON"
-		if ! [ -z "$chat_id1" ]; then
-			otv=$f_send
-			send
-			rm -f $f_send
-			else
-			logger "No chat_id1"
-		fi
+		otv=$f_send
+		send
+		rm -f $f_send
 	fi
 fi
 
 }
 
+sender_queue ()
+{
+logger "sender_queue"
+snu=$(sed -n 1"p" $sender_id | tr -d '\r')
+snu=$((snu+1))
+echo $snu > $sender_id
+}
 
 send1 () 
 {
 
-[ "$lev_log" == "1" ] && logger "send1 start"
+logger "send1 start-------------------------------------------------------"
+#special_mute=1 alerts; =2 resolv 
 
-echo $chat_id > $cuf"send3.txt"
-echo $otv >> $cuf"send3.txt"
-
-rm -f $cuf"out.txt"
-file=$cuf"out.txt"; 
-$ftb"cucu3.sh" $bic $styc &
-pauseloop;
-
-if [ -f $cuf"out.txt" ]; then
-	if [ "$(cat $cuf"out.txt" | grep ":true,")" ]; then	
-		logger "send OK"
-	else
-		logger "send file+, timeout.."
-		cat $cuf"out.txt" >> $log
-		sleep 2
-	fi
-else	
-	logger "send FAIL"
-	if [ -f $cuf"cu2_pid.txt" ]; then
-		logger "send kill cucu3"
-		cu_pid=$(sed -n 1"p" $cuf"cu2_pid.txt" | tr -d '\r')
-		killall cucu3.sh
-		kill -9 $cu_pid
-		rm -f $cuf"cu2_pid.txt"
-	fi
+#mute mask alerts
+if [ "$special_mute" -eq "1" ] && [ "$(sed -n 32"p" $ftb"settings.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')" ]; then
+	[ "$(cat $otv | grep -cE "$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute alerts-------------------------------------------------------"
+fi
+#mute mask resolv
+if [ "$special_mute" -eq "2" ] && [ "$(sed -n 34"p" $ftb"settings.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')" ]; then
+	[ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute resolv-------------------------------------------------------"
 fi
 
-[ "$lev_log" == "1" ] && logger "send1 exit"
+sender_queue
+echo $fhsender2$snu".txt" > $fhome"sender3.txt"
+echo $bic >> $fhome"sender3.txt"							#спец картинок в уведомлениях 0-2
+echo $styc >> $fhome"sender3.txt"							#показ спец картинок severity 0-6
+echo $s_url >> $fhome"sender3.txt"							#урл
+echo $s_mute >> $fhome"sender3.txt"							#mute
+#echo $s_urlpref >> $fhome"sender3.txt"						#урл-pref
 
+mv -f $otv $fhsender2$snu".txt"
+mv -f $fhome"sender3.txt" $fhsender1$snu".txt"
+
+logger "send1 end-------------------------------------------------------"
 }
 
 
 
 send ()
 {
-[ "$lev_log" == "1" ] && logger "send start"
-rm -f $cuf"send3.txt"
-
-chat_id=$(sed -n 2"p" $ftb"settings.conf" | sed 's/z/-/g' | tr -d '\r')
-[ "$lev_log" == "1" ] && logger "chat_id="$chat_id
+logger "send start"
 
 dl=$(wc -m $otv | awk '{ print $1 }')
 echo "dl="$dl
@@ -410,11 +419,11 @@ if [ "$dl" -gt "4000" ]; then
 	sv=$(echo "$dl/4000" | bc)
 	echo "sv="$sv
 	$ftb"rex.sh" $otv
-	
+	logger "obrezka"
 	for (( i=1;i<=$sv;i++)); do
-		otv=$fhome"rez"$i".txt"
+		otv=$fhome"rez3"$i".txt"
 		send1;
-		rm -f $fhome"rez"$i".txt"
+		rm -f $fhome"rez3"$i".txt"
 	done
 	
 else
@@ -443,14 +452,17 @@ done
 
 autohcheck ()
 {
-autohcheck_rez=$(curl -I -k -m 13 "$promapi" 2>&1 | grep -cE 'Failed')
+autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed')
 
 if [ "$autohcheck_rez" -eq "1" ]; then
-	logger "autohcheck prom api Failed"
+  logger "autohcheck prom api Failed"
+  pappi=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
+  [ "$pappi" -eq "0" ] && pappi1=0
+  
   if [ "$pappi" -gt "0" ]; then
 	logger "pappi>0"
 	if [ "$pappi1" -eq "0" ]; then
-		dtna=`date -d "$RTIME 5 min" '+ %Y%m%d%H%M%S'`
+		dtna=`date -d "$RTIME $pappi min" '+ %Y%m%d%H%M%S'`
 		echo $dtna > $fhome"napip.txt"
 		pappi1=1
 		logger "pappi1=1"
@@ -471,7 +483,10 @@ if [ "$autohcheck_rez" -eq "1" ]; then
 			echo > $fhome"alerts.txt"
 			echo > $fhome"alerts2.txt"
 			otv=$fhome"pappi.txt"
-			bic="1"
+			[ "$bicons" == "1" ] && bic="1"
+			s_mute=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+			#sys
+			[ "$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 			send;
 			pappiOK=1
 		else 
@@ -485,7 +500,10 @@ else
 	if [ "$pappiOK" -eq "1" ]; then
 		echo "Prom API up" > $fhome"pappi.txt"
 		otv=$fhome"pappi.txt"
-		bic="2"
+		[ "$bicons" == "1" ] && bic="2"
+		s_mute=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+		#sys
+		[ "$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 		send;
 		pappiOK=0
 	fi
@@ -496,7 +514,7 @@ fi
 
 PID=$$
 echo $PID > $fPID
-logger "start"
+logger "start abot3"
 Init;
 
 while true
@@ -505,10 +523,11 @@ sleep $ssec
 alert_bot;
 #to_send;
 kkik=$(($kkik+1))
-if [ "$kkik" -ge "$progons" ]; then
-	autohcheck 
-	Init
-fi
+[ "$kkik" -ge "$progons" ] && Init
+
+#kkik1=$((kkik%5))
+#[ "$kkik1" -eq "0" ] && autohcheck
+
 done
 
 

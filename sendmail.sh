@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 fhome=/usr/share/abot2/
 
 p1=$fhome"list_mail.txt"
@@ -26,4 +25,3 @@ echo $MBODY | mutt -s "$MSUBJ" -a $ATTACH -- $MADDR
 fi
 
 done
-

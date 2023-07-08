@@ -1,4 +1,4 @@
-/j /job - Unresolved issues
+/j /job - Unresolved problems
 /ss - Server status
 /d /del - Delete event notification (/d id)
 After deletion, the notification about the specified event will not come in the future
