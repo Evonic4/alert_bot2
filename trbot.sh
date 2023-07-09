@@ -84,8 +84,8 @@ local date1=`date '+ %Y-%m-%d %H:%M:%S'`
 
 if [ "$zap" == "1" ]; then
 	echo $date1" trbot_"$bui": "$1
-else
-	echo $date1" trbot_"$bui": "$1 >> $log
+#else
+#	echo $date1" trbot_"$bui": "$1 >> $log
 fi
 }
 
@@ -175,10 +175,13 @@ tmprbs5=$(cat $fhome"delete.txt" | wc -c)
 
 echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.txt"
 
+#Alerting mode
 regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
 [ "$regim" -eq "1" ] && echo "Alerting mode ON" >> $fhome"ss.txt"
 [ "$regim" -eq "0" ] && echo "Alerting mode OFF" >> $fhome"ss.txt"
 
+#Prom API
+autohcheck_rez=$(sed -n "1p" $fhome"prom_api_status.txt" | tr -d '\r')
 if [ "$autohcheck_rez" -eq "0" ]; then
 	echo "Prom API UP" >> $fhome"ss.txt"
 else
@@ -789,21 +792,21 @@ fi
 
 }
 
-pauseloop ()  		
-{
-sec1=0
-rm -f $file
-again0="yes"
-while [ "$again0" = "yes" ]
-do
-sec1=$((sec1+1))
-sleep 1
-if [ -f $file ] || [ "$sec1" -eq "$sec" ]; then
-	again0="go"
-	[ "$lev_log" == "1" ] && logger "pauseloop sec1="$sec1
-fi
-done
-}
+#pauseloop ()  		
+#{
+#sec1=0
+#rm -f $file
+#again0="yes"
+#while [ "$again0" = "yes" ]
+#do
+#sec1=$((sec1+1))
+#sleep 1
+#if [ -f $file ] || [ "$sec1" -eq "$sec" ]; then
+#	again0="go"
+#	[ "$lev_log" == "1" ] && logger "pauseloop sec1="$sec1
+#fi
+#done
+#}
 
 input ()  		
 {
@@ -901,17 +904,15 @@ echo $mi > $ftb"lastid.txt"
 
 }
 
-autohcheck ()
-{
-autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed')
-
-if [ "$autohcheck_rez" -eq "1" ]; then
-	logger "autohcheck prom api Failed"
-else
-	logger "autohcheck prom api OK"
-fi
-
-}
+#autohcheck ()
+#{
+#autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed')
+#if [ "$autohcheck_rez" -eq "1" ]; then
+#	logger "autohcheck prom api Failed"
+#else
+#	logger "autohcheck prom api OK"
+#fi
+#}
 
 
 #health_check-------------

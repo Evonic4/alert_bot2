@@ -33,19 +33,24 @@ chat_id=$(sed -n "2p" $fhome"settings.conf" | sed 's/z/-/g' | tr -d '\r')
 
 kkik=0
 
-integrity;
+#integrity;		#только под рутом(
 }
 
 
 
 integrity ()
 {
-logger "integrity"
+logger "integrity<<<<<<<<<<<<<<<<<<<"
 
 local ab3p=""
 local trbp=""
-ab3p=$(ps af | grep $(sed -n 1"p" ./abot3_pid.txt | tr -d '\r') | grep abot3.sh | awk '{ print $1 }')
-trbp=$(ps af | grep $(sed -n 1"p" ./trbot_pid.txt | tr -d '\r') | grep trbot.sh | awk '{ print $1 }')
+ab3p=$(ps af | grep $(sed -n 1"p" $fhome"abot3_pid.txt" | tr -d '\r') | grep abot3.sh | awk '{ print $1 }')
+trbp=$(ps af | grep $(sed -n 1"p" $fhome"trbot_pid.txt" | tr -d '\r') | grep trbot.sh | awk '{ print $1 }')
+#ab3p=$(ps axu| awk '{ print $1 }' | grep $(sed -n 1"p" $fhome"abot3_pid.txt")
+#trbp=$(ps axu| awk '{ print $1 }' | grep $(sed -n 1"p" $fhome"trbot_pid.txt")
+
+logger "ab3p="$ab3p
+logger "trbp="$trbp
 
 [ -z "$ab3p" ] && logger "starter abot3.sh" && $fhome"abot3.sh" &
 [ -z "$trbp" ] && logger "starter trbot.sh" && $fhome"trbot.sh" &
@@ -59,8 +64,8 @@ local date1=`date '+ %Y-%m-%d %H:%M:%S'`
 
 if [ "$zap" == "1" ]; then
 	echo $date1" sender_"$bui": "$1
-else
-	echo $date1" sender_"$bui": "$1 >> $log
+#else
+#	echo $date1" sender_"$bui": "$1 >> $log
 fi
 }
 
@@ -173,6 +178,7 @@ PID=$$
 echo $PID > $fPID
 Init2;
 logger "sender start"
+integrity	#первый старт
 
 while true
 do
