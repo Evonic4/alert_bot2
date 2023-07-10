@@ -137,11 +137,11 @@ groupp1=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${label1}'' | se
 inst=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.instance' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 jober=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.job' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 severity=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-#urler=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-#urlerpref=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.urlpref' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
+urler=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 desc=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
 unic=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum'`
 
+[ "$urler" == "null" ] && urler=""
 
 [ "$lev_log" == "1" ] && logger "redka i1="$i1
 [ "$lev_log" == "1" ] && logger "redka alertname="$alertname
@@ -151,17 +151,18 @@ unic=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum'`
 [ "$lev_log" == "1" ] && logger "redka jober="$jober
 [ "$lev_log" == "1" ] && logger "redka desc="$desc
 [ "$lev_log" == "1" ] && logger "redka unic="$unic
+[ "$lev_log" == "1" ] && logger "redka urler="$urler
 
 if [ "$severity" != "keepalive" -a "$groupp" == "$groupp1" ]; then
 
 finger=$(echo -n $alertname$inst$jober$severity$unic | md5sum | awk '{print $1}')
 echo $finger >> $fhome"newalerts.txt"
 
-[ "$severity" == "info" ] && styc="1" && code2="<b>&#9898;</b>"
-[ "$severity" == "warning" ] && styc="2" && code2="<b>&#x1F7E1;</b>"
-[ "$severity" == "average" ] && styc="3" && code2="<b>&#x1F7E0;</b>"
-[ "$severity" == "high" ] && styc="4" && code2="<b>&#128308;</b>"
-[ "$severity" == "disaster" ] && styc="5" && code2="<b>&#128996;</b>"
+[ "$severity" == "info" ] && styc="1" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#9898;</a></b>")
+[ "$severity" == "warning" ] && styc="2" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#x1F7E1;</a></b>")
+[ "$severity" == "average" ] && styc="3" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#x1F7E0;</a></b>")
+[ "$severity" == "high" ] && styc="4" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#128308;</a></b>")
+[ "$severity" == "disaster" ] && styc="5" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#128996;</a></b>")
 
 severity1=""
 severity2=", severity: "$severity
@@ -203,12 +204,12 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		
 		#silent_mode
 		silent_mode;
+		s_url=$urler
 		if [ "$silent_mode" == "on" ]; then
-		[ "$severity" == "high" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;		#s_url=$urler
-		[ "$severity" == "disaster" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;	#s_url=$urler
+		[ "$severity" == "high" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;
+		[ "$severity" == "disaster" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;
 		else
 		s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r')
-		#s_url=$urler
 		to_send;
 		fi
 		
@@ -338,6 +339,7 @@ silent_mode ()
 {
 silent_mode="off"
 [ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
+sm=$(sed -n 24"p" $ftb"settings.conf" | tr -d '\r')
 if [ "$sm" == "1" ]; then
 		mdt1=$(date '+%H:%M:%S' | sed 's/\://g' | tr -d '\r')
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
@@ -399,7 +401,6 @@ echo $bic >> $fhome"sender3.txt"							#спец картинок в уведо�
 echo $styc >> $fhome"sender3.txt"							#показ спец картинок severity 0-6
 echo $s_url >> $fhome"sender3.txt"							#урл
 echo $s_mute >> $fhome"sender3.txt"							#mute
-#echo $s_urlpref >> $fhome"sender3.txt"						#урл-pref
 
 mv -f $otv $fhsender2$snu".txt"
 mv -f $fhome"sender3.txt" $fhsender1$snu".txt"

@@ -52,8 +52,9 @@ trbp=$(ps af | grep $(sed -n 1"p" $fhome"trbot_pid.txt" | tr -d '\r') | grep trb
 logger "ab3p="$ab3p
 logger "trbp="$trbp
 
-[ -z "$ab3p" ] && logger "starter abot3.sh" && $fhome"abot3.sh" &
 [ -z "$trbp" ] && logger "starter trbot.sh" && $fhome"trbot.sh" &
+[ -z "$ab3p" ] && logger "starter abot3.sh" && $fhome"abot3.sh" &
+
 }
 
 
@@ -109,7 +110,7 @@ if ! [ -z "$test" ] && ! [ -z "$mess_path" ]; then
 	logger "sender mess_path="$mess_path
 	logger "sender bic1="$bic1
 	logger "sender styc1="$styc1
-	logger "sender url1="$url1
+	logger "sender url1="$url1"<"
 	logger "sender muter="$muter
 	
 	

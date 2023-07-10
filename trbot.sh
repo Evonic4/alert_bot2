@@ -1,5 +1,5 @@
 #!/bin/bash
-ver="v0.61"
+ver="v0.62"
 
 
 fhome=/usr/share/abot2/
@@ -189,6 +189,7 @@ else
 fi
 
 #health check
+mute_health_on=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
 [ "$mute_health_on" == "1" ] && tmprbs6="ON"
 [ "$mute_health_on" == "0" ] && tmprbs6="OFF"
 	
