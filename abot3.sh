@@ -419,12 +419,12 @@ echo "dl="$dl
 if [ "$dl" -gt "4000" ]; then
 	sv=$(echo "$dl/4000" | bc)
 	echo "sv="$sv
-	$ftb"rex.sh" $otv
-	logger "obrezka"
+	$ftb"rex3.sh" $otv
+	logger "obrezka3"
 	for (( i=1;i<=$sv;i++)); do
-		otv=$fhome"rez"$i".txt"
+		otv=$fhome"rez3"$i".txt"
 		send1;
-		rm -f $fhome"rez"$i".txt"
+		rm -f $fhome"rez3"$i".txt"
 	done
 	
 else
