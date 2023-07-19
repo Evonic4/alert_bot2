@@ -1,6 +1,6 @@
 #!/bin/bash
 
-home_trbot=/usr/share/zabbix/local/trbot/
+home_trbot=/usr/share/abot2/
 fhome=$home_trbot
 
 f_text=$1
