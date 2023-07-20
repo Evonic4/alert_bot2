@@ -778,13 +778,16 @@ dl=$(wc -m $otv | awk '{ print $1 }')
 echo "dl="$dl
 if [ "$dl" -gt "4000" ]; then
 	sv=$(echo "$dl/4000" | bc)
+	sv=$((sv+1))
 	echo "sv="$sv
 	$ftb"rex.sh" $otv
 	logger "obrezka"
-	for (( i=1;i<=$sv;i++)); do
-		otv=$fhome"rez"$i".txt"
+	for (( i5=1;i5<=$sv;i5++)); do
+		otv=$fhome"rez"$i5".txt"
+		logger "obrezka "$fhome"rez"$i5".txt"
 		send1;
-		rm -f $fhome"rez"$i".txt"
+		logger "to obrezka "$fhome"rez"$i5".txt"
+		rm -f $fhome"rez"$i5".txt"
 	done
 	
 else
@@ -902,7 +905,7 @@ for (( i=1;i<=$mi_col;i++)); do
 done
 fi
 echo $mi > $ftb"lastid.txt"
-
+[ "$lev_log" == "1" ] && logger "parce end"
 }
 
 #autohcheck ()

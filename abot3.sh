@@ -418,6 +418,7 @@ dl=$(wc -m $otv | awk '{ print $1 }')
 echo "dl="$dl
 if [ "$dl" -gt "4000" ]; then
 	sv=$(echo "$dl/4000" | bc)
+	sv=$((sv+1))
 	echo "sv="$sv
 	$ftb"rex3.sh" $otv
 	logger "obrezka3"
