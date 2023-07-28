@@ -1,7 +1,7 @@
 # alert_bot2  
 telegram prometheus mail bot  
   
-------------релизы--------------  
+------------релизы---------------  
 0,62  
 fix в выдаче status hc mute  
 fixes  
