@@ -26,7 +26,6 @@ regim=$(sed -n 3"p" $fhome"settings.conf" | tr -d '\r')
 proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $fhome"settings.conf" | tr -d '\r')
 em=$(sed -n 8"p" $fhome"settings.conf" | tr -d '\r')
-zap=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
 bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
@@ -62,12 +61,7 @@ snu=0	#номер файла sender_queue
 function logger()
 {
 local date1=`date '+ %Y-%m-%d %H:%M:%S'`
-
-if [ "$zap" == "1" ]; then
-	echo $date1" abot3_"$bui": "$1
-#else
-#	echo $date1" abot3_"$bui": "$1 >> $log
-fi
+echo $date1" abot3_"$bui": "$1
 }
 
 

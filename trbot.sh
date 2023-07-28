@@ -30,12 +30,11 @@ chat_id1=$(sed -n 1"p" $ftb"chats.txt" | tr -d '\r')
 regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
 echo $regim > $ftb"amode.txt"
 sec4=$(sed -n 4"p" $ftb"settings.conf" | tr -d '\r')
-sec4=$((sec4/1000))
+#sec4=$((sec4/1000))
 sec=$(sed -n 6"p" $ftb"settings.conf" | tr -d '\r')
 opov=$(sed -n 7"p" $ftb"settings.conf" | tr -d '\r')
 email=$(sed -n 8"p" $ftb"settings.conf" | tr -d '\r')
 startid=$(sed -n 9"p" $ftb"settings.conf" | tr -d '\r')
-zap=$(sed -n 10"p" $ftb"settings.conf" | tr -d '\r')
 bui=$(sed -n 11"p" $ftb"settings.conf" | tr -d '\r')
 #last_id=0
 progons=$(sed -n 13"p" $ftb"settings.conf" | tr -d '\r')
@@ -81,12 +80,7 @@ tohelpness;
 function logger()
 {
 local date1=`date '+ %Y-%m-%d %H:%M:%S'`
-
-if [ "$zap" == "1" ]; then
-	echo $date1" trbot_"$bui": "$1
-#else
-#	echo $date1" trbot_"$bui": "$1 >> $log
-fi
+echo $date1" trbot_"$bui": "$1
 }
 
 

@@ -21,7 +21,8 @@ mkdir -p $fhsender1
 mkdir -p $fhsender2
 echo 0 > $sender_id
 
-zap=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
+ssec1=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
+logger "ssec1="$ssec1
 bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
 token=$(sed -n "1p" $fhome"settings.conf" | tr -d '\r')
 proxy=$(sed -n 5"p" $fhome"settings.conf" | tr -d '\r')
@@ -62,12 +63,8 @@ logger "trbp="$trbp
 function logger()
 {
 local date1=`date '+ %Y-%m-%d %H:%M:%S'`
+echo $date1" sender_"$bui": "$1
 
-if [ "$zap" == "1" ]; then
-	echo $date1" sender_"$bui": "$1
-#else
-#	echo $date1" sender_"$bui": "$1 >> $log
-fi
 }
 
 
@@ -129,7 +126,7 @@ if ! [ -z "$test" ] && ! [ -z "$mess_path" ]; then
 	fi
 fi
 
-sleep 0.3
+sleep $ssec1
 done
 
 sums=$((sendok+senderr))
