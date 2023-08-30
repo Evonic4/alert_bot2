@@ -26,22 +26,9 @@ echo "" > /var/log/trbot/trbot.log;
 
 RUN cd /usr/share/abot2/; \
 perl -pi -e "s/\r\n/\n/" /usr/share/abot2/*.sh; \
-chmod +rx /usr/share/abot2/*.sh; \
-useradd -d /usr/share/abot2 -G adm -p 12345 -s /bin/bash mastmetric; \
-chown -R root:mastmetric /usr/share/abot2/; \
-chown -R root:mastmetric /var/log/trbot/;
-
+chmod +rx /usr/share/abot2/*.sh;
 
 VOLUME ["/etc/Muttrc.d"]
-USER mastmetric
 VOLUME ["/usr/share/abot2"]
 WORKDIR /usr/share/abot2
 ENTRYPOINT ["bash", "sender.sh"]
-#CMD ["./trbot.sh"]
-
-#EXPOSE 9084
-#EXPOSE 9085
-#EXPOSE 9086
-#EXPOSE 9087
-#EXPOSE 9088
-#EXPOSE 9089
