@@ -163,6 +163,9 @@ fi
 
 unset IFS
 
+cat $fhome"out2.txt"
+cat $fhome"out2_err.txt"
+
 }
 
 
