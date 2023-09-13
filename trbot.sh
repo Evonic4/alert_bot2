@@ -24,8 +24,8 @@ function Init2()
 {
 [ "$lev_log" == "1" ] && logger "Start Init"
 chat_id1=$(sed -n 2"p" $ftb"settings.conf" | tr -d '\r')
-echo $chat_id1 | tr " " "\n" > $ftb"chats.txt"
-chat_id1=$(sed -n 1"p" $ftb"chats.txt" | tr -d '\r')
+#echo $chat_id1 | tr " " "\n" > $ftb"chats.txt"
+#chat_id1=$(sed -n 1"p" $ftb"chats.txt" | tr -d '\r')
 
 regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
 echo $regim > $ftb"amode.txt"
