@@ -20,8 +20,6 @@ sender_id=$fhome"sender_id.txt"
 function Init() 
 {
 [ "$lev_log" == "1" ] && logger "Init"
-chat_id1=$(sed -n 1"p" $fhome"chats.txt" | sed 's/z/-/g' | tr -d '\r')
-
 regim=$(sed -n 3"p" $fhome"settings.conf" | tr -d '\r')
 proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $fhome"settings.conf" | tr -d '\r')
