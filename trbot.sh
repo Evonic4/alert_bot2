@@ -864,7 +864,7 @@ upd_id=$(sed -n 1"p" $ftb"lastid.txt" | tr -d '\r')
 logger "parce upd_id ="$upd_id
 
 if [ "$mi_col" -gt "0" ]; then
-for (( i=0;i<=$mi_col;i++)); do
+for (( i=0;i<$mi_col;i++)); do
 	mi=$(cat $ftb"in.txt" | jq ".result[$i].update_id" | tr -d '\r')
 	[ "$lev_log" == "1" ] && logger "parce update_id=mi="$mi
 	
@@ -895,10 +895,10 @@ for (( i=0;i<=$mi_col;i++)); do
 		fi
 	fi
 	if [ "$ffufuf" -eq "1" ]; then
-		logger "parce lastid > mi"
+		logger "parce lastid >= mi"
 	fi
 done
-[ "$upd_id" -ge "$mi" ] && echo $mi > $ftb"lastid.txt" && logger "parce mi = lastid"
+[ "$ffufuf" -eq "0" ] && echo $mi > $ftb"lastid.txt" && logger "parce mi -> lastid.txt"
 fi
 
 [ "$lev_log" == "1" ] && logger "parce end"
