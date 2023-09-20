@@ -1,5 +1,5 @@
 #!/bin/bash
-ver="v0.631"
+ver="v0.64"
 
 
 fhome=/usr/share/abot2/
@@ -859,12 +859,14 @@ fi
 parce ()
 {
 [ "$lev_log" == "1" ] && logger "parce"
+mi=0
 date1=`date '+ %d.%m.%Y %H:%M:%S'`
 mi_col=$(cat $cuf"in.txt" | grep -c update_id | tr -d '\r')
 logger "parce col mi_col ="$mi_col
 upd_id=$(sed -n 1"p" $ftb"lastid.txt" | tr -d '\r')
+logger "parce upd_id ="$upd_id
 
-if [ "$mi_col" -gt "1" ]; then
+if [ "$mi_col" -gt "0" ]; then
 for (( i=1;i<=$mi_col;i++)); do
 	i1=$((i-1))
 	mi=$(cat $ftb"in.txt" | jq ".result[$i1].update_id" | tr -d '\r')
@@ -898,7 +900,7 @@ for (( i=1;i<=$mi_col;i++)); do
 	fi
 done
 fi
-echo $mi > $ftb"lastid.txt"
+[ "$mi" -gt "0" ] && echo $mi > $ftb"lastid.txt" && logger "parce mi > lastid"
 [ "$lev_log" == "1" ] && logger "parce end"
 }
 
@@ -971,20 +973,18 @@ PID=$$
 echo $PID > $fPID
 
 logger ""
-logger "start abot2"
+logger "start abot2 "$bui" lev_log="$lev_log
 Init2;
 
+#start number notify
 ! [ -f $ftb"id.txt" ] && echo $startid > $fhome"id.txt"
 
 logger "chat_id1="$chat_id1
 starten_furer;
 
+#start
 [ "$send_up_start" == "1" ] && s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r') && send_def && echo "Start "$bui > $fhome"start.txt" && otv=$fhome"start.txt" && send
 
-
-#$fhome"sender.sh" &
-#sleep 1
-#$fhome"abot3.sh" &
 
 #health_check start
 [ "$health_on" -eq "1" ] && health_check_start;
