@@ -15,7 +15,7 @@ mass_mesid_file=$fhome"mmid.txt"
 home_trbot=$fhome
 #f_send=$fhome"abot2.txt"
 mkdir -p /var/log/trbot/
-lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
+lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 starten=1
 sender_id=$fhome"sender_id.txt"
 #sender_list=$fhome"sender_list.txt"
@@ -23,44 +23,44 @@ sender_id=$fhome"sender_id.txt"
 function Init2() 
 {
 [ "$lev_log" == "1" ] && logger "Start Init"
-chat_id1=$(sed -n 2"p" $ftb"settings.conf" | tr -d '\r')
-regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
+chat_id1=$(sed -n 2"p" $ftb"sett.conf" | tr -d '\r')
+regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 echo $regim > $ftb"amode.txt"
-sec4=$(sed -n 4"p" $ftb"settings.conf" | tr -d '\r')
+sec4=$(sed -n 4"p" $ftb"sett.conf" | tr -d '\r')
 #sec4=$((sec4/1000))
-sec=$(sed -n 6"p" $ftb"settings.conf" | tr -d '\r')
-opov=$(sed -n 7"p" $ftb"settings.conf" | tr -d '\r')
-email=$(sed -n 8"p" $ftb"settings.conf" | tr -d '\r')
-startid=$(sed -n 9"p" $ftb"settings.conf" | tr -d '\r')
-bui=$(sed -n 11"p" $ftb"settings.conf" | tr -d '\r')
+sec=$(sed -n 6"p" $ftb"sett.conf" | tr -d '\r')
+opov=$(sed -n 7"p" $ftb"sett.conf" | tr -d '\r')
+email=$(sed -n 8"p" $ftb"sett.conf" | tr -d '\r')
+startid=$(sed -n 9"p" $ftb"sett.conf" | tr -d '\r')
+bui=$(sed -n 11"p" $ftb"sett.conf" | tr -d '\r')
 #last_id=0
-progons=$(sed -n 13"p" $ftb"settings.conf" | tr -d '\r')
-lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
-send_up_start=$(sed -n 15"p" $ftb"settings.conf" | tr -d '\r')
-health_check=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
+progons=$(sed -n 13"p" $ftb"sett.conf" | tr -d '\r')
+lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
+send_up_start=$(sed -n 15"p" $ftb"sett.conf" | tr -d '\r')
+health_check=$(sed -n 17"p" $fhome"sett.conf" | tr -d '\r')
 health_on=0
 [ "$health_check" -gt "0" ] && health_on=1 #включено или нет по факту
-mute_health_on=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
+mute_health_on=$(sed -n 18"p" $fhome"sett.conf" | tr -d '\r')
 
-bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
-sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
-promapi=$(sed -n 21"p" $ftb"settings.conf" | tr -d '\r')
-label1=$(sed -n 22"p" $ftb"settings.conf" | tr -d '\r')
-groupp=$(sed -n 23"p" $ftb"settings.conf" | tr -d '\r')
+bicons=$(sed -n 19"p" $ftb"sett.conf" | tr -d '\r')
+sty=$(sed -n 20"p" $ftb"sett.conf" | tr -d '\r')
+promapi=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
+label1=$(sed -n 22"p" $ftb"sett.conf" | tr -d '\r')
+groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 
 #40+
-com_help=$(sed -n 40"p" $ftb"settings.conf" | tr -d '\r')
-com_job=$(sed -n 41"p" $ftb"settings.conf" | tr -d '\r')
-com_status=$(sed -n 42"p" $ftb"settings.conf" | tr -d '\r')
-com_del=$(sed -n 43"p" $ftb"settings.conf" | tr -d '\r')
-com_cd=$(sed -n 44"p" $ftb"settings.conf" | tr -d '\r')
-com_on=$(sed -n 45"p" $ftb"settings.conf" | tr -d '\r')
-com_off=$(sed -n 46"p" $ftb"settings.conf" | tr -d '\r')
-com_testmail=$(sed -n 47"p" $ftb"settings.conf" | tr -d '\r')
-com_health=$(sed -n 48"p" $ftb"settings.conf" | tr -d '\r')
-com_mute=$(sed -n 49"p" $ftb"settings.conf" | tr -d '\r')
-com_papi=$(sed -n 50"p" $ftb"settings.conf" | tr -d '\r')
-com_conf=$(sed -n 51"p" $ftb"settings.conf" | tr -d '\r')
+com_help=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
+com_job=$(sed -n 41"p" $ftb"sett.conf" | tr -d '\r')
+com_status=$(sed -n 42"p" $ftb"sett.conf" | tr -d '\r')
+com_del=$(sed -n 43"p" $ftb"sett.conf" | tr -d '\r')
+com_cd=$(sed -n 44"p" $ftb"sett.conf" | tr -d '\r')
+com_on=$(sed -n 45"p" $ftb"sett.conf" | tr -d '\r')
+com_off=$(sed -n 46"p" $ftb"sett.conf" | tr -d '\r')
+com_testmail=$(sed -n 47"p" $ftb"sett.conf" | tr -d '\r')
+com_health=$(sed -n 48"p" $ftb"sett.conf" | tr -d '\r')
+com_mute=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
+com_papi=$(sed -n 50"p" $ftb"sett.conf" | tr -d '\r')
+com_conf=$(sed -n 51"p" $ftb"sett.conf" | tr -d '\r')
 
 echo 0 > $fhome"err_send.txt"
 echo 0 > $fhome"err_accept.txt"
@@ -94,7 +94,7 @@ echo "/"$com_on" /"$com_off" - Alerting mode (quiet mode)" >> $fhome"help.txt"
 echo "/"$com_papi" - Prometheus API alert mode (/"$com_papi" on|off >0 mute on|off)" >> $fhome"help.txt"
 echo "/"$com_health" - Auto health checks in chat (/"$com_health" on|off|mute >0 mute on|off)" >> $fhome"help.txt"
 echo "/"$com_mute" - Working with notify sounds (/"$com_mute" on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves)" >> $fhome"help.txt"
-#echo "/"$com_conf" - Configure settings.conf (/"$com_conf" A B; где A - номер строки, B-значение)" >> $fhome"help.txt"
+#echo "/"$com_conf" - Configure sett.conf (/"$com_conf" A B; где A - номер строки, B-значение)" >> $fhome"help.txt"
 
 #help1.txt
 cp -f $fhome"help.txt" $fhome"help1.txt"
@@ -132,14 +132,14 @@ $fhome"to-config.sh" 3 $regim &
 [ "$regim" -eq "1" ] && echo "Alerting mode ON" > $ftb"regim.txt"
 [ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $ftb"regim.txt"
 otv=$fhome"regim.txt"
-s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 send_def
 send;
 
 echo $regim > $ftb"amode.txt"
 logger "regim="$regim
 
-cp -f $ftb"settings1.conf" $ftb"settings.conf"
+cp -f $ftb"settings1.conf" $ftb"sett.conf"
 }
 
 
@@ -180,7 +180,7 @@ else
 fi
 
 #health check
-mute_health_on=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
+mute_health_on=$(sed -n 18"p" $fhome"sett.conf" | tr -d '\r')
 [ "$mute_health_on" == "1" ] && tmprbs6="ON"
 [ "$mute_health_on" == "0" ] && tmprbs6="OFF"
 	
@@ -195,11 +195,11 @@ local tmp44=""
 local tmp45=""
 local tmp451=""
 
-tmp45=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+tmp45=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 [ "$tmp45" == "1" ] && tmp451="ON"
 [ "$tmp45" == "0" ] && tmp451="OFF"
 
-tmp40=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
+tmp40=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 if [ "$tmp40" == "0" ]; then
 	tmp44="OFF"
 else
@@ -218,7 +218,7 @@ mute_stat;
 echo "Mute "$mute_stat1 >> $fhome"ss.txt"
 
 otv=$fhome"ss.txt"
-s_mute=$(sed -n 18"p" $ftb"settings.conf" | tr -d '\r')
+s_mute=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
 send_def
 send;
 
@@ -230,21 +230,21 @@ logger "mute_stat"
 local mts=""
 mute_stat1=""
 
-mts=$(sed -n 18"p" $ftb"settings.conf" | tr -d '\r')
+mts=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
 [ "$mts" == "1" ] && mute_stat1=$mute_stat1"hc "
-mts=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+mts=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 [ "$mts" == "1" ] && mute_stat1=$mute_stat1"sys "
-mts=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+mts=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 [ "$mts" == "1" ] && mute_stat1=$mute_stat1"papi "
-mts=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r')
+mts=$(sed -n 30"p" $ftb"sett.conf" | tr -d '\r')
 [ "$mts" == "1" ] && mute_stat1=$mute_stat1"alerts "
-mts=$(sed -n 31"p" $ftb"settings.conf" | tr -d '\r')
+mts=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r')
 [ "$mts" == "1" ] && mute_stat1=$mute_stat1"resolves "
 
-mts=$(sed -n 32"p" $ftb"settings.conf" | tr -d '\r')
-[ "$mts" == "1" ] && mute_stat1=$mute_stat1"& mask alerts ["$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')"]"
-mts=$(sed -n 34"p" $ftb"settings.conf" | tr -d '\r')
-[ "$mts" == "1" ] && mute_stat1=$mute_stat1"& mask resolves ["$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')"]"
+mts=$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')
+[ "$mts" == "1" ] && mute_stat1=$mute_stat1"& mask alerts ["$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')"]"
+mts=$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')
+[ "$mts" == "1" ] && mute_stat1=$mute_stat1"& mask resolves ["$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')"]"
 
 [ -z "$mute_stat1" ] && mute_stat1="disable"
 }
@@ -260,7 +260,7 @@ if [ "$text" = "/$com_help" ] ; then
 	[ "$bicons" == "0" ] && [ "$sty" == "1" ] && otv=$fhome"help2.txt"
 	[ "$bicons" == "1" ] && [ "$sty" != "1" ] && otv=$fhome"help1.txt"
 	[ "$bicons" == "1" ] && [ "$sty" == "1" ] && otv=$fhome"help3.txt"
-	s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 	send_def
 	send;
 fi
@@ -268,7 +268,7 @@ fi
 if [ "$text" = "/$com_job" ]; then
 	$ftb"job.sh"
 	otv=$fhome"job.txt"
-	s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 	send_def
 	send;
 fi
@@ -285,12 +285,12 @@ if [[ "$text" == "/$com_conf"* ]]; then
 	com2=$(sed -n 3"p" $ftb"com_conf.txt" | tr -d '\r')
 		
 	if [[ $com1 =~ ^[0-9]+$ ]]; then
-		older_conf=$(sed -n $com1"p" $ftb"settings.conf" | tr -d '\r')
+		older_conf=$(sed -n $com1"p" $ftb"sett.conf" | tr -d '\r')
 		logger "configure com1="$com1" com2="$com2" older_conf="$older_conf
 		echo "Configure "$older_conf" -> "$com2 > $fhome"configure.txt"
 		$fhome"to-config.sh" $com1 $com2 &
 		otv=$fhome"configure.txt"
-		s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
@@ -392,7 +392,7 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	
 	#/mute on mask alerts
 	if [ "$com6" -eq "3" ]; then
-		com44=$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')
+		com44=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
 		if ! [ -z "$com44" ] && ! [ "$com44" == " " ]; then
 		echo "Mute ON mask alerts" > $fhome"mutes.txt"
 		com6=5 && cont1=32 && cont2="1"
@@ -403,7 +403,7 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	fi
 	#/mute on mask resolves
 	if [ "$com6" -eq "4" ]; then
-		com44=$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')
+		com44=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
 		if ! [ -z "$com44" ] && ! [ "$com44" == " " ]; then
 		echo "Mute ON mask resolves" > $fhome"mutes.txt"
 		com6=5 && cont1=34 && cont2="1"
@@ -437,8 +437,8 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 		echo $fhome"to-config.sh" 29 1 >> $fhome"1.sh"
 		echo $fhome"to-config.sh" 30 1 >> $fhome"1.sh"
 		echo $fhome"to-config.sh" 31 1 >> $fhome"1.sh"
-		! [ -z "$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')" ] && echo $fhome"to-config.sh" 32 1 >> $fhome"1.sh" && com444="[mask alerts]"
-		! [ -z "$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')" ] && echo $fhome"to-config.sh" 34 1 >> $fhome"1.sh" && com555="[mask resolves]"
+		! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ] && echo $fhome"to-config.sh" 32 1 >> $fhome"1.sh" && com444="[mask alerts]"
+		! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ] && echo $fhome"to-config.sh" 34 1 >> $fhome"1.sh" && com555="[mask resolves]"
 		chmod +rx $fhome"1.sh"
 		$fhome"1.sh" &
 		echo "Mute ON hc sys papi alerts resolves "$com444" "$com555 > $fhome"mutes.txt"
@@ -458,16 +458,16 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 		com6=6
 	fi
 	if [ "$com6" -eq "7" ]; then
-		com44=$(sed -n 32"p" $ftb"settings.conf" | tr -d '\r')
+		com44=$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')
 		if [ "$com44" -eq "1" ]; then
-			com444=$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')
+			com444=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
 			com555="Mute mask alerts ON ["$com444"]"
 			else
 			com555="Mute mask alerts OFF"
 		fi
-		com44=$(sed -n 34"p" $ftb"settings.conf" | tr -d '\r')
+		com44=$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')
 		if [ "$com44" -eq "1" ]; then
-			com444=$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')
+			com444=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
 			com555=$com555", mask resolves ON ["$com444"]"
 			else
 			com555=$com555", mask resolves OFF"
@@ -501,14 +501,14 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 
 	if [ "$com6" -eq "6" ]; then
 		otv=$fhome"mutes.txt"
-		s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
 	if [ "$com6" -eq "0" ]; then
 		echo "no commands" > $fhome"mutes.txt"
 		otv=$fhome"mutes.txt"
-		s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
@@ -582,14 +582,14 @@ if [[ "$text" == "/$com_health"* ]]; then						#on|off|mute >0 mute on|off
 	
 	if [ "$com6" -eq "5" ]; then
 		otv=$fhome"hc.txt"
-		s_mute=$(sed -n 18"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
 	if [ "$com6" -eq "0" ]; then
 		echo "no commands" > $fhome"hc.txt"
 		otv=$fhome"hc.txt"
-		s_mute=$(sed -n 18"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
@@ -615,13 +615,13 @@ if [[ "$text" == "/$com_papi"* ]]; then					#on|off|mute >0 mute on|off
 	com3=$(sed -n 4"p" $ftb"com_papi.txt" | tr -d '\r')
 	com4=$(sed -n 5"p" $ftb"com_papi.txt" | tr -d '\r')
 	
-	com7=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+	com7=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 	[ "$com7" == "1" ] && com8="ON"
 	[ "$com7" == "0" ] && com8="OFF"
 	
 	#/papi
 	if [ -z "$com1" ] && [ -z "$com2" ] && [ -z "$com3" ] && [ -z "$com4" ]; then
-		papi1=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
+		papi1=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 		if [ "$papi1" == "0" ]; then
 			com5="OFF"
 		else
@@ -673,14 +673,14 @@ if [[ "$text" == "/$com_papi"* ]]; then					#on|off|mute >0 mute on|off
 
 	if [ "$com6" -eq "5" ]; then
 		otv=$fhome"papis.txt"
-		s_mute=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
 	if [ "$com6" -eq "0" ]; then
 		echo "no commands" > $fhome"papis.txt"
 		otv=$fhome"papis.txt"
-		s_mute=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
 	fi
@@ -691,7 +691,7 @@ fi
 if [[ "$text" == "/$com_del"* ]]; then
 	$ftb"del.sh" $text	
 	otv=$fhome"del.txt"
-	s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 	send_def
 	send;
 fi
@@ -699,7 +699,7 @@ fi
 if [[ "$text" == "/$com_cd" ]]; then
 	echo > $ftb"delete.txt"
 	otv=$fhome"cd.txt"
-	s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 	send_def
 	send;
 fi
@@ -719,7 +719,7 @@ if [ "$text" == "/testmail" ]; then
 	echo "Testing send to mail" >> $fhome"mail.txt"
 	$fhome"sendmail.sh"
 	otv=$fhome"tmail.txt"
-	s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')
+	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 	send_def
 	send;
 fi
@@ -739,7 +739,7 @@ send1 ()
 {
 [ "$lev_log" == "1" ] && logger "send1 start"
 #sys
-[ "$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')" == "1" ] && s_mute="1"
+[ "$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 
 sender_queue
 
@@ -921,7 +921,7 @@ fi
 health_check_status ()
 {
 logger "health_check status"
-health_check=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
+health_check=$(sed -n 17"p" $fhome"sett.conf" | tr -d '\r')
 
 if [ "$health_on" -eq "0" ]; then
 	[ "$health_check" -gt "0" ] && health_check_on
@@ -931,7 +931,7 @@ fi
 }
 health_check_start ()
 {
-health_check=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
+health_check=$(sed -n 17"p" $fhome"sett.conf" | tr -d '\r')
 if [ "$health_check" -gt "0" ]; then
 	logger "health_check enable"
 	health_check_on;
@@ -985,7 +985,7 @@ logger "chat_id1="$chat_id1
 starten_furer;
 
 #start
-[ "$send_up_start" == "1" ] && s_mute=$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r') && send_def && echo "Start "$bui > $fhome"start.txt" && otv=$fhome"start.txt" && send
+[ "$send_up_start" == "1" ] && s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r') && send_def && echo "Start "$bui > $fhome"start.txt" && otv=$fhome"start.txt" && send
 
 
 #health_check start
