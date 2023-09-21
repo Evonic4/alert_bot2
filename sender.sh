@@ -191,9 +191,11 @@ cat $fhome"out2_err.txt"
 
 PID=$$
 echo $PID > $fPID
-Init2;
+
 logger "sender start"
 cp -f $fhome"settings.conf" $fhome"sett.conf"
+Init2;
+
 integrity	#первый старт
 
 while true
