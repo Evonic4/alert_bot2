@@ -5,9 +5,6 @@ fhome=/usr/share/abot2/
 fhsender=/usr/share/abot2/sender/
 fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
-#fcache1=$fhome"cache/1/"
-#fcache2=$fhome"cache/2/"
-#fPIDcu2=$fhome"cu2_pid.txt"
 f_send=$fhome"send_abot3.txt"
 log="/var/log/trbot/trbot.log"
 lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
@@ -97,6 +94,7 @@ fi
 
 }
 
+
 function gen_id_alert() 
 {
 
@@ -107,6 +105,7 @@ newid1=$newid
 #! [ "$urler" == "no" ] && newid1='<b><a href="'$urler'" target="_blank">'$newid'</a></b>'
 
 }
+
 
 function redka()
 {
@@ -222,6 +221,7 @@ done
 
 }
 
+
 resolv_sever2()
 {
 smt1=""; smt2=""; smt3=""; smt4=""
@@ -249,6 +249,7 @@ smt0=""; smt0=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "severity: warning" )
 smt0=""; smt0=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "severity: average" )
 ! [ -z "$smt0" ] && severity2=", severity: average"
 }
+
 
 comm_vessels()
 {
@@ -364,6 +365,7 @@ fi
 
 }
 
+
 sender_queue ()
 {
 logger "sender_queue"
@@ -371,6 +373,7 @@ snu=$(sed -n 1"p" $sender_id | tr -d '\r')
 snu=$((snu+1))
 echo $snu > $sender_id
 }
+
 
 send1 () 
 {

@@ -40,13 +40,13 @@ if ! [ -f $fPID ]; then		#----------------------- старт------------------
 PID=$$
 echo $PID > $fPID
 #echo "start"
-token=$(sed -n "1p" $ftb"settings.conf" | tr -d '\r')
+token=$(sed -n "1p" $ftb"sett.conf" | tr -d '\r')
 
 f_text=$(sed -n "2p" $ftb"send.txt" | tr -d '\r')
-proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
-bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
-sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
-ssec=$(sed -n 12"p" $ftb"settings.conf" | tr -d '\r')
+proxy=$(sed -n 5"p" $ftb"sett.conf" | tr -d '\r')
+bicons=$(sed -n 19"p" $ftb"sett.conf" | tr -d '\r')
+sty=$(sed -n 20"p" $ftb"sett.conf" | tr -d '\r')
+ssec=$(sed -n 12"p" $ftb"sett.conf" | tr -d '\r')
 
 [ "$bicons" == "1" ] && Z1=$1
 [ "$sty" == "1" ] && Z2=$2

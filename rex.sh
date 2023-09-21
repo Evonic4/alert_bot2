@@ -1,7 +1,7 @@
 #!/bin/bash
 
 fhome=/usr/share/abot2/
-bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
+bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
 log=$fhome"rex_log.txt"
 f_text=$1
 echo > $log

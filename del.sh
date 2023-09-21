@@ -3,8 +3,8 @@
 home_trbot=/usr/share/abot2/
 fhome=$home_trbot
 log="/var/log/trbot/trbot.log"
-zap=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
-bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
+zap=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
+bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
 
 
 iter=$2" "$3" "$4" "$5" "$6" "$7" "$8

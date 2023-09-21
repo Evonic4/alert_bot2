@@ -21,16 +21,16 @@ mkdir -p $fhsender1
 mkdir -p $fhsender2
 echo 0 > $sender_id
 
-ssec1=$(sed -n 10"p" $fhome"settings.conf" | tr -d '\r')
+ssec1=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
 logger "ssec1="$ssec1
-bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
-token=$(sed -n "1p" $fhome"settings.conf" | tr -d '\r')
-proxy=$(sed -n 5"p" $fhome"settings.conf" | tr -d '\r')
-bicons=$(sed -n 19"p" $fhome"settings.conf" | tr -d '\r')
-sty=$(sed -n 20"p" $fhome"settings.conf" | tr -d '\r')
-ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
-progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
-chat_id=$(sed -n "2p" $fhome"settings.conf" | sed 's/z/-/g' | tr -d '\r')
+bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
+token=$(sed -n "1p" $fhome"sett.conf" | tr -d '\r')
+proxy=$(sed -n 5"p" $fhome"sett.conf" | tr -d '\r')
+bicons=$(sed -n 19"p" $fhome"sett.conf" | tr -d '\r')
+sty=$(sed -n 20"p" $fhome"sett.conf" | tr -d '\r')
+ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
+progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
+chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
 
 kkik=0
 
@@ -193,6 +193,7 @@ PID=$$
 echo $PID > $fPID
 Init2;
 logger "sender start"
+cp -f $fhome"settings.conf" $fhome"sett.conf"
 integrity	#первый старт
 
 while true
