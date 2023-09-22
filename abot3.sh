@@ -7,7 +7,7 @@ fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
 f_send=$fhome"send_abot3.txt"
 log="/var/log/trbot/trbot.log"
-lev_log=$(sed -n 14"p" $ftb"settings.conf" | tr -d '\r')
+lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 ftb=$fhome
 cuf=$fhome
 fPID=$fhome"abot3_pid.txt"
@@ -17,32 +17,32 @@ sender_id=$fhome"sender_id.txt"
 function Init() 
 {
 [ "$lev_log" == "1" ] && logger "Init"
-regim=$(sed -n 3"p" $fhome"settings.conf" | tr -d '\r')
-proxy=$(sed -n 5"p" $ftb"settings.conf" | tr -d '\r')
-sec=$(sed -n 6"p" $fhome"settings.conf" | tr -d '\r')
-em=$(sed -n 8"p" $fhome"settings.conf" | tr -d '\r')
-bui=$(sed -n 11"p" $fhome"settings.conf" | tr -d '\r')
-ssec=$(sed -n 12"p" $fhome"settings.conf" | tr -d '\r')
-progons=$(sed -n 13"p" $fhome"settings.conf" | tr -d '\r')
-lev_log=$(sed -n 14"p" $fhome"settings.conf" | tr -d '\r')
-tst=$(sed -n 16"p" $fhome"settings.conf" | tr -d '\r')
-#portapi=$(sed -n 17"p" $fhome"settings.conf" | tr -d '\r')
-#ipapi=$(sed -n 18"p" $fhome"settings.conf" | tr -d '\r')
-bicons=$(sed -n 19"p" $ftb"settings.conf" | tr -d '\r')
-sty=$(sed -n 20"p" $ftb"settings.conf" | tr -d '\r')
+regim=$(sed -n 3"p" $fhome"sett.conf" | tr -d '\r')
+proxy=$(sed -n 5"p" $ftb"sett.conf" | tr -d '\r')
+sec=$(sed -n 6"p" $fhome"sett.conf" | tr -d '\r')
+em=$(sed -n 8"p" $fhome"sett.conf" | tr -d '\r')
+bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
+ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
+progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
+lev_log=$(sed -n 14"p" $fhome"sett.conf" | tr -d '\r')
+tst=$(sed -n 16"p" $fhome"sett.conf" | tr -d '\r')
+#portapi=$(sed -n 17"p" $fhome"sett.conf" | tr -d '\r')
+#ipapi=$(sed -n 18"p" $fhome"sett.conf" | tr -d '\r')
+bicons=$(sed -n 19"p" $ftb"sett.conf" | tr -d '\r')
+sty=$(sed -n 20"p" $ftb"sett.conf" | tr -d '\r')
 
-promapi=$(sed -n 21"p" $ftb"settings.conf" | tr -d '\r')
-label1=$(sed -n 22"p" $ftb"settings.conf" | tr -d '\r')
-groupp=$(sed -n 23"p" $ftb"settings.conf" | tr -d '\r')
+promapi=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
+label1=$(sed -n 22"p" $ftb"sett.conf" | tr -d '\r')
+groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 
-sm=$(sed -n 24"p" $ftb"settings.conf" | tr -d '\r')
-pappi=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
+sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 pappi1=0	#1-уже сработал, 0-не сработал
 pappiOK=0	#сообщение о восстановлении pappi
 special_mute=0
 
-mdt_start=$(sed -n 26"p" $ftb"settings.conf" | sed 's/\://g' | tr -d '\r')
-mdt_end=$(sed -n 27"p" $ftb"settings.conf" | sed 's/\://g' | tr -d '\r')
+mdt_start=$(sed -n 26"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
+mdt_end=$(sed -n 27"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
 
 kkik=0
 kkik1=0
@@ -197,10 +197,10 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		silent_mode;
 		s_url=$urler
 		if [ "$silent_mode" == "on" ]; then
-		[ "$severity" == "high" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;
-		[ "$severity" == "disaster" ] && s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r') && to_send;
+		[ "$severity" == "high" ] && s_mute=$(sed -n 30"p" $ftb"sett.conf" | tr -d '\r') && to_send;
+		[ "$severity" == "disaster" ] && s_mute=$(sed -n 30"p" $ftb"sett.conf" | tr -d '\r') && to_send;
 		else
-		s_mute=$(sed -n 30"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 30"p" $ftb"sett.conf" | tr -d '\r')
 		to_send;
 		fi
 		
@@ -297,10 +297,10 @@ for (( i=1;i<=$str_col;i++)); do
 		silent_mode;
 		if [ "$silent_mode" == "on" ]; then
 		logger "comm_vessels resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
-		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && s_mute=$(sed -n 31"p" $ftb"settings.conf" | tr -d '\r') && to_send;
+		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && s_mute=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r') && to_send;
 		else
 			[ "$lev_log" == "1" ] && logger "comm_vessels to_send"
-			s_mute=$(sed -n 31"p" $ftb"settings.conf" | tr -d '\r')
+			s_mute=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r')
 			! [ -z "$testid" ] && to_send
 			#to_send;
 		fi
@@ -332,7 +332,7 @@ silent_mode ()
 {
 silent_mode="off"
 [ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
-sm=$(sed -n 24"p" $ftb"settings.conf" | tr -d '\r')
+sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
 if [ "$sm" == "1" ]; then
 		mdt1=$(date '+%H:%M:%S' | sed 's/\://g' | tr -d '\r')
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
@@ -352,7 +352,7 @@ function to_send()
 {
 [ "$lev_log" == "1" ] && logger "start to_send"
 
-regim=$(sed -n 3"p" $ftb"settings.conf" | tr -d '\r')
+regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 
 if [ -f $f_send ]; then
 	if [ "$regim" == "1" ]; then
@@ -382,12 +382,12 @@ logger "send1 start-------------------------------------------------------"
 #special_mute=1 alerts; =2 resolv 
 
 #mute mask alerts
-if [ "$special_mute" -eq "1" ] && [ "$(sed -n 32"p" $ftb"settings.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')" ]; then
-	[ "$(cat $otv | grep -cE "$(sed -n 33"p" $ftb"settings.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute alerts-------------------------------------------------------"
+if [ "$special_mute" -eq "1" ] && [ "$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+	[ "$(cat $otv | grep -cE "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute alerts-------------------------------------------------------"
 fi
 #mute mask resolv
-if [ "$special_mute" -eq "2" ] && [ "$(sed -n 34"p" $ftb"settings.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')" ]; then
-	[ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"settings.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute resolv-------------------------------------------------------"
+if [ "$special_mute" -eq "2" ] && [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+	[ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute resolv-------------------------------------------------------"
 fi
 
 sender_queue
@@ -454,7 +454,7 @@ echo $autohcheck_rez > $ftb"prom_api_status.txt"
 
 if [ "$autohcheck_rez" -eq "1" ]; then
   logger "autohcheck prom api Failed"
-  pappi=$(sed -n 25"p" $ftb"settings.conf" | tr -d '\r')
+  pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
   [ "$pappi" -eq "0" ] && pappi1=0
   
   if [ "$pappi" -gt "0" ]; then
@@ -482,9 +482,9 @@ if [ "$autohcheck_rez" -eq "1" ]; then
 			echo > $fhome"alerts2.txt"
 			otv=$fhome"pappi.txt"
 			[ "$bicons" == "1" ] && bic="1"
-			s_mute=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+			s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 			#sys
-			[ "$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')" == "1" ] && s_mute="1"
+			[ "$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 			send;
 			pappiOK=1
 		else 
@@ -499,9 +499,9 @@ else
 		echo "Prom API up" > $fhome"pappi.txt"
 		otv=$fhome"pappi.txt"
 		[ "$bicons" == "1" ] && bic="2"
-		s_mute=$(sed -n 29"p" $ftb"settings.conf" | tr -d '\r')
+		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 		#sys
-		[ "$(sed -n 28"p" $ftb"settings.conf" | tr -d '\r')" == "1" ] && s_mute="1"
+		[ "$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 		send;
 		pappiOK=0
 	fi

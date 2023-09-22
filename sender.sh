@@ -194,6 +194,7 @@ echo $PID > $fPID
 
 logger "sender start"
 cp -f $fhome"settings.conf" $fhome"sett.conf"
+sleep 1
 Init2;
 
 integrity	#первый старт
