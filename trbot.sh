@@ -25,7 +25,7 @@ function Init2()
 [ "$lev_log" == "1" ] && logger "Start Init"
 chat_id1=$(sed -n 2"p" $ftb"sett.conf" | tr -d '\r')
 regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
-echo $regim > $ftb"amode.txt"
+#echo $regim > $ftb"amode.txt"
 sec4=$(sed -n 4"p" $ftb"sett.conf" | tr -d '\r')
 #sec4=$((sec4/1000))
 sec=$(sed -n 6"p" $ftb"sett.conf" | tr -d '\r')
@@ -86,7 +86,7 @@ function tohelpness()
 #help.txt
 echo "Commands:" > $fhome"help.txt"
 echo "/"$com_job" - Unresolved problems" >> $fhome"help.txt"
-echo "/"$com_status" - Server status" >> $fhome"help.txt"
+echo "/"$com_status" - Bot status" >> $fhome"help.txt"
 echo "/"$com_del" - Delete event notification (/"$com_del" 12345678)" >> $fhome"help.txt"
 echo "After deletion, the notification about the specified event will not come in the future" >> $fhome"help.txt"
 echo "/"$com_cd" - Clearing the list of deleted notifications" >> $fhome"help.txt"
@@ -124,25 +124,6 @@ echo "<b>&#128996;</b> disaster" >> $fhome"help3.txt"
 }
 
 
-
-regstat()
-{
-$fhome"to-config.sh" 3 $regim &
-
-[ "$regim" -eq "1" ] && echo "Alerting mode ON" > $ftb"regim.txt"
-[ "$regim" -eq "0" ] && echo "Alerting mode OFF" > $ftb"regim.txt"
-otv=$fhome"regim.txt"
-s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
-send_def
-send;
-
-echo $regim > $ftb"amode.txt"
-logger "regim="$regim
-
-cp -f $ftb"settings1.conf" $ftb"sett.conf"
-}
-
-
 bot_status()
 {
 local tmprbs1=""
@@ -167,7 +148,8 @@ tmprbs5=$(cat $fhome"delete.txt" | wc -c)
 echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.txt"
 
 #Alerting mode
-regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
+#regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
+regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 [ "$regim" -eq "1" ] && echo "Alerting mode ON" >> $fhome"ss.txt"
 [ "$regim" -eq "0" ] && echo "Alerting mode OFF" >> $fhome"ss.txt"
 
@@ -705,13 +687,21 @@ if [[ "$text" == "/$com_cd" ]]; then
 fi
 
 if [ "$text" == "/$com_on" ]; then
-	regim=1;
-	regstat;
+	$fhome"to-config.sh" 3 1 &
+	echo "Alerting mode ON" > $fhome"regim.txt"
+	otv=$fhome"regim.txt"
+	s_mute=$(sed -n 28"p" $fhome"sett.conf" | tr -d '\r')
+	send_def
+	send;
 fi
 
 if [ "$text" == "/$com_off" ]; then
-	regim=0;
-	regstat;
+	$fhome"to-config.sh" 3 0 &
+	echo "Alerting mode OFF" > $fhome"regim.txt"
+	otv=$fhome"regim.txt"
+	s_mute=$(sed -n 28"p" $fhome"sett.conf" | tr -d '\r')
+	send_def
+	send;
 fi
 
 if [ "$text" == "/testmail" ]; then
