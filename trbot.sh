@@ -270,11 +270,13 @@ if [[ "$text" == "/$com_conf"* ]]; then
 		older_conf=$(sed -n $com1"p" $ftb"sett.conf" | tr -d '\r')
 		logger "configure com1="$com1" com2="$com2" older_conf="$older_conf
 		echo "Configure "$older_conf" -> "$com2 > $fhome"configure.txt"
+		echo "configuration initialization started" >> $fhome"configure.txt"
 		$fhome"to-config.sh" $com1 $com2 &
 		otv=$fhome"configure.txt"
 		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 		send_def
 		send;
+		Init2;
 	fi
 fi
 
