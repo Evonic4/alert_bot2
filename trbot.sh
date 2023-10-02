@@ -134,7 +134,7 @@ local tmprbs5=0
 local tmprbs6=""
 
 #opov
-[ "$opov" -eq "0" ] && tmprbs1="Managed"
+[ "$opov" -eq "0" ] && tmprbs1="Manadged"
 [ "$opov" -eq "1" ] && tmprbs1="Messenger"
 
 tmprbs2=$(cat $fhome"alerts2.txt" | wc -l)
