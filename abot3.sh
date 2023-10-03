@@ -393,8 +393,10 @@ if [ "$special_mute" -eq "1" ]; then
 		[ "$lev_log" == "1" ] && logger "send1 conf32=1"
 		if ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
 			[ "$lev_log" == "1" ] && logger "send1 conf33!=_"
+			[ "$lev_log" == "1" ] && logger "send1 otv="$otv
 			gftest1=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
-			gftest2=$(cat $otv | grep -cE $gftest1)
+			cat $otv | grep -cE $gftest1 > $fhome"tmp_mute1.txt"
+			gftest2=$(sed -n 1"p" $fhome"tmp_mute1.txt" | tr -d '\r')
 			[ "$lev_log" == "1" ] && logger "send1 gftest1="$gftest1
 			[ "$lev_log" == "1" ] && logger "send1 gftest2="$gftest2
 			if [ "$gftest2" -gt "0" ]; then
@@ -411,8 +413,10 @@ if [ "$special_mute" -eq "2" ]; then
 		[ "$lev_log" == "1" ] && logger "send1 conf34=1"
 		if ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
 			[ "$lev_log" == "1" ] && logger "send1 conf35!=_"
-			gftest1=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
-			gftest2=$(cat $otv | grep -cE $gftest1)
+			[ "$lev_log" == "1" ] && logger "send1 otv="$otv
+			gftest1=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
+			cat $otv | grep -cE $gftest1 > $fhome"tmp_mute2.txt"
+			gftest2=$(sed -n 1"p" $fhome"tmp_mute2.txt" | tr -d '\r')
 			[ "$lev_log" == "1" ] && logger "send1 gftest1="$gftest1
 			[ "$lev_log" == "1" ] && logger "send1 gftest2="$gftest2
 			if [ "$gftest2" -gt "0" ]; then
