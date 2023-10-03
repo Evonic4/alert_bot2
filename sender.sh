@@ -34,7 +34,7 @@ chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
 
 kkik=0
 
-#integrity;		#только под рутом(
+integrity;		#только под рутом(
 }
 
 
@@ -197,7 +197,7 @@ cp -f $fhome"settings.conf" $fhome"sett.conf"
 sleep 1
 Init2;
 
-integrity	#первый старт
+#integrity	#первый старт
 
 while true
 do
