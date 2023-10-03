@@ -386,13 +386,36 @@ logger "send1 start-------------------------------------------------------"
 #special_mute=1 alerts; =2 resolv 
 
 #mute mask alerts
-if [ "$special_mute" -eq "1" ] && [ "$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
-	[ "$(cat $otv | grep -cE "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute alerts-------------------------------------------------------"
+if [ "$special_mute" -eq "1" ]; then
+	[ "$lev_log" == "1" ] && logger "send1 special_mute=1"
+	if [ "$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')" == "1" ]; then
+		[ "$lev_log" == "1" ] && logger "send1 conf32=1"
+		if ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+			[ "$lev_log" == "1" ] && logger "send1 conf33!=_"
+			if [ "$(cat $otv | grep -cE "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ]; then
+				[ "$lev_log" == "1" ] && logger "send1 otv alert mask >0"
+				s_mute=1
+			fi
+		fi
+	fi
 fi
 #mute mask resolv
-if [ "$special_mute" -eq "2" ] && [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
-	[ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute resolv-------------------------------------------------------"
+if [ "$special_mute" -eq "2" ]; then
+	[ "$lev_log" == "1" ] && logger "send1 special_mute=1"
+	if [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" == "1" ]; then
+		[ "$lev_log" == "1" ] && logger "send1 conf34=1"
+		if ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+			[ "$lev_log" == "1" ] && logger "send1 conf35!=_"
+			if [ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ]; then
+				[ "$lev_log" == "1" ] && logger "send1 otv resolv mask >0"
+				s_mute=1
+			fi
+		fi
+	fi
 fi
+#if [ "$special_mute" -eq "2" ] && [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+#	[ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute resolv-------------------------------------------------------"
+#fi
 
 sender_queue
 echo $fhsender2$snu".txt" > $fhome"sender3.txt"
