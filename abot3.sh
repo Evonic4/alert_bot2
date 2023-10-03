@@ -381,7 +381,8 @@ logger "sender_queue snu="$snu
 
 send1 () 
 {
-
+local gftest1=0
+local gftest2=0
 logger "send1 start-------------------------------------------------------"
 #special_mute=1 alerts; =2 resolv 
 
@@ -392,7 +393,11 @@ if [ "$special_mute" -eq "1" ]; then
 		[ "$lev_log" == "1" ] && logger "send1 conf32=1"
 		if ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
 			[ "$lev_log" == "1" ] && logger "send1 conf33!=_"
-			if [ "$(cat $otv | grep -cE "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ]; then
+			gftest1=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
+			gftest2=$(cat $otv | grep -cE $gftest1)
+			[ "$lev_log" == "1" ] && logger "send1 gftest1="$gftest1
+			[ "$lev_log" == "1" ] && logger "send1 gftest2="$gftest2
+			if [ "$gftest2" -gt "0" ]; then
 				[ "$lev_log" == "1" ] && logger "send1 otv alert mask >0"
 				s_mute=1
 			fi
@@ -406,7 +411,11 @@ if [ "$special_mute" -eq "2" ]; then
 		[ "$lev_log" == "1" ] && logger "send1 conf34=1"
 		if ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
 			[ "$lev_log" == "1" ] && logger "send1 conf35!=_"
-			if [ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ]; then
+			gftest1=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
+			gftest2=$(cat $otv | grep -cE $gftest1)
+			[ "$lev_log" == "1" ] && logger "send1 gftest1="$gftest1
+			[ "$lev_log" == "1" ] && logger "send1 gftest2="$gftest2
+			if [ "$gftest2" -gt "0" ]; then
 				[ "$lev_log" == "1" ] && logger "send1 otv resolv mask >0"
 				s_mute=1
 			fi
