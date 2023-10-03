@@ -11,7 +11,7 @@ lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 ftb=$fhome
 cuf=$fhome
 fPID=$fhome"abot3_pid.txt"
-sender_id=$fhome"sender_id.txt"
+#sender_id=$fhome"sender_id.txt"
 
 
 function Init() 
@@ -35,7 +35,7 @@ promapi=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
 label1=$(sed -n 22"p" $ftb"sett.conf" | tr -d '\r')
 groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 
-sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+#sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
 pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 pappi1=0	#1-уже сработал, 0-не сработал
 pappiOK=0	#сообщение о восстановлении pappi
@@ -63,7 +63,7 @@ echo $date1" abot3_"$bui": "$1
 
 function alert_bot()
 {
-
+local str_col=0
 #[ "$lev_log" == "1" ] && logger "prom api checks"
 
 autohcheck;
@@ -253,6 +253,7 @@ smt0=""; smt0=$(sed -n $num2'p' $fhome"alerts2.txt" | grep "severity: average" )
 
 comm_vessels()
 {
+local str_col=0
 special_mute=2
 [ "$lev_log" == "1" ] && logger "comm_vessels checks"
 cp -f $fhome"alerts.txt" $fhome"alerts_old.txt"
@@ -330,6 +331,7 @@ echo "" > $fhome"newalerts.txt"
 
 silent_mode ()
 {
+local sm=0
 silent_mode="off"
 [ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
 sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
@@ -368,10 +370,12 @@ fi
 
 sender_queue ()
 {
-logger "sender_queue"
-snu=$(sed -n 1"p" $sender_id | tr -d '\r')
-snu=$((snu+1))
-echo $snu > $sender_id
+#snu=$(sed -n 1"p" $sender_id | tr -d '\r')
+#snu=$((snu+1))
+#echo $snu > $sender_id
+
+snu="B_"$(date +%s)
+logger "sender_queue snu="$snu
 }
 
 

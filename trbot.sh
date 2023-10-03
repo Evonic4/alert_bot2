@@ -17,7 +17,7 @@ home_trbot=$fhome
 mkdir -p /var/log/trbot/
 lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 starten=1
-sender_id=$fhome"sender_id.txt"
+#sender_id=$fhome"sender_id.txt"
 #sender_list=$fhome"sender_list.txt"
 
 function Init2() 
@@ -132,6 +132,7 @@ local tmprbs3=0
 local tmprbs4=0
 local tmprbs5=0
 local tmprbs6=""
+local sm1=0
 
 #opov
 [ "$opov" -eq "0" ] && tmprbs1="Manadged"
@@ -152,6 +153,16 @@ echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.tx
 regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 [ "$regim" -eq "1" ] && echo "Alerting mode ON" >> $fhome"ss.txt"
 [ "$regim" -eq "0" ] && echo "Alerting mode OFF" >> $fhome"ss.txt"
+
+#silent_mode
+sm1=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+if [ "$sm1" -eq "1" ]; then
+	silent_mode;
+	[ "$silent_mode" == "on" ] && echo "Silent mode ON" >> $fhome"ss.txt"
+	[ "$silent_mode" == "off" ] && echo "Silent mode OFF" >> $fhome"ss.txt"
+else
+	echo "Silent mode OFF" >> $fhome"ss.txt"
+fi
 
 #Prom API
 autohcheck_rez=$(sed -n "1p" $fhome"prom_api_status.txt" | tr -d '\r')
@@ -720,11 +731,32 @@ logger "roborob otv="$otv
 }
 
 
+silent_mode ()
+{
+silent_mode="off"
+[ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
+sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+if [ "$sm" == "1" ]; then
+		mdt1=$(date '+%H:%M:%S' | sed 's/\://g' | tr -d '\r')
+		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
+		[ "$lev_log" == "1" ] && logger "silent_mode mdt_start="$mdt_start
+		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
+		if [ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]; then
+			silent_mode="on"
+		fi
+fi
+logger "silent_mode="$silent_mode
+
+}
+
 sender_queue ()
 {
-snu=$(sed -n 1"p" $sender_id | tr -d '\r')
-snu=$((snu+1))
-echo $snu > $sender_id
+#snu=$(sed -n 1"p" $sender_id | tr -d '\r')
+#snu=$((snu+1))
+#echo $snu > $sender_id
+
+snu="A_"$(date +%s)
+logger "sender_queue snu="$snu
 }
 
 send1 () 
