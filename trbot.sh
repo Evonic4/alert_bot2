@@ -1,5 +1,5 @@
 #!/bin/bash
-ver="v0.641"
+ver="v0.642"
 
 
 fhome=/usr/share/abot2/
