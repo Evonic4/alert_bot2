@@ -133,6 +133,8 @@ local tmprbs4=0
 local tmprbs5=0
 local tmprbs6=""
 local sm1=0
+local sm2=""
+local sm3=""
 
 #opov
 [ "$opov" -eq "0" ] && tmprbs1="Manadged"
@@ -156,12 +158,16 @@ regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 
 #silent_mode
 sm1=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+sm2=$(sed -n 26"p" $ftb"sett.conf" | tr -d '\r')
+sm3=$(sed -n 27"p" $ftb"sett.conf" | tr -d '\r')
+[ "$silent_mode" == "on" ] && echo "Silent mode ON "$sm2" - "$sm3 >> $fhome"ss.txt"
+[ "$silent_mode" == "off" ] && echo "Silent mode OFF" >> $fhome"ss.txt"
 if [ "$sm1" -eq "1" ]; then
 	silent_mode;
-	[ "$silent_mode" == "on" ] && echo "Silent mode ON" >> $fhome"ss.txt"
-	[ "$silent_mode" == "off" ] && echo "Silent mode OFF" >> $fhome"ss.txt"
+	[ "$silent_mode" == "on" ] && echo "Now silent mode working" >> $fhome"ss.txt"
+	[ "$silent_mode" == "off" ] && echo "Now silent mode not working" >> $fhome"ss.txt"
 else
-	echo "Silent mode OFF" >> $fhome"ss.txt"
+	echo "Now silent mode not working" >> $fhome"ss.txt"
 fi
 
 #Prom API
