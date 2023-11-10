@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 
 #переменные
 fhome=/usr/share/abot2/
@@ -7,11 +8,15 @@ fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
 fPID=$fhome"sender_pid.txt"
 log=$fhsender"sender_log.txt"
-
 sender_id=$fhome"sender_id.txt"
 sender_list=$fhome"sender_list.txt"
 sendok=0
 senderr=0
+fpost_home=/home/en/fetchmail/
+fpost_new=/home/en/fetchmail/mail/new/
+fpost_cur=/home/en/fetchmail/mail/cur/
+fpost_tmp=/home/en/fetchmail/mail/tmp/
+
 
 function Init2() 
 {
@@ -20,6 +25,15 @@ logger "Init2"
 mkdir -p $fhsender1
 mkdir -p $fhsender2
 echo 0 > $sender_id
+
+em=$(sed -n 8"p" $fhome"sett.conf" | tr -d '\r')
+if [ "$em" -eq "1" ]; then
+	smtp_server=$(sed -n 36"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_port=$(sed -n 37"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_user=$(sed -n 38"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_pass=$(sed -n 39"p" $fhome"sett.conf" | tr -d '\r')
+	! [ "$smtp_server" == "" ] && ! [ "$smtp_port" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ] && echo $smtp_server"  smtp --port="$smtp_port" --user="$smtp_user" --pass="$smtp_pass" --ssl" > /etc/nullmailer/remotes
+fi
 
 ssec1=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
 logger "ssec1="$ssec1
@@ -32,9 +46,16 @@ ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
 chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
 
+chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
+
+if [ "$chm" -eq "1" ]; then
+	chmod 700 $fpost_home"fetchmail.conf"
+	chown -R root:root $fpost_home
+fi
+
 kkik=0
 
-integrity;		#только под рутом(
+#integrity;		#только под рутом(
 }
 
 
@@ -196,6 +217,7 @@ logger "sender start"
 cp -f $fhome"settings.conf" $fhome"sett.conf"
 sleep 1
 Init2;
+
 
 #integrity	#первый старт
 

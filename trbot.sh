@@ -1,5 +1,6 @@
 #!/bin/bash
-ver="v0.642"
+export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+ver="v0.65"
 
 
 fhome=/usr/share/abot2/
@@ -48,19 +49,19 @@ promapi=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
 label1=$(sed -n 22"p" $ftb"sett.conf" | tr -d '\r')
 groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 
-#40+
-com_help=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
-com_job=$(sed -n 41"p" $ftb"sett.conf" | tr -d '\r')
-com_status=$(sed -n 42"p" $ftb"sett.conf" | tr -d '\r')
-com_del=$(sed -n 43"p" $ftb"sett.conf" | tr -d '\r')
-com_cd=$(sed -n 44"p" $ftb"sett.conf" | tr -d '\r')
-com_on=$(sed -n 45"p" $ftb"sett.conf" | tr -d '\r')
-com_off=$(sed -n 46"p" $ftb"sett.conf" | tr -d '\r')
-com_testmail=$(sed -n 47"p" $ftb"sett.conf" | tr -d '\r')
-com_health=$(sed -n 48"p" $ftb"sett.conf" | tr -d '\r')
-com_mute=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
-com_papi=$(sed -n 50"p" $ftb"sett.conf" | tr -d '\r')
-com_conf=$(sed -n 51"p" $ftb"sett.conf" | tr -d '\r')
+#50+
+com_help=$(sed -n 50"p" $ftb"sett.conf" | tr -d '\r')
+com_job=$(sed -n 51"p" $ftb"sett.conf" | tr -d '\r')
+com_status=$(sed -n 52"p" $ftb"sett.conf" | tr -d '\r')
+com_del=$(sed -n 53"p" $ftb"sett.conf" | tr -d '\r')
+com_cd=$(sed -n 54"p" $ftb"sett.conf" | tr -d '\r')
+com_on=$(sed -n 55"p" $ftb"sett.conf" | tr -d '\r')
+com_off=$(sed -n 56"p" $ftb"sett.conf" | tr -d '\r')
+com_testmail=$(sed -n 57"p" $ftb"sett.conf" | tr -d '\r')
+com_health=$(sed -n 58"p" $ftb"sett.conf" | tr -d '\r')
+com_mute=$(sed -n 59"p" $ftb"sett.conf" | tr -d '\r')
+com_papi=$(sed -n 60"p" $ftb"sett.conf" | tr -d '\r')
+com_conf=$(sed -n 61"p" $ftb"sett.conf" | tr -d '\r')
 
 echo 0 > $fhome"err_send.txt"
 echo 0 > $fhome"err_accept.txt"
@@ -76,7 +77,7 @@ tohelpness;
 
 function logger()
 {
-local date1=`date '+ %Y-%m-%d %H:%M:%S'`
+local date1=$(date '+ %Y-%m-%d %H:%M:%S')
 echo $date1" trbot_"$bui": "$1
 }
 

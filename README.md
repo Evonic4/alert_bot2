@@ -3,6 +3,8 @@
   
 Use docker image evonic/abot2:latest  
 Configure settings in settings.conf  
-If use mail to redockerfile with conf smime.rc  
+  
+added receiving alerts from emails, structure:  
+start|alertname|group|instance|job|severity|urler|description|unic  
   
   

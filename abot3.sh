@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 
 #переменные
 fhome=/usr/share/abot2/
@@ -6,11 +7,14 @@ fhsender=/usr/share/abot2/sender/
 fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
 f_send=$fhome"send_abot3.txt"
-log="/var/log/trbot/trbot.log"
 lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 ftb=$fhome
 cuf=$fhome
 fPID=$fhome"abot3_pid.txt"
+fpost_home=/home/en/fetchmail/
+fpost_new=/home/en/fetchmail/mail/new/
+fpost_cur=/home/en/fetchmail/mail/cur/
+fpost_tmp=/home/en/fetchmail/mail/tmp/
 #sender_id=$fhome"sender_id.txt"
 
 
@@ -44,6 +48,8 @@ special_mute=0
 mdt_start=$(sed -n 26"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
 mdt_end=$(sed -n 27"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
 
+chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
+
 kkik=0
 kkik1=0
 bic="0"
@@ -55,7 +61,7 @@ snu=0	#номер файла sender_queue
 
 function logger()
 {
-local date1=`date '+ %Y-%m-%d %H:%M:%S'`
+local date1=$(date '+ %Y-%m-%d %H:%M:%S')
 echo $date1" abot3_"$bui": "$1
 }
 
@@ -63,6 +69,7 @@ echo $date1" abot3_"$bui": "$1
 
 function alert_bot()
 {
+logger "alert_bot"
 local str_col=0
 #[ "$lev_log" == "1" ] && logger "prom api checks"
 
@@ -75,9 +82,9 @@ if [ "$autohcheck_rez" -eq "0" ]; then
 	fi
 [ "$lev_log" == "1" ] && cat $fhome"a3.txt"
 if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
-logger "status success"
+logger "alert_bot GET status success"
 str_col=$(grep -cv "^---" $fhome"a3.txt")
-logger "bot api str_col="$str_col
+logger "alert_bot bot api str_col="$str_col
 
 if [ "$str_col" -gt "6" ]; then
 num_alerts=$(grep -c 'alertname' $fhome"a3.txt" )
@@ -85,7 +92,7 @@ echo "" > $fhome"newalerts.txt"
 redka;
 fi
 
-comm_vessels;
+[ "$str_col" -gt "6" ] && comm_vessels;
 fi
 fi
 
@@ -93,6 +100,80 @@ fi
 #[ "$lev_log" == "1" ] && logger "prom api checks end"
 
 }
+
+
+#==========================================================================================================================
+check_mail ()
+{
+local tmp=0
+local tmp1=""
+local a=0
+
+logger " "
+logger "check_mail start"
+cd $fpost_new; fetchmail -v -f $fpost_home"fetchmail.conf"
+#su en -c 'cd $fpost_new; fetchmail -v -f /home/en/fetchmail/fetchmail.conf' -s /bin/bash
+
+find $fpost_new -maxdepth 1 -type f > $fhome"post_in.txt"
+str_col11=$(grep -c '' $fhome"post_in.txt")
+logger "check_mail str_col11="$str_col11
+
+
+if [ "$str_col11" -gt "0" ]; then
+
+	for (( i8=1;i8<=$str_col11;i8++)); do
+	test_post=$(sed -n $i8"p" $fhome"post_in.txt" | tr -d '\r')
+	logger "check_mail test_post="$test_post
+	
+	tmp=$(grep -c "\[FIRING:" $test_post)
+	[ "$tmp" -gt "0" ] && a=1
+	tmp=$(grep -c "\[RESOLVED\]" $test_post)
+	[ "$tmp" -gt "0" ] && a=2
+	
+	tmp=$(grep -c "start|" $test_post)
+
+	if [ "$tmp" -gt "0" ]; then
+	tmp1=$(grep -m1 -A7 "start|" $test_post | sed 's/=//g' | sed -e :a -e 's/<[^>]*>//g;/</N;//ba' | sed 's/^[ \t]*//;s/[ \t]*$//' | tr -d '\n\r')
+	
+	alertname=$(echo $tmp1 | awk -F'|' '{print $2}' | tr -d '\r')
+	groupp1=$(echo $tmp1 | awk -F'|' '{print $3}' | tr -d '\r')
+	inst=$(echo $tmp1 | awk -F'|' '{print $4}' | tr -d '\r')
+	jober=$(echo $tmp1 | awk -F'|' '{print $5}' | tr -d '\r')
+	severity=$(echo $tmp1 | awk -F'|' '{print $6}' | tr -d '\r')
+	urler=$(echo $tmp1 | awk -F'|' '{print $7}' | tr -d '\r')
+	desc=$(echo $tmp1 | awk -F'|' '{print $8}' | tr -d '\r')
+	unic=$(echo $tmp1 | awk -F'|' '{print $9}' | tr -d '\r')
+	#finger=$(echo -n $alertname$inst$jober$severity$unic | md5sum | awk '{print $1}')
+	
+	[ "$a" -eq "1" ] && logger "check_mail [ALERT]"
+	[ "$a" -eq "2" ] && logger "check_mail [RESOLVED]"
+	! [ -z "$tst" ] && desc=$desc", "$tst": "$(date '+ %Y-%m-%d %H:%M:%S')			#2023-11-09 23:43:23
+	
+	logger "check_mail alertname="$alertname
+	logger "check_mail groupp1="$groupp1
+	logger "check_mail inst="$inst
+	logger "check_mail jober="$jober
+	logger "check_mail severity="$severity
+	logger "check_mail urler="$urler
+	logger "check_mail desc="$desc
+	logger "check_mail unic="$unic
+	#logger "check_mail finger="$finger
+	
+	[ "$a" -eq "1" ] && fromm="m" && redka2;
+	[ "$a" -eq "2" ] && resolved_mail;
+	
+	mv -f $test_post $fpost_tmp
+	else
+		logger "check_mail ERROR: find start"
+		mv -f $test_post $fpost_cur
+	fi
+	done
+else
+	logger "check_mail ERROR: no post data";
+fi
+
+}
+#==========================================================================================================================
 
 
 function gen_id_alert() 
@@ -116,21 +197,17 @@ logger "redka num_alerts="$num_alerts
 for (( i1=0;i1<$num_alerts;i1++)); do
 rm -f $f_send
 
-bic="0"
-styc="0"
-code2=""
-
-state=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].state' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
+state=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].state' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 if [ "$state" == "firing" ]; then
 
-alertname=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.alertname' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-groupp1=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${label1}'' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-inst=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.instance' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-jober=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.job' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-severity=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-urler=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-desc=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//'`
-unic=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum'`
+alertname=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.alertname' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+groupp1=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${label1}'' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+inst=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.instance' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+jober=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.job' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+severity=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+urler=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+desc=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum')
 
 [ "$urler" == "null" ] && urler=""
 
@@ -144,10 +221,30 @@ unic=`cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum'`
 [ "$lev_log" == "1" ] && logger "redka unic="$unic
 [ "$lev_log" == "1" ] && logger "redka urler="$urler
 
+
+#-----------------процедура-------
+fromm="t"
+redka2;
+#--------------------процедура-------
+
+fi	#state=firing
+done
+#to_send;
+}
+
+
+function redka2()
+{
+logger "redka2"
+bic="0"
+styc="0"
+code2=""
+
 if [ "$severity" != "keepalive" -a "$groupp" == "$groupp1" ]; then
 
 finger=$(echo -n $alertname$inst$jober$severity$unic | md5sum | awk '{print $1}')
 echo $finger >> $fhome"newalerts.txt"
+logger "redka2 finger="$finger
 
 [ "$severity" == "info" ] && styc="1" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#9898;</a></b>")
 [ "$severity" == "warning" ] && styc="2" && code2=$(echo "<b><a href=\"$urler\" target=\"_blank\">&#x1F7E1;</a></b>")
@@ -167,10 +264,10 @@ desc2=$(echo $desc | awk -F", ${tst}:" '{print $2}'| awk -F"." '{print $1}')
 desc=$desc1
 desc3=", "$tst":"$desc2 #Started at 
 desc4=", Started at "$desc2
-[ "$lev_log" == "1" ] && logger "redka new desc="$desc
+[ "$lev_log" == "1" ] && logger "redka2 new desc="$desc
 fi
 
-logger "redka finger="$finger
+logger "redka2 finger="$finger
 if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 	logger "- new alert"
 	if ! [ "$(grep $finger $fhome"delete.txt")" ]; then
@@ -178,7 +275,7 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		gen_id_alert;
 		[ "$bicons" == "1" ] && bic="1"
 		echo $newid1" "$finger >> $fhome"alerts.txt"
-		logger "redka newid1="$newid1
+		logger "redka2 newid1="$newid1
 		
 		[ "$sty" == "0" ] && echo $newid1" "$desc$desc4 >> $fhome"alerts2.txt"
 		[ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts2.txt"
@@ -193,6 +290,9 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		
 		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid1$severity2 > $fhome"mail.txt" && echo "[ALERT] "$newid1" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
 		
+		[ "$fromm" == "m" ] && echo $finger >> $fhome"alerts_mail.txt"
+		cat $fhome"alerts_mail.txt"
+		
 		#silent_mode
 		silent_mode;
 		s_url=$urler
@@ -205,21 +305,17 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		fi
 		
 	else
-	logger "finger "$finger" already removed earlier"
+	logger "redka2 finger "$finger" already removed earlier"
 	fi
 else
-logger "finger "$finger" is already in alerts"
+logger "redka2 finger "$finger" is already in alerts"
 fi
 fi
-
-fi	#state=firing
-
-
-done
-
-#to_send;
 
 }
+
+
+
 
 
 resolv_sever2()
@@ -262,10 +358,10 @@ logger "comm_vessels alerts_old str_col="$str_col
 for (( i=1;i<=$str_col;i++)); do
 	rm -f $f_send
 	test=$(sed -n $i"p" $fhome"alerts_old.txt" | awk '{print $2}' | tr -d '\r')
-	num=$(grep -n "$test" $fhome"newalerts.txt" | awk -F":" '{print $1}')
+	num=$(grep -n "$test" $fhome"newalerts.txt" | awk -F":" '{print $1}' | tr -d '\r')
 	[ "$lev_log" == "1" ] && logger "comm_vessels test="$test
 	[ "$lev_log" == "1" ] && logger "comm_vessels num="$num
-	if [ -z "$num" ]; then
+	if [ -z "$num" ] && [ "$(grep -c $test $fhome"alerts_mail.txt")" -eq "0" ]; then
 		[ "$lev_log" == "1" ] && logger "comm_vessels check "$test" in newalerts.txt not found"
 		
 		testid=$(sed -n $i"p" $fhome"alerts_old.txt" | awk '{print $1}' | tr -d '\r')
@@ -281,7 +377,7 @@ for (( i=1;i<=$str_col;i++)); do
 		
 		desc4=$(sed -n $num2"p" $fhome"alerts2.txt" | tr -d '\r')
 		[ "$lev_log" == "1" ] && logger "comm_vessels resolved desc4="$desc4
-		local date2=`date '+ %Y-%m-%d %H:%M:%S'`
+		local date2=$(date '+ %Y-%m-%d %H:%M:%S')
 		desc3=", timestamp: "$date2
 		[ "$bicons" == "0" ] && echo "[OK] "$desc4$desc3 >> $f_send && idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk '{print $2}')
 		[ "$bicons" != "0" ] && echo $desc4$desc3 >> $f_send && idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk -F"</b>" '{print $2}' | awk '{print $1}')
@@ -308,11 +404,11 @@ for (( i=1;i<=$str_col;i++)); do
 		
 		#resolved---
 		
-		str_col1=$(grep -cv "^---" $fhome"alerts.txt")
+		str_col11=$(grep -cv "^---" $fhome"alerts.txt")
 		str_col2=$(grep -cv "^---" $fhome"alerts2.txt")
 		
 		head -n $((num1-1)) $fhome"alerts.txt" > $fhome"alerts1_tmp.txt"
-		tail -n $((str_col1-num1)) $fhome"alerts.txt" >> $fhome"alerts1_tmp.txt"
+		tail -n $((str_col11-num1)) $fhome"alerts.txt" >> $fhome"alerts1_tmp.txt"
 		cp -f $fhome"alerts1_tmp.txt" $fhome"alerts.txt"
 		
 		head -n $((num2-1)) $fhome"alerts2.txt" > $fhome"alerts2_tmp.txt"
@@ -327,6 +423,75 @@ done
 
 echo "" > $fhome"newalerts.txt"
 }
+
+
+resolved_mail () 
+{
+logger "resolved_mail"
+local idfp=""
+local descrip1=""
+local descrip2=""
+local col1=0
+local col2=0
+local numfp1=0
+local numfp2=0
+rm -f $f_send
+
+finger=$(echo -n $alertname$inst$jober$severity$unic | md5sum | awk '{print $1}')
+logger "resolved_mail finger="$finger
+
+if [ "$(grep -c $finger $fhome"alerts.txt")" -gt "0" ]; then
+	idfp=$(grep $finger $fhome"alerts.txt" | awk '{print $1}' | tr -d '\r')
+	numfp1=$(grep -n $finger $fhome"alerts.txt" | awk -F':' '{print $1}' | tr -d '\r')
+	logger "resolved_mail idfp="$idfp
+	numfp2=$(grep -n $idfp $fhome"alerts2.txt" | awk -F':' '{print $1}' | tr -d '\r')
+	logger "resolved_mail numfp1="$numfp1", numfp2="$numfp2
+	
+	[ "$bicons" == "1" ] && bic="2"
+	descrip1=$(sed -n $numfp2"p" $fhome"alerts2.txt" | tr -d '\r')
+	local date2=$(date '+ %Y-%m-%d %H:%M:%S')
+	descrip2=", timestamp: "$date2
+	[ "$bicons" == "0" ] && echo "[OK] "$descrip1$descrip2 >> $f_send && idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk '{print $2}')
+	[ "$bicons" != "0" ] && echo $descrip1$descrip2 >> $f_send && idprob=$(sed -n "1p" $f_send | tr -d '\r' | awk -F"</b>" '{print $2}' | awk '{print $1}')
+	logger "resolved_mail idprob="$idprob" finger="$finger
+	
+	num2=$numfp2
+	resolv_sever2;
+	
+	desc4=$(sed -n $num2"p" $fhome"alerts2.txt" | tr -d '\r' | awk -F"</b>" '{print $2}')
+	[ "$em" == "1" ] && echo "[OK] Resolved "$idprob$severity2 > $fhome"mail.txt" && echo "[OK] "$desc4$descrip2 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+	
+	#silent_mode
+	silent_mode;
+	if [ "$silent_mode" == "on" ]; then
+	logger "resolved_mail resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
+	! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && s_mute=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r') && to_send;
+	else
+		[ "$lev_log" == "1" ] && logger "resolved_mail to_send"
+		s_mute=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r')
+		! [ -z "$idfp" ] && to_send
+		#to_send;
+	fi
+	
+	col1=$(grep -cv "^---" $fhome"alerts.txt")
+	col2=$(grep -cv "^---" $fhome"alerts2.txt")
+	
+	head -n $((numfp1-1)) $fhome"alerts.txt" > $fhome"alerts1_tmp.txt"
+	tail -n $((col1-numfp1)) $fhome"alerts.txt" >> $fhome"alerts1_tmp.txt"
+	cp -f $fhome"alerts1_tmp.txt" $fhome"alerts.txt"
+		
+	head -n $((numfp2-1)) $fhome"alerts2.txt" > $fhome"alerts2_tmp.txt"
+	tail -n $((col2-numfp2)) $fhome"alerts2.txt" >> $fhome"alerts2_tmp.txt"
+	cp -f $fhome"alerts2_tmp.txt" $fhome"alerts2.txt"
+	
+	sed -i "/$finger/d" $fhome"alerts_mail.txt"
+	
+else
+	logger "resolved_mail ERROR id finger not found"
+fi
+
+}
+
 
 
 silent_mode ()
@@ -374,7 +539,7 @@ sender_queue ()
 #snu=$((snu+1))
 #echo $snu > $sender_id
 
-snu="B_"$(date +%s)
+snu="B_"$(date +%s)$(date +%N)
 logger "sender_queue snu="$snu
 }
 
@@ -496,7 +661,7 @@ if [ "$autohcheck_rez" -eq "1" ]; then
   if [ "$pappi" -gt "0" ]; then
 	logger "pappi>0"
 	if [ "$pappi1" -eq "0" ]; then
-		dtna=`date -d "$RTIME $pappi min" '+ %Y%m%d%H%M%S'`
+		dtna=$(date -d "$RTIME $pappi min" '+ %Y%m%d%H%M%S')
 		echo $dtna > $fhome"napip.txt"
 		pappi1=1
 		logger "pappi1=1"
@@ -514,8 +679,8 @@ if [ "$autohcheck_rez" -eq "1" ]; then
 			echo "Prom API down "$pappi" min" > $fhome"pappi.txt"
 			pappi1=0
 			logger "pappi1=0"
-			echo > $fhome"alerts.txt"
-			echo > $fhome"alerts2.txt"
+			#echo > $fhome"alerts.txt"
+			#echo > $fhome"alerts2.txt"
 			otv=$fhome"pappi.txt"
 			[ "$bicons" == "1" ] && bic="1"
 			s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
@@ -555,7 +720,9 @@ while true
 do
 sleep $ssec
 alert_bot;
-#to_send;
+
+[ "$chm" -eq "1" ] && check_mail;
+
 kkik=$(($kkik+1))
 [ "$kkik" -ge "$progons" ] && Init
 
