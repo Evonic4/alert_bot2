@@ -55,7 +55,7 @@ fi
 
 kkik=0
 
-#integrity;		#только под рутом(
+integrity;		#только под рутом(
 }
 
 
