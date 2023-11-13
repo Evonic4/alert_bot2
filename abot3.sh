@@ -111,8 +111,8 @@ local a=0
 
 logger " "
 logger "check_mail start"
-cd $fpost_new; fetchmail -v -f $fpost_home"fetchmail.conf"
-#su en -c 'cd $fpost_new; fetchmail -v -f /home/en/fetchmail/fetchmail.conf' -s /bin/bash
+#cd $fpost_new; fetchmail -v -f $fpost_home"fetchmail.conf"
+su en -c 'cd $fpost_new; fetchmail -v -f /home/en/fetchmail/fetchmail.conf' -s /bin/bash
 
 find $fpost_new -maxdepth 1 -type f > $fhome"post_in.txt"
 str_col11=$(grep -c '' $fhome"post_in.txt")

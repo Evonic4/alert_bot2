@@ -65,8 +65,10 @@ if [ "$chm" -eq "1" ]; then
 	echo "keep" >> $fpost_home"fetchmail.conf"
 	echo "mda \"/usr/bin/procmail -m /home/en/fetchmail/procmail.conf\"" >> $fpost_home"fetchmail.conf"
 	
+	chown -R en:en $fpost_home
+	chown -R en:en $fpost_home"fetchmail.conf"
+	chown -R en:en $fpost_home"procmail.conf"
 	chmod 700 $fpost_home"fetchmail.conf"
-	chown -R root:en $fpost_home"*"
 fi
 
 kkik=0
