@@ -66,7 +66,7 @@ if [ "$chm" -eq "1" ]; then
 	echo "mda \"/usr/bin/procmail -m /home/en/fetchmail/procmail.conf\"" >> $fpost_home"fetchmail.conf"
 	
 	chmod 700 $fpost_home"fetchmail.conf"
-	#chown -R en:root $fpost_home
+	chown -R en:en $fpost_home
 fi
 
 kkik=0
