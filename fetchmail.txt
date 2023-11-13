@@ -1,0 +1,4 @@
+set logfile /home/en/fetchmail/fetchmail.log
+set invisible
+set no bouncemail
+

@@ -47,10 +47,26 @@ progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
 chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
 
 chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
-
+local fpool=$(sed -n 42"p" $ftb"sett.conf" | tr -d '\r')
+local fport=$(sed -n 43"p" $ftb"sett.conf" | tr -d '\r')
+local fproto=$(sed -n 44"p" $ftb"sett.conf" | tr -d '\r')
+local fuser=$(sed -n 45"p" $ftb"sett.conf" | tr -d '\r')
+local fpass=$(sed -n 46"p" $ftb"sett.conf" | tr -d '\r')
+local fssl=$(sed -n 47"p" $ftb"sett.conf" | tr -d '\r')
 if [ "$chm" -eq "1" ]; then
+	cp -f $fhome"fetchmail.txt" $fpost_home"fetchmail.conf"
+	echo "poll "$fpool >> $fpost_home"fetchmail.conf"
+	echo "port "$fport >> $fpost_home"fetchmail.conf"
+	echo "proto "$fproto >> $fpost_home"fetchmail.conf"
+	echo "user \""$fuser"\"" >> $fpost_home"fetchmail.conf"
+	echo "password \""$fpass"\"" >> $fpost_home"fetchmail.conf"
+	echo $fssl >> $fpost_home"fetchmail.conf"
+	
+	echo "keep" >> $fpost_home"fetchmail.conf"
+	echo "mda \"/usr/bin/procmail -m /home/en/fetchmail/procmail.conf\"" >> $fpost_home"fetchmail.conf"
+	
 	chmod 700 $fpost_home"fetchmail.conf"
-	chown -R root:root $fpost_home
+	#chown -R en:root $fpost_home
 fi
 
 kkik=0
