@@ -344,6 +344,7 @@ fi
 
 chmod +rx $fhome"sendmail.sh"
 $fhome"sendmail.sh"
+fi
 }
 
 
