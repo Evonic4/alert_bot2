@@ -32,7 +32,7 @@ if [ "$em" -eq "1" ]; then
 	smtp_sport=$(sed -n 37"p" $fhome"sett.conf" | tr -d '\r')
 	smtp_user=$(sed -n 38"p" $fhome"sett.conf" | tr -d '\r')
 	smtp_pass=$(sed -n 39"p" $fhome"sett.conf" | tr -d '\r')
-	! [ "$smtp_server" == "" ] && ! [ "$smtp_port" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ] && smtp_content;
+	! [ "$smtp_hostname" == "" ] && ! [ "$smtp_sport" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ] && smtp_content;
 fi
 
 ssec1=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
