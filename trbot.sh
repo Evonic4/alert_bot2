@@ -97,8 +97,10 @@ if ! [ "$smtp_hostname" == "" ] && ! [ "$smtp_sport" == "" ] && ! [ "$smtp_user"
 	echo "else" >> $fhome"sendmail.sh"
 	echo "	echo \"to_mail is NULL\"" >> $fhome"sendmail.sh"
 	echo "fi" >> $fhome"sendmail.sh"
-
+	
+	chmod +rx $fhome"sendmail.sh"
 	$fhome"sendmail.sh"
+	
 	otv=$fhome"tmail.txt"
 else
 	logger "smail FAIL"
