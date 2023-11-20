@@ -66,8 +66,8 @@ if [ "$chm" -eq "1" ]; then
 	echo "mda \"/usr/bin/procmail -m /home/en/fetchmail/procmail.conf\"" >> $fpost_home"fetchmail.conf"
 	
 	chown -R en:en $fpost_home
-	chown -R en:en $fpost_home"fetchmail.conf"
-	chown -R en:en $fpost_home"procmail.conf"
+	#chown -R en:en $fpost_home"fetchmail.conf"
+	#chown -R en:en $fpost_home"procmail.conf"
 	chmod 700 $fpost_home"fetchmail.conf"
 fi
 
@@ -257,13 +257,10 @@ sleep 1
 Init2;
 
 
-#integrity	#первый старт
-
 while true
 do
 sleep 1
 sender;
-
 kkik=$(($kkik+1))
 [ "$kkik" -ge "$progons" ] && Init2
 
