@@ -28,11 +28,11 @@ echo 0 > $sender_id
 
 em=$(sed -n 8"p" $fhome"sett.conf" | tr -d '\r')
 if [ "$em" -eq "1" ]; then
-	smtp_server=$(sed -n 36"p" $fhome"sett.conf" | tr -d '\r')
-	smtp_port=$(sed -n 37"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_hostname=$(sed -n 36"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_sport=$(sed -n 37"p" $fhome"sett.conf" | tr -d '\r')
 	smtp_user=$(sed -n 38"p" $fhome"sett.conf" | tr -d '\r')
 	smtp_pass=$(sed -n 39"p" $fhome"sett.conf" | tr -d '\r')
-	! [ "$smtp_server" == "" ] && ! [ "$smtp_port" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ] && echo $smtp_server"  smtp --port="$smtp_port" --user="$smtp_user" --pass="$smtp_pass" --ssl" > /etc/nullmailer/remotes
+	! [ "$smtp_server" == "" ] && ! [ "$smtp_port" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ] && smtp_content;
 fi
 
 ssec1=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
@@ -76,6 +76,26 @@ kkik=0
 integrity;		#только под рутом(
 }
 
+
+smtp_content()
+{
+logger "smtp_content"
+echo "hostname="$smtp_hostname > /etc/ssmtp/ssmtp.conf
+echo "FromLineOverride=NO" >> /etc/ssmtp/ssmtp.conf
+echo "AuthUser="$smtp_user >> /etc/ssmtp/ssmtp.conf
+echo "AuthPass="$smtp_pass >> /etc/ssmtp/ssmtp.conf
+echo "AuthMethod=LOGIN" >> /etc/ssmtp/ssmtp.conf
+echo "mailhub="$smtp_sport >> /etc/ssmtp/ssmtp.conf
+echo "rewriteDomain="$(echo $smtp_server | ) >> /etc/ssmtp/ssmtp.conf
+echo "UseTLS=YES" >> /etc/ssmtp/ssmtp.conf
+echo "Debug=YES" >> /etc/ssmtp/ssmtp.conf
+echo "TLS_CA_File=/etc/ssl/certs/ca-certificates.crt" >> /etc/ssmtp/ssmtp.conf
+chmod 640 /etc/ssmtp/ssmtp.conf
+
+echo "root:"$smtp_user":"$smtp_sport > /etc/ssmtp/revaliases
+echo "monitoring:"$smtp_user":"$smtp_sport >> /etc/ssmtp/revaliases
+chmod 640 /etc/ssmtp/ssmtp.conf
+}
 
 
 integrity ()
