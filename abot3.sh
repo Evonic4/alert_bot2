@@ -327,14 +327,23 @@ smail()
 if ! [ "$smtp_hostname" == "" ] && ! [ "$smtp_sport" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ]; then
 logger "smail"
 cp -f $fhome"sendmail_tmp.sh" $fhome"sendmail.sh"
-echo "su monitoring -c 'cd; echo \""$MBODY"\" | mail -s \""$MSUBJ"\" \$MADDR' -s /bin/bash" >> $fhome"sendmail.sh"
-echo "done" >> $fhome"sendmail.sh" 
-echo "else" >> $fhome"sendmail.sh"
-echo "	echo \"to_mail is NULL\"" >> $fhome"sendmail.sh"
-echo "fi" >> $fhome"sendmail.sh"
+
+to_mail=$(sed -n 41"p" $fhome"sett.conf" | tr -d '\r')
+
+if ! [ "$to_mail" == "" ]; then
+	for MADDR in $(echo $to_mail | tr " " "\n")
+	do
+	logger "smail send mail to "$MADDR
+	
+	echo "su monitoring -c 'cd; echo \""$MBODY"\" | mail -s \""$MSUBJ"\" "$MADDR"' -s /bin/bash" >> $fhome"sendmail.sh"
+	
+	done
+else
+	logger "smail to_mail is NULL"
+fi
+
 chmod +rx $fhome"sendmail.sh"
 $fhome"sendmail.sh"
-fi
 }
 
 
