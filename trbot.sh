@@ -49,6 +49,11 @@ promapi=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
 label1=$(sed -n 22"p" $ftb"sett.conf" | tr -d '\r')
 groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 
+	smtp_hostname=$(sed -n 36"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_sport=$(sed -n 37"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_user=$(sed -n 38"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_pass=$(sed -n 39"p" $fhome"sett.conf" | tr -d '\r')
+
 #50+
 com_help=$(sed -n 50"p" $ftb"sett.conf" | tr -d '\r')
 com_job=$(sed -n 51"p" $ftb"sett.conf" | tr -d '\r')
@@ -80,6 +85,28 @@ function logger()
 local date1=$(date '+ %Y-%m-%d %H:%M:%S')
 echo $date1" trbot_"$bui": "$1
 }
+
+
+smail()
+{
+if ! [ "$smtp_hostname" == "" ] && ! [ "$smtp_sport" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ]; then
+	logger "smail OK"
+	cp -f $fhome"sendmail_tmp.sh" $fhome"sendmail.sh"
+	echo "su monitoring -c \"cd; echo "$MBODY" | mail -s "$MSUBJ" $MADDR\" -s /bin/bash" >> $fhome"sendmail.sh"
+	echo "done" >> $fhome"sendmail.sh" 
+	echo "else" >> $fhome"sendmail.sh"
+	echo "	echo \"to_mail is NULL\"" >> $fhome"sendmail.sh"
+	echo "fi" >> $fhome"sendmail.sh"
+
+	$fhome"sendmail.sh"
+	otv=$fhome"tmail.txt"
+else
+	logger "smail FAIL"
+	echo "No parameters specified" > $fhome"tmail1.txt"
+	otv=$fhome"tmail1.txt"
+fi
+}
+
 
 
 function tohelpness()
@@ -251,7 +278,7 @@ mts=$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')
 
 roborob ()  	
 {
-date1=`date '+ %d.%m.%Y %H:%M:%S'`
+date1=$(date '+ %d.%m.%Y %H:%M:%S')
 [ "$lev_log" == "1" ] && logger "text="$text
 otv=""
 
@@ -725,10 +752,9 @@ if [ "$text" == "/$com_off" ]; then
 fi
 
 if [ "$text" == "/testmail" ]; then
-	echo "Test abot2-"$bui" "$date1 > $fhome"mail.txt"
-	echo "Testing send to mail" >> $fhome"mail.txt"
-	$fhome"sendmail.sh"
-	otv=$fhome"tmail.txt"
+	MSUBJ="Test abot2-"$bui" "$date1
+	MBODY="Testing send to mail"
+	smail;
 	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
 	send_def
 	send;

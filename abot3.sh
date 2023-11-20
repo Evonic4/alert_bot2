@@ -24,7 +24,13 @@ function Init()
 regim=$(sed -n 3"p" $fhome"sett.conf" | tr -d '\r')
 proxy=$(sed -n 5"p" $ftb"sett.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $fhome"sett.conf" | tr -d '\r')
+
 em=$(sed -n 8"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_hostname=$(sed -n 36"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_sport=$(sed -n 37"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_user=$(sed -n 38"p" $fhome"sett.conf" | tr -d '\r')
+	smtp_pass=$(sed -n 39"p" $fhome"sett.conf" | tr -d '\r')
+
 bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
@@ -288,7 +294,7 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		[ "$bicons" == "1" ] && [ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc3 >> $f_send
 		[ "$bicons" == "1" ] && [ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc3 >> $f_send
 		
-		[ "$em" == "1" ] && echo "[ALERT] Problem "$newid1$severity2 > $fhome"mail.txt" && echo "[ALERT] "$newid1" "$desc$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		[ "$em" == "1" ] && MSUBJ="[ALERT] Problem "$newid1$severity2 && MBODY="[ALERT] "$newid1" "$desc$desc3 && smail;
 		
 		[ "$fromm" == "m" ] && echo $finger >> $fhome"alerts_mail.txt"
 		cat $fhome"alerts_mail.txt"
@@ -315,6 +321,19 @@ fi
 }
 
 
+
+smail()
+{
+if ! [ "$smtp_hostname" == "" ] && ! [ "$smtp_sport" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ]; then
+logger "smail"
+cp -f $fhome"sendmail_tmp.sh" $fhome"sendmail.sh"
+echo "su monitoring -c \"cd; echo "$MBODY" | mail -s "$MSUBJ" $MADDR\" -s /bin/bash" >> $fhome"sendmail.sh"
+echo "done" >> $fhome"sendmail.sh" 
+echo "else" >> $fhome"sendmail.sh"
+echo "	echo \"to_mail is NULL\"" >> $fhome"sendmail.sh"
+echo "fi" >> $fhome"sendmail.sh"
+fi
+}
 
 
 
@@ -387,7 +406,7 @@ for (( i=1;i<=$str_col;i++)); do
 		[ "$lev_log" == "1" ] && logger "comm_vessels resolv_sever2"
 		desc4=$(sed -n $num2"p" $fhome"alerts2.txt" | tr -d '\r' | awk -F"</b>" '{print $2}')
 		[ "$lev_log" == "1" ] && logger "comm_vessels resolved desc4="$desc4
-		[ "$em" == "1" ] && echo "[OK] Resolved "$idprob$severity2 > $fhome"mail.txt" && echo "[OK] "$desc4$desc3 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+		[ "$em" == "1" ] && MSUBJ="[OK] Resolved "$idprob$severity2 && MBODY="[OK] "$desc4$desc3 && smail;
 		
 		
 		#silent_mode
@@ -459,7 +478,7 @@ if [ "$(grep -c $finger $fhome"alerts.txt")" -gt "0" ]; then
 	resolv_sever2;
 	
 	desc4=$(sed -n $num2"p" $fhome"alerts2.txt" | tr -d '\r' | awk -F"</b>" '{print $2}')
-	[ "$em" == "1" ] && echo "[OK] Resolved "$idprob$severity2 > $fhome"mail.txt" && echo "[OK] "$desc4$descrip2 >> $fhome"mail.txt" && $ftb"sendmail.sh"
+	[ "$em" == "1" ] && MSUBJ="[OK] Resolved "$idprob$severity2 && MBODY="[OK] "$desc4$descrip2 && smail;
 	
 	#silent_mode
 	silent_mode;
