@@ -4,9 +4,10 @@ ver="v0.65"
 
 
 fhome=/usr/share/abot2/
-fhsender=/usr/share/abot2/sender/
+fhsender=$fhome"sender/"
 fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
+fstat=$fhome"stat/"
 log="/var/log/trbot/trbot.log"
 fPID=$fhome"trbot_pid.txt"
 ftb=$fhome
@@ -14,12 +15,12 @@ cuf=$fhome
 fm=$fhome"mail.txt"
 mass_mesid_file=$fhome"mmid.txt"
 home_trbot=$fhome
-#f_send=$fhome"abot2.txt"
 mkdir -p /var/log/trbot/
 lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 starten=1
-#sender_id=$fhome"sender_id.txt"
-#sender_list=$fhome"sender_list.txt"
+tinp_err=$(sed -n 1"p" $fstat"stat_terr_in.txt" | tr -d '\r')
+
+
 
 function Init2() 
 {
@@ -32,7 +33,8 @@ sec4=$(sed -n 4"p" $ftb"sett.conf" | tr -d '\r')
 sec=$(sed -n 6"p" $ftb"sett.conf" | tr -d '\r')
 opov=$(sed -n 7"p" $ftb"sett.conf" | tr -d '\r')
 email=$(sed -n 8"p" $ftb"sett.conf" | tr -d '\r')
-startid=$(sed -n 9"p" $ftb"sett.conf" | tr -d '\r')
+#--------> sender
+#startid=$(sed -n 9"p" $ftb"sett.conf" | tr -d '\r')
 bui=$(sed -n 11"p" $ftb"sett.conf" | tr -d '\r')
 #last_id=0
 progons=$(sed -n 13"p" $ftb"sett.conf" | tr -d '\r')
@@ -68,13 +70,9 @@ com_mute=$(sed -n 59"p" $ftb"sett.conf" | tr -d '\r')
 com_papi=$(sed -n 60"p" $ftb"sett.conf" | tr -d '\r')
 com_conf=$(sed -n 61"p" $ftb"sett.conf" | tr -d '\r')
 
-echo 0 > $fhome"err_send.txt"
-echo 0 > $fhome"err_accept.txt"
-
 kkik=0
 snu=0	#номер файла sender_queue
-tinp_ok=0
-tinp_err=0
+
 tohelpness;
 }
 
@@ -243,11 +241,9 @@ else
 fi
 echo "Prometheus API down alert "$tmp44" mute "$tmp451 >> $fhome"ss.txt"
 
-
-
-#telegram API errors
-sumi=$((tinp_ok+tinp_err))
-[ "$sumi" -gt "0" ] && echo "Telegram api send_err:"$(sed -n 1"p" $fhome"err_send.txt" | tr -d '\r')", input_err:"$(echo "scale=2; $tinp_err/$sumi * 100" | bc) >> $fhome"ss.txt"
+#telegram API errors - old stat!
+#sumi=$((tinp_ok+tinp_err))
+#[ "$sumi" -gt "0" ] && echo "Telegram api send_err:"$(sed -n 1"p" $fhome"err_send.txt" | tr -d '\r')", input_err:"$(echo "scale=2; $tinp_err/$sumi * 100" | bc) >> $fhome"ss.txt"
 
 #mute
 mute_stat;
@@ -797,7 +793,7 @@ sender_queue ()
 #snu=$((snu+1))
 #echo $snu > $sender_id
 
-snu="A_"$(date +%s)
+snu="A_"$(date +%s%N)
 logger "sender_queue snu="$snu
 }
 
@@ -853,29 +849,14 @@ fi
 
 }
 
-#pauseloop ()  		
-#{
-#sec1=0
-#rm -f $file
-#again0="yes"
-#while [ "$again0" = "yes" ]
-#do
-#sec1=$((sec1+1))
-#sleep 1
-#if [ -f $file ] || [ "$sec1" -eq "$sec" ]; then
-#	again0="go"
-#	[ "$lev_log" == "1" ] && logger "pauseloop sec1="$sec1
-#fi
-#done
-#}
 
 input ()  		
 {
 logger "input start"
-$ftb"cucu1.sh"
+$ftb"cucu1.sh" $upd_id1
 
 if [ "$(cat $fhome"in.txt" | grep "\"ok\":true,")" ]; then	
-	tinp_ok=$((tinp_ok+1))
+	#tinp_ok=$((tinp_ok+1))
 	logger "input OK "$tinp_ok
 else
 	tinp_err=$((tinp_err+1))
@@ -912,6 +893,7 @@ if [ "$starten" -eq "1" ]; then
 	fi
 	logger "starten_furer upd_id="$upd_id
 	starten=0
+	upd_id1=$(sed -n 1"p" $fhome"lastid.txt" | tr -d '\r')
 fi
 
 }
@@ -923,7 +905,7 @@ parce ()
 {
 [ "$lev_log" == "1" ] && logger "parce"
 mi=0
-date1=`date '+ %d.%m.%Y %H:%M:%S'`
+date1=$(date '+ %d.%m.%Y %H:%M:%S')
 mi_col=$(cat $cuf"in.txt" | grep -c update_id | tr -d '\r')
 logger "parce col mi_col ="$mi_col
 upd_id=$(sed -n 1"p" $ftb"lastid.txt" | tr -d '\r')
@@ -1044,8 +1026,8 @@ logger ""
 logger "start abot2 "$bui" lev_log="$lev_log
 Init2;
 
-#start number notify
-! [ -f $ftb"id.txt" ] && echo $startid > $fhome"id.txt"
+#start number notify--------> sender
+#! [ -f $ftb"id.txt" ] && echo $startid > $fhome"id.txt"
 
 logger "chat_id1="$chat_id1
 starten_furer;
@@ -1067,6 +1049,7 @@ ffufuf1=0
 tinp_ok1=$tinp_ok
 [ "$opov" == "0" ] && input;
 [ "$opov" == "0" ] && [ "$tinp_ok" -gt "$tinp_ok1" ] && parce;
+[ "$i" -gt "50" ] && upd_id1=$upd_id
 health_check_status
 [ "$health_on" -eq "1" ] && health_checking;
 #[ "$regim" -eq "1" ] && [ "$health_on" -eq "1" ] && health_checking;
@@ -1074,8 +1057,8 @@ health_check_status
 kkik=$(($kkik+1))
 if [ "$kkik" -ge "$progons" ]; then
 	Init2
-	sumi=$((tinp_ok+tinp_err))
-	echo $(echo "scale=2; $tinp_err/$sumi * 100" | bc) >> $fhome"err_accept.txt"
+	#sumi=$((tinp_ok+tinp_err))
+	#echo $(echo "scale=2; $tinp_err/$sumi * 100" | bc) >> $fhome"err_accept.txt"
 fi
 
 done

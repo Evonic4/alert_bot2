@@ -3,15 +3,13 @@ export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 
 #переменные
 fhome=/usr/share/abot2/
-fhsender=/usr/share/abot2/sender/
+fhsender=$fhome"sender/"
 fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
+fstat=$fhome"stat/"
 fPID=$fhome"sender_pid.txt"
 log=$fhsender"sender_log.txt"
-sender_id=$fhome"sender_id.txt"
 sender_list=$fhome"sender_list.txt"
-sendok=0
-senderr=0
 fpost_home=/home/en/fetchmail/
 fpost_new=/home/en/fetchmail/mail/new/
 fpost_cur=/home/en/fetchmail/mail/cur/
@@ -24,7 +22,6 @@ logger "Init2"
 #rm -rf $fhsender
 mkdir -p $fhsender1
 mkdir -p $fhsender2
-echo 0 > $sender_id
 
 em=$(sed -n 8"p" $fhome"sett.conf" | tr -d '\r')
 if [ "$em" -eq "1" ]; then
@@ -35,6 +32,7 @@ if [ "$em" -eq "1" ]; then
 	! [ "$smtp_hostname" == "" ] && ! [ "$smtp_sport" == "" ] && ! [ "$smtp_user" == "" ] && ! [ "$smtp_pass" == "" ] && smtp_content;
 fi
 
+startid=$(sed -n 9"p" $fhome"sett.conf" | tr -d '\r')
 ssec1=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
 logger "ssec1="$ssec1
 bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
@@ -45,14 +43,15 @@ sty=$(sed -n 20"p" $fhome"sett.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
 chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
+pushg_port=$(sed -n 40"p" $fhome"sett.conf" | tr -d '\r')
 
-chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
-local fpool=$(sed -n 42"p" $ftb"sett.conf" | tr -d '\r')
-local fport=$(sed -n 43"p" $ftb"sett.conf" | tr -d '\r')
-local fproto=$(sed -n 44"p" $ftb"sett.conf" | tr -d '\r')
-local fuser=$(sed -n 45"p" $ftb"sett.conf" | tr -d '\r')
-local fpass=$(sed -n 46"p" $ftb"sett.conf" | tr -d '\r')
-local fssl=$(sed -n 47"p" $ftb"sett.conf" | tr -d '\r')
+chm=$(sed -n 40"p" $fhome"sett.conf" | tr -d '\r')
+local fpool=$(sed -n 42"p" $fhome"sett.conf" | tr -d '\r')
+local fport=$(sed -n 43"p" $fhome"sett.conf" | tr -d '\r')
+local fproto=$(sed -n 44"p" $fhome"sett.conf" | tr -d '\r')
+local fuser=$(sed -n 45"p" $fhome"sett.conf" | tr -d '\r')
+local fpass=$(sed -n 46"p" $fhome"sett.conf" | tr -d '\r')
+local fssl=$(sed -n 47"p" $fhome"sett.conf" | tr -d '\r')
 if [ "$chm" -eq "1" ]; then
 	cp -f $fhome"fetchmail.txt" $fpost_home"fetchmail.conf"
 	echo "poll "$fpool >> $fpost_home"fetchmail.conf"
@@ -72,6 +71,10 @@ if [ "$chm" -eq "1" ]; then
 fi
 
 kkik=0
+
+#stat
+sendok=$(sed -n 1"p" $fstat"stat_tok_out.txt" | tr -d '\r')
+senderr=$(sed -n 1"p" $fstat"stat_terr_out.txt" | tr -d '\r')
 
 integrity;		#только под рутом(
 }
@@ -108,20 +111,22 @@ local trbp=""
 #trbp=$(ps af | grep $(sed -n 1"p" $fhome"trbot_pid.txt" | tr -d '\r') | grep trbot.sh | awk '{ print $1 }')
 ab3p=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"abot3_pid.txt"))
 trbp=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"trbot_pid.txt"))
+hcp=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"hchecker_pid.txt"))
 
 logger "ab3p="$ab3p
 logger "trbp="$trbp
+logger "hcp="$hcp
 
 [ -z "$trbp" ] && logger "starter trbot.sh" && $fhome"trbot.sh" &
 [ -z "$ab3p" ] && logger "starter abot3.sh" && $fhome"abot3.sh" &
-
+[ -z "$hcp" ] && logger "starter hchecker.sh" && $fhome"hchecker.sh" &
 }
 
 
 
 function logger()
 {
-local date1=`date '+ %Y-%m-%d %H:%M:%S'`
+local date1=$(date '+ %Y-%m-%d %H:%M:%S')
 echo $date1" sender_"$bui": "$1
 
 }
@@ -188,8 +193,10 @@ fi
 sleep $ssec1
 done
 
-sums=$((sendok+senderr))
-[ "$sums" -gt "0" ] && echo $(echo "scale=2; $senderr/$sums * 100" | bc) > $fhome"err_send.txt"
+#sums=$((sendok+senderr))
+#[ "$sums" -gt "0" ] && echo $(echo "scale=2; $senderr/$sums * 100" | bc) > $fhome"err_send.txt"
+echo $sendok > $fstat"stat_tok_out.txt"
+echo $senderr > $fstat"stat_terr_out.txt"
 
 fi
 
@@ -217,7 +224,7 @@ logger "sender directly"
 #[ "$(grep -c "<" $mess_path)" -gt "0" ] || [ "$(grep -c ">" $mess_path)" -gt "0" ] && pravka_teg
 
 IFS=$'\x10'
-text=`cat $mess_path`
+text=$(cat $mess_path)
 echo "token="$token
 echo "chat_id="$chat_id
 echo $text
@@ -250,12 +257,20 @@ cat $fhome"out2_err.txt"
 
 PID=$$
 echo $PID > $fPID
-
 logger "sender start"
 cp -f $fhome"settings.conf" $fhome"sett.conf"
+
+#start number notify
+! [ -f $fhome"id.txt" ] && echo $startid > $fhome"id.txt"
+
+#stat init
+echo 0 > $fstat"stat_alert_in.txt"
+echo 0 > $fstat"stat_terr_in.txt"
+echo 0 > $fstat"stat_terr_out.txt"
+echo 0 > $fstat"stat_tok_out.txt"
+su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:'$pushg_port -s /bin/bash 1>/dev/null 2>/dev/null &
 sleep 1
 Init2;
-
 
 while true
 do

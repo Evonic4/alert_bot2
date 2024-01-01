@@ -3,19 +3,21 @@ export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 
 #переменные
 fhome=/usr/share/abot2/
-fhsender=/usr/share/abot2/sender/
+fhsender=$fhome"sender/"
 fhsender1=$fhsender"1/"
 fhsender2=$fhsender"2/"
+fstat=$fhome"stat/"
 f_send=$fhome"send_abot3.txt"
-lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 ftb=$fhome
 cuf=$fhome
+lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 fPID=$fhome"abot3_pid.txt"
 fpost_home=/home/en/fetchmail/
 fpost_new=/home/en/fetchmail/mail/new/
 fpost_cur=/home/en/fetchmail/mail/cur/
 fpost_tmp=/home/en/fetchmail/mail/tmp/
-#sender_id=$fhome"sender_id.txt"
+col_alert_in=$(sed -n 1"p" $fstat"stat_alert_in.txt" | tr -d '\r')		#stat alert in
+
 
 
 function Init() 
@@ -570,7 +572,7 @@ sender_queue ()
 #snu=$((snu+1))
 #echo $snu > $sender_id
 
-snu="B_"$(date +%s)$(date +%N)
+snu="B_"$(date +%s%N)
 logger "sender_queue snu="$snu
 }
 
@@ -659,23 +661,6 @@ else
 	send1;
 fi
 }
-
-
-#pauseloop ()  		
-#{
-#sec1=0
-#rm -f $file
-#again0="yes"
-#while [ "$again0" = "yes" ]
-#do
-#sec1=$((sec1+1))
-#sleep 1
-#if [ -f $file ] || [ "$sec1" -eq "$sec" ]; then
-#	again0="go"
-#	[ "$lev_log" == "1" ] && logger "pauseloop sec1="$sec1
-#fi
-#done
-#}
 
 
 
