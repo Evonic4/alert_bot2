@@ -72,7 +72,7 @@ com_conf=$(sed -n 61"p" $ftb"sett.conf" | tr -d '\r')
 
 kkik=0
 snu=0	#номер файла sender_queue
-
+tinp_ok=0
 tohelpness;
 }
 
@@ -856,7 +856,7 @@ logger "input start"
 $ftb"cucu1.sh" $upd_id1
 
 if [ "$(cat $fhome"in.txt" | grep "\"ok\":true,")" ]; then	
-	#tinp_ok=$((tinp_ok+1))
+	tinp_ok=$((tinp_ok+1))
 	logger "input OK "$tinp_ok
 else
 	tinp_err=$((tinp_err+1))
@@ -1021,6 +1021,7 @@ fi
 
 PID=$$
 echo $PID > $fPID
+i=0
 
 logger ""
 logger "start abot2 "$bui" lev_log="$lev_log

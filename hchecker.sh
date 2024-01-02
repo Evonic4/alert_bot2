@@ -33,7 +33,7 @@ echo $date1" hchecker_"$bui": "$1
 zapushgateway ()
 {
 logger "zapushgateway start"
-local $pushg_ip="127.0.0.1"
+local pushg_ip="127.0.0.1"
 
 echo "abot2_stat_check_api "$stat_check_api | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
 echo "abot2_stat_check_trbot "$stat_check_trbot | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
