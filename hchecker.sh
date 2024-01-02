@@ -20,6 +20,7 @@ logger "Init2"
 bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
 startid=$(sed -n 9"p" $fhome"sett.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"sett.conf" | tr -d '\r')
+pushg_port=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
 }
 
 
