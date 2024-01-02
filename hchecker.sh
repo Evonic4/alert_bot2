@@ -20,7 +20,7 @@ logger "Init2"
 bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
 startid=$(sed -n 9"p" $fhome"sett.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"sett.conf" | tr -d '\r')
-pushg_port=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
+pushg=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
 }
 
 
@@ -34,17 +34,16 @@ echo $date1" hchecker_"$bui": "$1
 zapushgateway ()
 {
 logger "zapushgateway start"
-local pushg_ip="127.0.0.1"
 
-echo "abot2_stat_check_api "$stat_check_api | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
-echo "abot2_stat_check_trbot "$stat_check_trbot | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
-echo "abot2_stat_check_abot3 "$stat_check_abot3 | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
-echo "abot2_stat_check_sender "$stat_check_sender | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
+echo "abot2_stat_check_api "$stat_check_api | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_check_trbot "$stat_check_trbot | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_check_abot3 "$stat_check_abot3 | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_check_sender "$stat_check_sender | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
 
-echo "abot2_stat_send_ok "$stat_send_ok | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
-echo "abot2_stat_send_err "$stat_send_err | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
-echo "abot2_stat_input_err "$stat_input_err | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
-echo "abot2_stat_input_alert "$stat_input_alert | curl -m 4 --data-binary @- "http://"$pushg_ip":"$pushg_port"/metrics/bot_id/"$bui
+echo "abot2_stat_send_ok "$stat_send_ok | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_send_err "$stat_send_err | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_input_err "$stat_input_err | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_input_alert "$stat_input_alert | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
 }
 
 

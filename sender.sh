@@ -43,7 +43,7 @@ sty=$(sed -n 20"p" $fhome"sett.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
 chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
-pushg_port=$(sed -n 40"p" $fhome"sett.conf" | tr -d '\r')
+pushg=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
 
 chm=$(sed -n 40"p" $fhome"sett.conf" | tr -d '\r')
 local fpool=$(sed -n 42"p" $fhome"sett.conf" | tr -d '\r')
@@ -268,7 +268,7 @@ echo 0 > $fstat"stat_alert_in.txt"
 echo 0 > $fstat"stat_terr_in.txt"
 echo 0 > $fstat"stat_terr_out.txt"
 echo 0 > $fstat"stat_tok_out.txt"
-su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:'$pushg_port -s /bin/bash 1>/dev/null 2>/dev/null &
+su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:'$(echo $pushg | awk -F ":" '{ print $2 }') -s /bin/bash 1>/dev/null 2>/dev/null &
 sleep 1
 Init2;
 
