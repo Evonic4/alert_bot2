@@ -269,6 +269,8 @@ echo 0 > $fstat"stat_terr_in.txt"
 echo 0 > $fstat"stat_terr_out.txt"
 echo 0 > $fstat"stat_tok_out.txt"
 
+Init2;
+
 cp -f $fhome"0.sh" $fhome"start_pg.sh"
 pushg_port=$(echo $pushg | awk -F ":" '{ print $2 }'| tr -d '\r')
 logger "sender pushg_port="$pushg_port
@@ -277,7 +279,6 @@ chmod +rx $fhome"start_pg.sh"
 $fhome"start_pg.sh"
 
 sleep 1
-Init2;
 
 while true
 do
