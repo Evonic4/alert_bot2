@@ -33,6 +33,9 @@ if [ "$em" -eq "1" ]; then
 fi
 
 startid=$(sed -n 9"p" $fhome"sett.conf" | tr -d '\r')
+#start number notify
+! [ -f $fhome"id.txt" ] && echo $startid > $fhome"id.txt"
+
 ssec1=$(sed -n 10"p" $fhome"sett.conf" | tr -d '\r')
 logger "ssec1="$ssec1
 bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
@@ -259,9 +262,6 @@ PID=$$
 echo $PID > $fPID
 logger "sender start"
 cp -f $fhome"settings.conf" $fhome"sett.conf"
-
-#start number notify
-! [ -f $fhome"id.txt" ] && echo $startid > $fhome"id.txt"
 
 #stat init
 echo 0 > $fstat"stat_alert_in.txt"
