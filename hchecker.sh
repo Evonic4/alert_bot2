@@ -35,15 +35,15 @@ zapushgateway ()
 {
 logger "zapushgateway start"
 
-echo "abot2_stat_check_api "$stat_check_api | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
-echo "abot2_stat_check_trbot "$stat_check_trbot | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
-echo "abot2_stat_check_abot3 "$stat_check_abot3 | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
-echo "abot2_stat_check_sender "$stat_check_sender | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_check_api "$stat_check_api | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
+echo "abot2_stat_check_trbot "$stat_check_trbot | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
+echo "abot2_stat_check_abot3 "$stat_check_abot3 | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
+echo "abot2_stat_check_sender "$stat_check_sender | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
 
-echo "abot2_stat_send_ok "$stat_send_ok | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
-echo "abot2_stat_send_err "$stat_send_err | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
-echo "abot2_stat_input_err "$stat_input_err | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
-echo "abot2_stat_input_alert "$stat_input_alert | curl -m 4 --data-binary @- "http://"$pushg"/metrics/bot_id/"$bui
+echo "abot2_stat_send_ok "$stat_send_ok | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
+echo "abot2_stat_send_err "$stat_send_err | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
+echo "abot2_stat_input_err "$stat_input_err | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
+echo "abot2_stat_input_alert "$stat_input_alert | curl -m 4 --data-binary @- "http://"$pushg"/metrics/job/abot2/bot_id/"$bui
 }
 
 
