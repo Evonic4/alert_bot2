@@ -268,7 +268,13 @@ echo 0 > $fstat"stat_alert_in.txt"
 echo 0 > $fstat"stat_terr_in.txt"
 echo 0 > $fstat"stat_terr_out.txt"
 echo 0 > $fstat"stat_tok_out.txt"
-su pushgateway -c '"/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:"$(echo $pushg | awk -F ":" "{ print $2 }" | tr -d "\r")' -s /bin/bash 1>/dev/null 2>/dev/null &
+
+cp -f $fhome"0.sh" $fhome"start_pg.sh"
+pushg_port=$(echo $pushg | awk -F ":" '{ print $2 }'| tr -d '\r')
+echo "su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:${pushg_port}' -s /bin/bash 1>/dev/null 2>/dev/null &" >> $fhome"start_pg.sh"
+chmod +rx $fhome"start_pg.sh"
+$fhome"start_pg.sh"
+
 sleep 1
 Init2;
 
