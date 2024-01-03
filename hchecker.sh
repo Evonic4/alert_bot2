@@ -90,6 +90,7 @@ stat_send_ok=$(sed -n 1"p" $fstat"stat_tok_out.txt" | tr -d '\r')
 stat_send_err=$(sed -n 1"p" $fstat"stat_terr_out.txt" | tr -d '\r')
 stat_input_err=$(sed -n 1"p" $fstat"stat_terr_in.txt" | tr -d '\r')
 id_tmp=$(sed -n 1"p" $fhome"id.txt" | tr -d '\r'); stat_input_alert=$((id_tmp-startid))
+[ "$stat_input_alert" -lt "0" ] && stat_input_alert=0
 
 [ "$lev_log" == "1" ] && logger "stat_check_api="$stat_check_api
 [ "$lev_log" == "1" ] && logger "stat_check_trbot="$stat_check_trbot

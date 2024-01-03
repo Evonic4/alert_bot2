@@ -268,7 +268,7 @@ echo 0 > $fstat"stat_alert_in.txt"
 echo 0 > $fstat"stat_terr_in.txt"
 echo 0 > $fstat"stat_terr_out.txt"
 echo 0 > $fstat"stat_tok_out.txt"
-su pushgateway -c "/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:"$(echo $pushg | awk -F ":" '{ print $2 }' | tr -d '\r') -s /bin/bash 1>/dev/null 2>/dev/null &
+su pushgateway -c '"/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:"$(echo $pushg | awk -F ":" "{ print $2 }" | tr -d "\r")' -s /bin/bash 1>/dev/null 2>/dev/null &
 sleep 1
 Init2;
 
