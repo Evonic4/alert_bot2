@@ -258,7 +258,7 @@ tmprbs7=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
 tmprbs8=""
 [ "$tmprbs7" == "1" ] && tmprbs8="ON ["$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')"]"
 [ "$tmprbs7" == "0" ] && tmprbs8="OFF"
-echo "Mute job " >> $fhome"ss.txt"
+echo "Mute job "$tmprbs8 >> $fhome"ss.txt"
 
 
 otv=$fhome"ss.txt"
@@ -342,7 +342,7 @@ if [[ "$text" == "/$com_conf"* ]]; then
 	fi
 fi
 
-if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves
+if [[ "$text" == "/$com_mute "* ]]; then		#on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves
 	echo $text | tr " " "\n" > $fhome"com_mute.txt"
 	local com1=""
 	local com2=""
@@ -561,7 +561,7 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 fi
 
 
-if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
+if [[ "$text" == "/$com_mutej "* ]]; then		#|on|off|mask *
 	echo $text | tr " " "\n" > $fhome"com_mutej.txt"
 	local com2=""
 	local com3=""
@@ -597,7 +597,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 		tmprbs8=""
 		[ "$tmprbs7" == "1" ] && tmprbs8="ON ["$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')"]"
 		[ "$tmprbs7" == "0" ] && tmprbs8="OFF"
-		echo "Mute job " >> $fhome"mutesj.txt"
+		echo "Mute job "$tmprbs8 >> $fhome"mutesj.txt"
 	fi
 
 	#/mutej on
