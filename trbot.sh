@@ -1,6 +1,6 @@
 #!/bin/bash
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
-ver="v0.66"
+ver="v0.67"
 
 
 fhome=/usr/share/abot2/
@@ -60,8 +60,8 @@ groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 com_help=$(sed -n 50"p" $ftb"sett.conf" | tr -d '\r')
 com_job=$(sed -n 51"p" $ftb"sett.conf" | tr -d '\r')
 com_status=$(sed -n 52"p" $ftb"sett.conf" | tr -d '\r')
-com_del=$(sed -n 53"p" $ftb"sett.conf" | tr -d '\r')
-com_cd=$(sed -n 54"p" $ftb"sett.conf" | tr -d '\r')
+#com_del=$(sed -n 53"p" $ftb"sett.conf" | tr -d '\r')
+#com_cd=$(sed -n 54"p" $ftb"sett.conf" | tr -d '\r')
 com_on=$(sed -n 55"p" $ftb"sett.conf" | tr -d '\r')
 com_off=$(sed -n 56"p" $ftb"sett.conf" | tr -d '\r')
 com_testmail=$(sed -n 57"p" $ftb"sett.conf" | tr -d '\r')
@@ -69,6 +69,7 @@ com_health=$(sed -n 58"p" $ftb"sett.conf" | tr -d '\r')
 com_mute=$(sed -n 59"p" $ftb"sett.conf" | tr -d '\r')
 com_papi=$(sed -n 60"p" $ftb"sett.conf" | tr -d '\r')
 com_conf=$(sed -n 61"p" $ftb"sett.conf" | tr -d '\r')
+com_mutej=$(sed -n 62"p" $ftb"sett.conf" | tr -d '\r')
 
 kkik=0
 snu=0	#номер файла sender_queue
@@ -122,13 +123,14 @@ function tohelpness()
 echo "Commands:" > $fhome"help.txt"
 echo "/"$com_job" - Unresolved problems" >> $fhome"help.txt"
 echo "/"$com_status" - Bot status" >> $fhome"help.txt"
-echo "/"$com_del" - Delete event notification (/"$com_del" 12345678)" >> $fhome"help.txt"
-echo "After deletion, the notification about the specified event will not come in the future" >> $fhome"help.txt"
-echo "/"$com_cd" - Clearing the list of deleted notifications" >> $fhome"help.txt"
+#echo "/"$com_del" - Delete event notification (/"$com_del" 12345678)" >> $fhome"help.txt"
+#echo "After deletion, the notification about the specified event will not come in the future" >> $fhome"help.txt"
+#echo "/"$com_cd" - Clearing the list of deleted notifications" >> $fhome"help.txt"
 echo "/"$com_on" /"$com_off" - Alerting mode (quiet mode)" >> $fhome"help.txt"
 echo "/"$com_papi" - Prometheus API alert mode (/"$com_papi" on|off >0 mute on|off)" >> $fhome"help.txt"
 echo "/"$com_health" - Auto health checks in chat (/"$com_health" on|off|mute >0 mute on|off)" >> $fhome"help.txt"
 echo "/"$com_mute" - Working with notify sounds (/"$com_mute" on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves)" >> $fhome"help.txt"
+echo "/"$com_mutej" - Mute notify (/"$com_mutej" |on|off|mask *)" >> $fhome"help.txt"
 #echo "/"$com_conf" - Configure sett.conf (/"$com_conf" A B; где A - номер строки, B-значение)" >> $fhome"help.txt"
 
 #help1.txt
@@ -179,11 +181,11 @@ tmprbs2=$(cat $fhome"alerts2.txt" | wc -l)
 tmprbs3=$(cat $fhome"alerts2.txt" | wc -c)
 [ "$tmprbs2" -gt "0" ] && [ "$tmprbs3" -lt "8" ] && tmprbs2=0
 
-tmprbs4=$(cat $fhome"delete.txt" | wc -l)
-tmprbs5=$(cat $fhome"delete.txt" | wc -c)
-[ "$tmprbs4" -gt "0" ] && [ "$tmprbs5" -lt "8" ] && tmprbs4=0
-
-echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.txt"
+#tmprbs4=$(cat $fhome"delete.txt" | wc -l)
+#tmprbs5=$(cat $fhome"delete.txt" | wc -c)
+#[ "$tmprbs4" -gt "0" ] && [ "$tmprbs5" -lt "8" ] && tmprbs4=0
+#echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.txt"
+echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2 > $fhome"ss.txt"
 
 #Alerting mode
 #regim=$(sed -n "1p" $fhome"amode.txt" | tr -d '\r')
@@ -248,6 +250,16 @@ echo "Prometheus API down alert "$tmp44" mute "$tmp451 >> $fhome"ss.txt"
 #mute
 mute_stat;
 echo "Mute "$mute_stat1 >> $fhome"ss.txt"
+
+#mutej
+local tmprbs7=0
+local tmprbs8=""
+tmprbs7=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
+tmprbs8=""
+[ "$tmprbs7" == "1" ] && tmprbs8="ON ["$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')"]"
+[ "$tmprbs7" == "0" ] && tmprbs8="OFF"
+echo "Mute job " >> $fhome"ss.txt"
+
 
 otv=$fhome"ss.txt"
 s_mute=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
@@ -548,6 +560,102 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	fi
 fi
 
+
+if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
+	echo $text | tr " " "\n" > $fhome"com_mutej.txt"
+	local com2=""
+	local com3=""
+	local com4=""
+	local com5=""
+	local com6=""
+	local com7=""
+	local com8=""
+	local com9=""
+	local com10=""
+	local com11=""
+	
+	local com12=0
+	local com13=""
+	local cont2=""
+
+	com2=$(sed -n 2"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com3=$(sed -n 3"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com4=$(sed -n 4"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com5=$(sed -n 5"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com6=$(sed -n 6"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com7=$(sed -n 7"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com8=$(sed -n 8"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com9=$(sed -n 9"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com10=$(sed -n 10"p" $ftb"com_mutej.txt" | tr -d '\r')
+	com11=$(sed -n 11"p" $ftb"com_mutej.txt" | tr -d '\r')
+	
+	#/mutej
+	if [ -z "$com2" ] && [ -z "$com3" ] && [ -z "$com4" ]; then
+		local tmprbs7=0
+		local tmprbs8=""
+		tmprbs7=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
+		tmprbs8=""
+		[ "$tmprbs7" == "1" ] && tmprbs8="ON ["$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')"]"
+		[ "$tmprbs7" == "0" ] && tmprbs8="OFF"
+		echo "Mute job " >> $fhome"mutesj.txt"
+	fi
+
+	#/mutej on
+	[ "$com2" == "on" ] && [ -z "$com3" ] && com12=1
+	#/mutej off
+	[ "$com2" == "off" ] && [ -z "$com3" ] && com12=2
+	#/mutej mask *
+	[ "$com2" == "mask" ] && [ -z "$com3" ] && com12=3
+
+	#/mutej on
+	if [ "$com12" -eq "1" ]; then
+		echo "#!/bin/bash" > $fhome"1.sh"
+		echo $fhome"to-config.sh" 67 1 >> $fhome"1.sh"
+		chmod +rx $fhome"1.sh"
+		$fhome"1.sh" &
+		"Mute jobs ON " > $fhome"mutesj.txt"
+		com12=4
+	fi
+	#/mutej off
+	if [ "$com12" -eq "2" ]; then
+		echo "#!/bin/bash" > $fhome"1.sh"
+		echo $fhome"to-config.sh" 67 0 >> $fhome"1.sh"
+		chmod +rx $fhome"1.sh"
+		$fhome"1.sh" &
+		"Mute jobs OFF " > $fhome"mutesj.txt"
+		com12=4
+	fi
+	#/mute mask *
+	if [ "$com12" -eq "3" ]; then
+		cont2=$com3" "$com4" "$com5" "$com6" "$com7" "$com8" "$com9" "$com10" "$com11
+		cont2=$(echo $cont2 | sed 's/[ \t]*$//')
+		echo "Mute mask ["$cont2"]" > $fhome"mutesj.txt"
+		
+		echo "#!/bin/bash" > $fhome"1.sh"
+		echo $fhome"to-config.sh" 49 $cont2 >> $fhome"1.sh"
+		chmod +rx $fhome"1.sh"
+		$fhome"1.sh" &
+		
+		com12=4
+	fi
+
+	if [ "$com12" -eq "4" ]; then
+		otv=$fhome"mutesj.txt"
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+		send_def
+		send;
+	fi
+	if [ "$com12" -eq "0" ]; then
+		echo "no commands" > $fhome"mutesj.txt"
+		otv=$fhome"mutesj.txt"
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+		send_def
+		send;
+	fi
+fi
+
+
+
 if [[ "$text" == "/$com_health"* ]]; then						#on|off|mute >0 mute on|off
 	echo $text | tr " " "\n" > $fhome"com_health.txt"
 	local com1=""
@@ -721,22 +829,21 @@ if [[ "$text" == "/$com_papi"* ]]; then					#on|off|mute >0 mute on|off
 fi
 
 
-
-if [[ "$text" == "/$com_del"* ]]; then
-	$ftb"del.sh" $text	
-	otv=$fhome"del.txt"
-	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
-	send_def
-	send;
-fi
-
-if [[ "$text" == "/$com_cd" ]]; then
-	echo > $ftb"delete.txt"
-	otv=$fhome"cd.txt"
-	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
-	send_def
-	send;
-fi
+#исключено по добавлению com_mutej
+#if [[ "$text" == "/$com_del"* ]]; then
+#	$ftb"del.sh" $text	
+#	otv=$fhome"del.txt"
+#	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+#	send_def
+#	send;
+#fi
+#if [[ "$text" == "/$com_cd" ]]; then
+#	echo > $ftb"delete.txt"
+#	otv=$fhome"cd.txt"
+#	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+#	send_def
+#	send;
+#fi
 
 if [ "$text" == "/$com_on" ]; then
 	$fhome"to-config.sh" 3 1 &

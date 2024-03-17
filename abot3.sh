@@ -58,6 +58,9 @@ mdt_end=$(sed -n 27"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
 
 chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
 
+#mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
+#mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
+
 kkik=0
 kkik1=0
 bic="0"
@@ -278,7 +281,7 @@ fi
 logger "redka2 finger="$finger
 if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 	logger "- new alert"
-	if ! [ "$(grep $finger $fhome"delete.txt")" ]; then
+	#if ! [ "$(grep $finger $fhome"delete.txt")" ]; then		#более не используется com_mutej
 		[ "$lev_log" == "1" ] && logger "-1"
 		gen_id_alert;
 		[ "$bicons" == "1" ] && bic="1"
@@ -311,10 +314,9 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		s_mute=$(sed -n 30"p" $ftb"sett.conf" | tr -d '\r')
 		to_send;
 		fi
-		
-	else
-	logger "redka2 finger "$finger" already removed earlier"
-	fi
+	#else
+	#logger "redka2 finger "$finger" already removed earlier"
+	#fi
 else
 logger "redka2 finger "$finger" is already in alerts"
 fi
@@ -579,8 +581,10 @@ logger "sender_queue snu="$snu
 
 send1 () 
 {
+local mute_job=0
 local gftest1=0
 local gftest2=0
+local gftest3=0
 logger "send1 start-------------------------------------------------------"
 #special_mute=1 alerts; =2 resolv 
 
@@ -620,19 +624,27 @@ if [ "$special_mute" -eq "2" ]; then
 		fi
 	fi
 fi
-#if [ "$special_mute" -eq "2" ] && [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" -eq "1" ] && ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
-#	[ "$(cat $otv | grep -cE "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')")" -gt "0" ] && s_mute=1 && logger "mute resolv-------------------------------------------------------"
-#fi
+#mutej mask mutejf mutej_onof
+mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
+mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
+if [ "$mutej_onof" == "1" ]; then
+	[ "$lev_log" == "1" ] && logger "send1 mutej_onof=1"
+	gftest3=$(cat $otv | grep -cE $mutejf)
+	[ "$lev_log" == "1" ] && logger "send1 gftest3="$gftest3
+	[ "$gftest3" -gt "0" ] && mute_job=1
+fi
 
-sender_queue
-echo $fhsender2$snu".txt" > $fhome"sender3.txt"
-echo $bic >> $fhome"sender3.txt"							#спец картинок в уведомлениях 0-2
-echo $styc >> $fhome"sender3.txt"							#показ спец картинок severity 0-6
-echo $s_url >> $fhome"sender3.txt"							#урл
-echo $s_mute >> $fhome"sender3.txt"							#mute
-
-mv -f $otv $fhsender2$snu".txt"
-mv -f $fhome"sender3.txt" $fhsender1$snu".txt"
+[ "$lev_log" == "1" ] && logger "send1 mute_job="$mute_job
+if [ "$mute_job" -eq "0" ]; then
+	sender_queue
+	echo $fhsender2$snu".txt" > $fhome"sender3.txt"
+	echo $bic >> $fhome"sender3.txt"							#спец картинок в уведомлениях 0-2
+	echo $styc >> $fhome"sender3.txt"							#показ спец картинок severity 0-6
+	echo $s_url >> $fhome"sender3.txt"							#урл
+	echo $s_mute >> $fhome"sender3.txt"							#mute
+	mv -f $otv $fhsender2$snu".txt"
+	mv -f $fhome"sender3.txt" $fhsender1$snu".txt"
+fi
 
 logger "send1 end-------------------------------------------------------"
 }
