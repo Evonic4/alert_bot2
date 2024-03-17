@@ -342,8 +342,9 @@ if [[ "$text" == "/$com_conf"* ]]; then
 	fi
 fi
 
-if [[ "$text" == "/$com_mute "* ]]; then		#on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves
+if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves
 	echo $text | tr " " "\n" > $fhome"com_mute.txt"
+	local com0=""
 	local com1=""
 	local com2=""
 	local com3=""
@@ -363,6 +364,7 @@ if [[ "$text" == "/$com_mute "* ]]; then		#on|off|mask *|all|status|sys|papi|hc|
 	local cont2=""
 	local cont3=0
 	local cont4=""
+	com0=$(sed -n 1"p" $ftb"com_mute.txt" | tr -d '\r')
 	com1=$(sed -n 2"p" $ftb"com_mute.txt" | tr -d '\r')
 	com2=$(sed -n 3"p" $ftb"com_mute.txt" | tr -d '\r')
 	com3=$(sed -n 4"p" $ftb"com_mute.txt" | tr -d '\r')
@@ -376,7 +378,7 @@ if [[ "$text" == "/$com_mute "* ]]; then		#on|off|mask *|all|status|sys|papi|hc|
 	com10=$(sed -n 11"p" $ftb"com_mute.txt" | tr -d '\r')
 	
 	#/mute
-	if [ -z "$com1" ] && [ -z "$com2" ] && [ -z "$com3" ]; then
+	if [ "$com0" == "/$com_mute" ] && [ -z "$com1" ] && [ -z "$com2" ] && [ -z "$com3" ]; then
 		mute_stat;
 		echo "Mute "$mute_stat1 > $fhome"mutes.txt"
 		com6=5
@@ -561,8 +563,9 @@ if [[ "$text" == "/$com_mute "* ]]; then		#on|off|mask *|all|status|sys|papi|hc|
 fi
 
 
-if [[ "$text" == "/$com_mutej "* ]]; then		#|on|off|mask *
+if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 	echo $text | tr " " "\n" > $fhome"com_mutej.txt"
+	local com1=""
 	local com2=""
 	local com3=""
 	local com4=""
@@ -577,7 +580,7 @@ if [[ "$text" == "/$com_mutej "* ]]; then		#|on|off|mask *
 	local com12=0
 	local com13=""
 	local cont2=""
-
+	com1=$(sed -n 1"p" $ftb"com_mutej.txt" | tr -d '\r')
 	com2=$(sed -n 2"p" $ftb"com_mutej.txt" | tr -d '\r')
 	com3=$(sed -n 3"p" $ftb"com_mutej.txt" | tr -d '\r')
 	com4=$(sed -n 4"p" $ftb"com_mutej.txt" | tr -d '\r')
@@ -590,7 +593,7 @@ if [[ "$text" == "/$com_mutej "* ]]; then		#|on|off|mask *
 	com11=$(sed -n 11"p" $ftb"com_mutej.txt" | tr -d '\r')
 	
 	#/mutej
-	if [ -z "$com2" ] && [ -z "$com3" ] && [ -z "$com4" ]; then
+	if [ "$com1" == "/$com_mutej" ] && [ -z "$com2" ] && [ -z "$com3" ] && [ -z "$com4" ]; then
 		local tmprbs7=0
 		local tmprbs8=""
 		tmprbs7=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
