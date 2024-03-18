@@ -251,6 +251,7 @@ echo "Prometheus API down alert "$tmp44" mute "$tmp451 >> $fhome"ss.txt"
 mute_stat;
 echo "Mute "$mute_stat1 >> $fhome"ss.txt"
 
+
 #mutej
 local tmprbs7=0
 local tmprbs8=""
@@ -296,7 +297,7 @@ mts=$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')
 roborob ()  	
 {
 date1=$(date '+ %d.%m.%Y %H:%M:%S')
-[ "$lev_log" == "1" ] && logger "text="$text
+[ "$lev_log" == "1" ] && logger "roborob text="$text
 otv=""
 
 if [ "$text" = "/$com_help" ] ; then
@@ -343,6 +344,7 @@ if [[ "$text" == "/$com_conf"* ]]; then
 fi
 
 if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|mask|rm alerts|resolves
+	logger "roborob com_mute"
 	echo $text | tr " " "\n" > $fhome"com_mute.txt"
 	local com0=""
 	local com1=""
@@ -376,15 +378,16 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	com8=$(sed -n 9"p" $ftb"com_mute.txt" | tr -d '\r')
 	com9=$(sed -n 10"p" $ftb"com_mute.txt" | tr -d '\r')
 	com10=$(sed -n 11"p" $ftb"com_mute.txt" | tr -d '\r')
-	
+
 	#/mute
+	if [ "$com0" == "/$com_mute" ]; then
 	if [ "$com0" == "/$com_mute" ] && [ -z "$com1" ] && [ -z "$com2" ] && [ -z "$com3" ]; then
 		mute_stat;
 		echo "Mute "$mute_stat1 > $fhome"mutes.txt"
-		com6=5
+		com6=6
 	fi
-	
-	
+
+
 	#/mute mask
 	[ "$com1" == "mask" ] && [ -z "$com2" ] && com6=7
 	#/mute status
@@ -437,6 +440,7 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	[ "$com1" == "mask" ] && [ "$com2" == "rm" ] && [ "$com3" == "alerts" ] && echo "Mute delete mask alerts" > $fhome"mutes.txt" && com6=11 && cont1=32 && cont2="0" && cont3=33 && cont4=""
 	#/mute rm resolves
 	[ "$com1" == "mask" ] && [ "$com2" == "rm" ] && [ "$com3" == "resolves" ] && echo "Mute delete mask resolves" > $fhome"mutes.txt" && com6=11 && cont1=34 && cont2="0" && cont3=35 && cont4=""
+	fi
 	
 	#/mute on mask alerts
 	if [ "$com6" -eq "3" ]; then
@@ -553,17 +557,18 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 		send_def
 		send;
 	fi
-	if [ "$com6" -eq "0" ]; then
-		echo "no commands" > $fhome"mutes.txt"
-		otv=$fhome"mutes.txt"
-		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
-		send_def
-		send;
-	fi
+#	if [ "$com6" -eq "0" ]; then
+#		echo "no commands" > $fhome"mutes.txt"
+#		otv=$fhome"mutes.txt"
+#		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+#		send_def
+#		send;
+#	fi
 fi
 
 
 if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
+	logger "roborob com_mutej"
 	echo $text | tr " " "\n" > $fhome"com_mutej.txt"
 	local com1=""
 	local com2=""
@@ -593,6 +598,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 	com11=$(sed -n 11"p" $ftb"com_mutej.txt" | tr -d '\r')
 	
 	#/mutej
+	if [ "$com1" == "/$com_mutej" ]; then
 	if [ "$com1" == "/$com_mutej" ] && [ -z "$com2" ] && [ -z "$com3" ] && [ -z "$com4" ]; then
 		local tmprbs7=0
 		local tmprbs8=""
@@ -600,7 +606,8 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 		tmprbs8=""
 		[ "$tmprbs7" == "1" ] && tmprbs8="ON ["$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')"]"
 		[ "$tmprbs7" == "0" ] && tmprbs8="OFF"
-		echo "Mute job "$tmprbs8 >> $fhome"mutesj.txt"
+		echo "Mute job "$tmprbs8 > $fhome"mutesj.txt"
+		com12=4
 	fi
 
 	#/mutej on
@@ -609,6 +616,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 	[ "$com2" == "off" ] && [ -z "$com3" ] && com12=2
 	#/mutej mask *
 	[ "$com2" == "mask" ] && [ -z "$com3" ] && com12=3
+	fi
 
 	#/mutej on
 	if [ "$com12" -eq "1" ]; then
@@ -616,7 +624,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 		echo $fhome"to-config.sh" 67 1 >> $fhome"1.sh"
 		chmod +rx $fhome"1.sh"
 		$fhome"1.sh" &
-		"Mute jobs ON " > $fhome"mutesj.txt"
+		echo "Mute jobs ON " > $fhome"mutesj.txt"
 		com12=4
 	fi
 	#/mutej off
@@ -625,7 +633,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 		echo $fhome"to-config.sh" 67 0 >> $fhome"1.sh"
 		chmod +rx $fhome"1.sh"
 		$fhome"1.sh" &
-		"Mute jobs OFF " > $fhome"mutesj.txt"
+		echo "Mute jobs OFF " > $fhome"mutesj.txt"
 		com12=4
 	fi
 	#/mute mask *
@@ -648,13 +656,13 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 		send_def
 		send;
 	fi
-	if [ "$com12" -eq "0" ]; then
-		echo "no commands" > $fhome"mutesj.txt"
-		otv=$fhome"mutesj.txt"
-		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
-		send_def
-		send;
-	fi
+#	if [ "$com12" -eq "0" ]; then
+#		echo "no commands" > $fhome"mutesj.txt"
+#		otv=$fhome"mutesj.txt"
+#		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+#		send_def
+#		send;
+#	fi
 fi
 
 

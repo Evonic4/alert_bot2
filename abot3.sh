@@ -629,9 +629,11 @@ mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
 mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
 if [ "$mutej_onof" == "1" ]; then
 	[ "$lev_log" == "1" ] && logger "send1 mutej_onof=1"
-	gftest3=$(cat $otv | grep -cE $mutejf)
-	[ "$lev_log" == "1" ] && logger "send1 gftest3="$gftest3
-	[ "$gftest3" -gt "0" ] && mute_job=1
+	if ! [ -z "$mutejf" ]; then
+		gftest3=$(cat $otv | grep -cE $mutejf)
+		[ "$lev_log" == "1" ] && logger "send1 gftest3="$gftest3
+		[ "$gftest3" -gt "0" ] && mute_job=1
+	fi
 fi
 
 [ "$lev_log" == "1" ] && logger "send1 mute_job="$mute_job
