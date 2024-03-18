@@ -615,7 +615,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 	#/mutej off
 	[ "$com2" == "off" ] && [ -z "$com3" ] && com12=2
 	#/mutej mask *
-	[ "$com2" == "mask" ] && [ -z "$com3" ] && com12=3
+	[ "$com2" == "mask" ] && ! [ -z "$com3" ] && com12=3
 	fi
 
 	#/mutej on
