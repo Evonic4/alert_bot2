@@ -220,7 +220,18 @@ urler=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /
 desc=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum')
 
+webhook=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.webhook' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+annot_url=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+annot_text=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_text' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+annot_tag=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_tag' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+annot_atoken=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_atoken' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+
 [ "$urler" == "null" ] && urler=""
+[ "$webhook" == "null" ] && webhook=""
+[ "$annot_url" == "null" ] && annot_url=""
+[ "$annot_text" == "null" ] && annot_text=""
+[ "$annot_tag" == "null" ] && annot_tag=""
+[ "$annot_atoken" == "null" ] && annot_atoken=""
 
 [ "$lev_log" == "1" ] && logger "redka i1="$i1
 [ "$lev_log" == "1" ] && logger "redka alertname="$alertname
@@ -232,6 +243,11 @@ unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum')
 [ "$lev_log" == "1" ] && logger "redka unic="$unic
 [ "$lev_log" == "1" ] && logger "redka urler="$urler
 
+[ "$lev_log" == "1" ] && logger "redka webhook="$webhook
+[ "$lev_log" == "1" ] && logger "redka annot_url="$annot_url
+[ "$lev_log" == "1" ] && logger "redka annot_text="$annot_text
+[ "$lev_log" == "1" ] && logger "redka annot_tag="$annot_tag
+[ "$lev_log" == "1" ] && logger "redka annot_atoken="$annot_atoken
 
 #-----------------процедура-------
 fromm="t"
@@ -300,6 +316,8 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		[ "$bicons" == "1" ] && [ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc3 >> $f_send
 		
 		[ "$em" == "1" ] && MSUBJ="[ALERT] Problem "$newid1$severity2 && MBODY="[ALERT] "$newid1" "$desc$desc3 && smail;
+		! [ -z "$webhook" ] && webhooker;
+		! [ -z "$annot_url" ] && annoter;
 		
 		[ "$fromm" == "m" ] && echo $finger >> $fhome"alerts_mail.txt"
 		cat $fhome"alerts_mail.txt"
@@ -322,6 +340,34 @@ logger "redka2 finger "$finger" is already in alerts"
 fi
 fi
 
+}
+
+
+annoter ()
+{
+logger "annoter start "$finger
+cp -f $fhome"0.sh" $fhome"annot/annot_"$finger".sh"
+
+echo "curl -X POST "$annot_url" \\" >> $fhome"annot/annot_"$finger".sh"
+echo "  -H 'Content-Type: application/json' \\" >> $fhome"annot/annot_"$finger".sh"
+echo "  -H 'Authorization: Bearer "$annot_atoken"' \\" >> $fhome"annot/annot_"$finger".sh"
+echo "--data '{" >> $fhome"annot/annot_"$finger".sh"
+echo "\"text\": \""$annot_text"\"," >> $fhome"annot/annot_"$finger".sh"
+echo "\"tags\": [\""$annot_tag"\"]" >> $fhome"annot/annot_"$finger".sh"
+echo "  }' 1>"$fhome"annot/annot_"$finger".log 2>>"$fhome"annot/annot_"$finger".log" >> $fhome"annot/annot_"$finger".sh"
+
+chmod +rx $fhome"annot/annot_"$finger".sh"
+$fhome"annot/annot_"$finger".sh" &
+}
+
+
+webhooker()
+{
+logger "webhooker start "$finger
+cp -f $fhome"0.sh" $fhome"wh/webhooker_"$finger".sh"
+echo "curl -s -L -k -m 13 "$webhook" 1>"$fhome"wh/webhooker_"$finger".log 2>>"$fhome"wh/webhooker_"$finger".log" >> $fhome"wh/webhooker_"$finger".sh"
+chmod +rx $fhome"wh/webhooker_"$finger".sh"
+$fhome"wh/webhooker_"$finger".sh" &
 }
 
 

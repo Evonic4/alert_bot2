@@ -640,7 +640,7 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 	if [ "$com12" -eq "3" ]; then
 		cont2=$com3" "$com4" "$com5" "$com6" "$com7" "$com8" "$com9" "$com10" "$com11
 		cont2=$(echo $cont2 | sed 's/[ \t]*$//')
-		echo "Mute mask ["$cont2"]" > $fhome"mutesj.txt"
+		echo "Mute jobs mask ["$cont2"]" > $fhome"mutesj.txt"
 		
 		echo "#!/bin/bash" > $fhome"1.sh"
 		echo $fhome"to-config.sh" 49 $cont2 >> $fhome"1.sh"
