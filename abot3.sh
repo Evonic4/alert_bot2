@@ -85,12 +85,12 @@ local str_col=0
 #[ "$lev_log" == "1" ] && logger "prom api checks"
 
 autohcheck;
-if [ "$autohcheck_rez" -eq "0" ]; then
-	if [ -z "$proxy" ]; then
-		curl -k -s -m 4 "$promapi" | jq '.' > $fhome"a3.txt"
-	else
-		curl -k -s -m 4 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
-	fi
+#if [ "$autohcheck_rez" -eq "0" ]; then
+#	if [ -z "$proxy" ]; then
+#		curl -k -s -m 4 "$promapi" | jq '.' > $fhome"a3.txt"
+#	else
+#		curl -k -s -m 4 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
+#	fi
 [ "$lev_log" == "1" ] && cat $fhome"a3.txt"
 if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
 logger "alert_bot GET status success"
@@ -105,7 +105,7 @@ fi
 
 [ "$str_col" -gt "6" ] && comm_vessels;
 fi
-fi
+#fi
 
 
 #[ "$lev_log" == "1" ] && logger "prom api checks end"
@@ -598,7 +598,7 @@ logger "silent_mode="$silent_mode
 
 function to_send()
 {
-[ "$lev_log" == "1" ] && logger "start to_send"
+[ "$lev_log" == "1" ] && logger "to_send start"
 
 regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 
@@ -610,6 +610,76 @@ if [ -f $f_send ]; then
 		rm -f $f_send
 	fi
 fi
+
+}
+
+
+
+send ()
+{
+logger "send start otv="
+local mute_job=0
+local gftest1=0
+local gftest2=0
+local gftest3=0
+
+cat $otv
+
+#special_mute=1 alerts; =2 resolv 
+
+#mute mask alerts
+if [ "$special_mute" -eq "1" ]; then
+	[ "$lev_log" == "1" ] && logger "send special_mute=1"
+	if [ "$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')" == "1" ]; then
+		[ "$lev_log" == "1" ] && logger "send conf32=1"
+		if ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+			[ "$lev_log" == "1" ] && logger "send conf33!=_"
+			gftest1=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
+			gftest2=$(cat $otv | grep -cE $gftest1)
+			[ "$lev_log" == "1" ] && logger "send gftest1="$gftest1
+			[ "$lev_log" == "1" ] && logger "send gftest2="$gftest2
+			if [ "$gftest2" -gt "0" ]; then
+				[ "$lev_log" == "1" ] && logger "send otv alert mask >0"
+				s_mute=1
+			fi
+		fi
+	fi
+fi
+#mute mask resolv
+if [ "$special_mute" -eq "2" ]; then
+	[ "$lev_log" == "1" ] && logger "send special_mute=1"
+	if [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" == "1" ]; then
+		[ "$lev_log" == "1" ] && logger "send conf34=1"
+		if ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
+			[ "$lev_log" == "1" ] && logger "send conf35!=_"
+			gftest1=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
+			gftest2=$(cat $otv | grep -cE $gftest1)
+			[ "$lev_log" == "1" ] && logger "send gftest1="$gftest1
+			[ "$lev_log" == "1" ] && logger "send gftest2="$gftest2
+			if [ "$gftest2" -gt "0" ]; then
+				[ "$lev_log" == "1" ] && logger "send otv resolv mask >0"
+				s_mute=1
+			fi
+		fi
+	fi
+fi
+logger "send mutej !!!!!!!!!!"
+#mutej mask mutejf mutej_onof
+mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
+mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
+if [ "$mutej_onof" == "1" ]; then
+	[ "$lev_log" == "1" ] && logger "send mutej_onof=1"
+	logger "send mutejf="$mutejf
+	if ! [ -z "$mutejf" ]; then
+		gftest3=$(cat $otv | grep -cE $mutejf)
+		[ "$lev_log" == "1" ] && logger "send gftest3="$gftest3
+		[ "$gftest3" -gt "0" ] && mute_job=1
+	fi
+fi
+[ "$lev_log" == "1" ] && logger "send mute_job="$mute_job
+logger "send mutej !!!!!!!"
+
+[ "$mute_job" -eq "0" ] && send2;
 
 }
 
@@ -627,63 +697,10 @@ logger "sender_queue snu="$snu
 
 send1 () 
 {
-local mute_job=0
-local gftest1=0
-local gftest2=0
-local gftest3=0
+
 logger "send1 start-------------------------------------------------------"
-#special_mute=1 alerts; =2 resolv 
-
-#mute mask alerts
-if [ "$special_mute" -eq "1" ]; then
-	[ "$lev_log" == "1" ] && logger "send1 special_mute=1"
-	if [ "$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')" == "1" ]; then
-		[ "$lev_log" == "1" ] && logger "send1 conf32=1"
-		if ! [ -z "$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')" ]; then
-			[ "$lev_log" == "1" ] && logger "send1 conf33!=_"
-			gftest1=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
-			gftest2=$(cat $otv | grep -cE $gftest1)
-			[ "$lev_log" == "1" ] && logger "send1 gftest1="$gftest1
-			[ "$lev_log" == "1" ] && logger "send1 gftest2="$gftest2
-			if [ "$gftest2" -gt "0" ]; then
-				[ "$lev_log" == "1" ] && logger "send1 otv alert mask >0"
-				s_mute=1
-			fi
-		fi
-	fi
-fi
-#mute mask resolv
-if [ "$special_mute" -eq "2" ]; then
-	[ "$lev_log" == "1" ] && logger "send1 special_mute=1"
-	if [ "$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')" == "1" ]; then
-		[ "$lev_log" == "1" ] && logger "send1 conf34=1"
-		if ! [ -z "$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')" ]; then
-			[ "$lev_log" == "1" ] && logger "send1 conf35!=_"
-			gftest1=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
-			gftest2=$(cat $otv | grep -cE $gftest1)
-			[ "$lev_log" == "1" ] && logger "send1 gftest1="$gftest1
-			[ "$lev_log" == "1" ] && logger "send1 gftest2="$gftest2
-			if [ "$gftest2" -gt "0" ]; then
-				[ "$lev_log" == "1" ] && logger "send1 otv resolv mask >0"
-				s_mute=1
-			fi
-		fi
-	fi
-fi
-#mutej mask mutejf mutej_onof
-mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
-mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
-if [ "$mutej_onof" == "1" ]; then
-	[ "$lev_log" == "1" ] && logger "send1 mutej_onof=1"
-	if ! [ -z "$mutejf" ]; then
-		gftest3=$(cat $otv | grep -cE $mutejf)
-		[ "$lev_log" == "1" ] && logger "send1 gftest3="$gftest3
-		[ "$gftest3" -gt "0" ] && mute_job=1
-	fi
-fi
-
 [ "$lev_log" == "1" ] && logger "send1 mute_job="$mute_job
-if [ "$mute_job" -eq "0" ]; then
+
 	sender_queue
 	echo $fhsender2$snu".txt" > $fhome"sender3.txt"
 	echo $bic >> $fhome"sender3.txt"							#спец картинок в уведомлениях 0-2
@@ -692,16 +709,16 @@ if [ "$mute_job" -eq "0" ]; then
 	echo $s_mute >> $fhome"sender3.txt"							#mute
 	mv -f $otv $fhsender2$snu".txt"
 	mv -f $fhome"sender3.txt" $fhsender1$snu".txt"
-fi
+
 
 logger "send1 end-------------------------------------------------------"
 }
 
 
 
-send ()
+send2 ()
 {
-logger "send start"
+logger "send2 start"
 
 dl=$(wc -m $otv | awk '{ print $1 }')
 echo "dl="$dl
