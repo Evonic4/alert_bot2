@@ -85,12 +85,12 @@ local str_col=0
 #[ "$lev_log" == "1" ] && logger "prom api checks"
 
 autohcheck;
-#if [ "$autohcheck_rez" -eq "0" ]; then
-#	if [ -z "$proxy" ]; then
-#		curl -k -s -m 4 "$promapi" | jq '.' > $fhome"a3.txt"
-#	else
-#		curl -k -s -m 4 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
-#	fi
+if [ "$autohcheck_rez" -eq "0" ]; then
+	if [ -z "$proxy" ]; then
+		curl -k -s -m 4 "$promapi" | jq '.' > $fhome"a3.txt"
+	else
+		curl -k -s -m 4 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
+	fi
 [ "$lev_log" == "1" ] && cat $fhome"a3.txt"
 if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
 logger "alert_bot GET status success"
@@ -105,7 +105,7 @@ fi
 
 [ "$str_col" -gt "6" ] && comm_vessels;
 fi
-#fi
+fi
 
 
 #[ "$lev_log" == "1" ] && logger "prom api checks end"
