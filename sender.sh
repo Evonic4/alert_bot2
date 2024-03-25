@@ -110,6 +110,7 @@ logger "integrity<<<<<<<<<<<<<<<<<<<"
 
 local ab3p=""
 local trbp=""
+local hcp=""
 #ab3p=$(ps af | grep $(sed -n 1"p" $fhome"abot3_pid.txt" | tr -d '\r') | grep abot3.sh | awk '{ print $1 }')
 #trbp=$(ps af | grep $(sed -n 1"p" $fhome"trbot_pid.txt" | tr -d '\r') | grep trbot.sh | awk '{ print $1 }')
 ab3p=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"abot3_pid.txt"))

@@ -1,6 +1,6 @@
 #!/bin/bash
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
-ver="v0.67"
+ver="v0.68"
 
 
 fhome=/usr/share/abot2/
@@ -60,7 +60,7 @@ groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 com_help=$(sed -n 50"p" $ftb"sett.conf" | tr -d '\r')
 com_job=$(sed -n 51"p" $ftb"sett.conf" | tr -d '\r')
 com_status=$(sed -n 52"p" $ftb"sett.conf" | tr -d '\r')
-#com_del=$(sed -n 53"p" $ftb"sett.conf" | tr -d '\r')
+com_init=$(sed -n 53"p" $ftb"sett.conf" | tr -d '\r')
 #com_cd=$(sed -n 54"p" $ftb"sett.conf" | tr -d '\r')
 com_on=$(sed -n 55"p" $ftb"sett.conf" | tr -d '\r')
 com_off=$(sed -n 56"p" $ftb"sett.conf" | tr -d '\r')
@@ -70,6 +70,11 @@ com_mute=$(sed -n 59"p" $ftb"sett.conf" | tr -d '\r')
 com_papi=$(sed -n 60"p" $ftb"sett.conf" | tr -d '\r')
 com_conf=$(sed -n 61"p" $ftb"sett.conf" | tr -d '\r')
 com_mutej=$(sed -n 62"p" $ftb"sett.conf" | tr -d '\r')
+
+admins=$(sed -n 68"p" $ftb"sett.conf" | tr -d '\r')
+! [ -z "$admins" ] && echo $admins | tr " " "\n" > $fhome"admins.txt"
+[ "$lev_log" == "1" ] && logger "Init admins="$admins
+cat $fhome"admins.txt"
 
 kkik=0
 snu=0	#номер файла sender_queue
@@ -251,7 +256,6 @@ echo "Prometheus API down alert "$tmp44" mute "$tmp451 >> $fhome"ss.txt"
 mute_stat;
 echo "Mute "$mute_stat1 >> $fhome"ss.txt"
 
-
 #mutej
 local tmprbs7=0
 local tmprbs8=""
@@ -260,6 +264,13 @@ tmprbs8=""
 [ "$tmprbs7" == "1" ] && tmprbs8="ON ["$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')"]"
 [ "$tmprbs7" == "0" ] && tmprbs8="OFF"
 echo "Mute job "$tmprbs8 >> $fhome"ss.txt"
+
+#Admins bot
+local tmprbs9=""
+admins=$(sed -n 68"p" $ftb"sett.conf" | tr -d '\r')
+tmprbs9=$admins
+[ -z "$admins" ] && tmprbs9="all"
+echo "Admins bot: "$tmprbs9 >> $fhome"ss.txt"
 
 
 otv=$fhome"ss.txt"
@@ -294,6 +305,25 @@ mts=$(sed -n 34"p" $ftb"sett.conf" | tr -d '\r')
 [ -z "$mute_stat1" ] && mute_stat1="disable"
 }
 
+
+are_you_an_admin ()
+{
+username=$(cat $fhome"in.txt" | jq ".result[$i].message.from.username" | sed 's/\"//g' | tr -d '\r')
+goa=""
+local admtest1=0
+
+if ! [ -z "$admins" ]; then
+	admtest1=$(cat $fhome"admins.txt" | grep -cE $username)
+	[ "$admtest1" -gt "0" ] && goa="ok"
+else
+	goa="ok"
+fi
+logger "are_you_an_admin? "$username" "$goa
+
+[ "$goa" == "" ] && echo "you are not an admin" > $fhome"you_no_admin.txt" && otv=$fhome"you_no_admin.txt" && s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r') && send_def && send;
+}
+
+
 roborob ()  	
 {
 date1=$(date '+ %d.%m.%Y %H:%M:%S')
@@ -322,7 +352,21 @@ if [ "$text" = "/$com_status" ]; then
 	bot_status;
 fi
 
+if [ "$text" = "/$com_init" ]; then
+	are_you_an_admin;
+	if [ "$goa" == "ok" ]; then
+		echo "init start" > $fhome"initer.txt"
+		otv=$fhome"initer.txt"
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+		send_def
+		send;
+		Init2;
+	fi
+fi
+
 if [[ "$text" == "/$com_conf"* ]]; then
+	are_you_an_admin;
+	if [ "$goa" == "ok" ]; then
 	echo $text | tr " " "\n" > $fhome"com_conf.txt"
 	local com1=""
 	local com2=""
@@ -340,6 +384,7 @@ if [[ "$text" == "/$com_conf"* ]]; then
 		send_def
 		send;
 		Init2;
+	fi
 	fi
 fi
 
@@ -380,18 +425,18 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	com10=$(sed -n 11"p" $ftb"com_mute.txt" | tr -d '\r')
 
 	#/mute
-	if [ "$com0" == "/$com_mute" ]; then
-	if [ "$com0" == "/$com_mute" ] && [ -z "$com1" ] && [ -z "$com2" ] && [ -z "$com3" ]; then
-		mute_stat;
-		echo "Mute "$mute_stat1 > $fhome"mutes.txt"
-		com6=6
-	fi
-
+   if [ "$com0" == "/$com_mute" ]; then
+		if [ "$com0" == "/$com_mute" ] && [ -z "$com1" ] && [ -z "$com2" ] && [ -z "$com3" ]; then
+			mute_stat;
+			echo "Mute "$mute_stat1 > $fhome"mutes.txt"
+			com6=6
+		fi
 
 	#/mute mask
 	[ "$com1" == "mask" ] && [ -z "$com2" ] && com6=7
 	#/mute status
 	[ "$com1" == "status" ] && mute_stat && echo "Mute "$mute_stat1 > $fhome"mutes.txt" && com6=5
+	
 	#/mute on
 	[ "$com1" == "on" ] && [ -z "$com2" ] && com6=1
 	#/mute on all
@@ -414,7 +459,6 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	[ "$com1" == "mask" ] && [ "$com2" == "alerts" ] && ! [ -z "$com3" ] && com6=12
 	#/mute mask resolves *
 	[ "$com1" == "mask" ] && [ "$com2" == "resolves" ] && ! [ -z "$com3" ] && com6=13
-
 	
 	#/mute off
 	[ "$com1" == "off" ] && [ -z "$com2" ] && echo "Mute OFF hc sys papi alerts resolves mask" > $fhome"mutes.txt" && com6=2
@@ -440,47 +484,62 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 	[ "$com1" == "mask" ] && [ "$com2" == "rm" ] && [ "$com3" == "alerts" ] && echo "Mute delete mask alerts" > $fhome"mutes.txt" && com6=11 && cont1=32 && cont2="0" && cont3=33 && cont4=""
 	#/mute rm resolves
 	[ "$com1" == "mask" ] && [ "$com2" == "rm" ] && [ "$com3" == "resolves" ] && echo "Mute delete mask resolves" > $fhome"mutes.txt" && com6=11 && cont1=34 && cont2="0" && cont3=35 && cont4=""
-	fi
+	
+   fi
 	
 	#/mute on mask alerts
 	if [ "$com6" -eq "3" ]; then
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
 		com44=$(sed -n 33"p" $ftb"sett.conf" | tr -d '\r')
 		if ! [ -z "$com44" ] && ! [ "$com44" == " " ]; then
-		echo "Mute ON mask alerts" > $fhome"mutes.txt"
-		com6=5 && cont1=32 && cont2="1"
+			echo "Mute ON mask alerts" > $fhome"mutes.txt"
+			com6=5 && cont1=32 && cont2="1"
 		else
-		echo "Mute no mask alerts" > $fhome"mutes.txt"
-		com6=5 && cont1=32 && cont2="0"
+			echo "Mute no mask alerts" > $fhome"mutes.txt"
+			com6=5 && cont1=32 && cont2="0"
+		fi
 		fi
 	fi
 	#/mute on mask resolves
 	if [ "$com6" -eq "4" ]; then
-		com44=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
-		if ! [ -z "$com44" ] && ! [ "$com44" == " " ]; then
-		echo "Mute ON mask resolves" > $fhome"mutes.txt"
-		com6=5 && cont1=34 && cont2="1"
-		else
-		echo "Mute no mask resolves" > $fhome"mutes.txt"
-		com6=5 && cont1=34 && cont2="0"
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			com44=$(sed -n 35"p" $ftb"sett.conf" | tr -d '\r')
+			if ! [ -z "$com44" ] && ! [ "$com44" == " " ]; then
+			echo "Mute ON mask resolves" > $fhome"mutes.txt"
+			com6=5 && cont1=34 && cont2="1"
+			else
+			echo "Mute no mask resolves" > $fhome"mutes.txt"
+			com6=5 && cont1=34 && cont2="0"
+			fi
 		fi
 	fi
 	#/mute mask alerts *
 	if [ "$com6" -eq "12" ]; then
-		cont1=33 
-		cont2=$com3" "$com4" "$com5" "$com66" "$com7" "$com8" "$com9" "$com10
-		cont2=$(echo $cont2 | sed 's/[ \t]*$//')
-		echo "Mute mask alerts ["$cont2"]" > $fhome"mutes.txt"
-		com6=5
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			cont1=33 
+			cont2=$com3" "$com4" "$com5" "$com66" "$com7" "$com8" "$com9" "$com10
+			cont2=$(echo $cont2 | sed 's/[ \t]*$//')
+			echo "Mute mask alerts ["$cont2"]" > $fhome"mutes.txt"
+			com6=5
+		fi
 	fi
 	#/mute mask resolves *
 	if [ "$com6" -eq "13" ]; then
-		cont1=35 
-		cont2=$com3" "$com4" "$com5" "$com66" "$com7" "$com8" "$com9" "$com10
-		cont2=$(echo $cont2 | sed 's/[ \t]*$//')
-		echo "Mute mask resolves ["$cont2"]" > $fhome"mutes.txt"
-		com6=5
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			cont1=35 
+			cont2=$com3" "$com4" "$com5" "$com66" "$com7" "$com8" "$com9" "$com10
+			cont2=$(echo $cont2 | sed 's/[ \t]*$//')
+			echo "Mute mask resolves ["$cont2"]" > $fhome"mutes.txt"
+			com6=5
+		fi
 	fi
 	if [ "$com6" -eq "1" ]; then
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
 		com444=""
 		com555=""
 		echo "#!/bin/bash" > $fhome"1.sh"
@@ -495,8 +554,11 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 		$fhome"1.sh" &
 		echo "Mute ON hc sys papi alerts resolves "$com444" "$com555 > $fhome"mutes.txt"
 		com6=6
+		fi
 	fi
 	if [ "$com6" -eq "2" ]; then
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
 		echo "#!/bin/bash" > $fhome"1.sh"
 		echo $fhome"to-config.sh" 18 0 >> $fhome"1.sh"
 		echo $fhome"to-config.sh" 28 0 >> $fhome"1.sh"
@@ -508,6 +570,7 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 		chmod +rx $fhome"1.sh"
 		$fhome"1.sh" &
 		com6=6
+		fi
 	fi
 	if [ "$com6" -eq "7" ]; then
 		com44=$(sed -n 32"p" $ftb"sett.conf" | tr -d '\r')
@@ -528,26 +591,35 @@ if [[ "$text" == "/$com_mute"* ]]; then		#on|off|mask *|all|status|sys|papi|hc|m
 		com6=6
 	fi
 	if [ "$com6" -eq "8" ]; then
-		echo "#!/bin/bash" > $fhome"1.sh"
-		echo $fhome"to-config.sh" 32 0 >> $fhome"1.sh"
-		echo $fhome"to-config.sh" 33 "" >> $fhome"1.sh"
-		echo $fhome"to-config.sh" 34 0 >> $fhome"1.sh"
-		echo $fhome"to-config.sh" 35 "" >> $fhome"1.sh"
-		chmod +rx $fhome"1.sh"
-		$fhome"1.sh" &
-		com6=6
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			echo "#!/bin/bash" > $fhome"1.sh"
+			echo $fhome"to-config.sh" 32 0 >> $fhome"1.sh"
+			echo $fhome"to-config.sh" 33 "" >> $fhome"1.sh"
+			echo $fhome"to-config.sh" 34 0 >> $fhome"1.sh"
+			echo $fhome"to-config.sh" 35 "" >> $fhome"1.sh"
+			chmod +rx $fhome"1.sh"
+			$fhome"1.sh" &
+			com6=6
+		fi
 	fi
 	if [ "$com6" -eq "11" ]; then
-		echo "#!/bin/bash" > $fhome"1.sh"
-		echo $fhome"to-config.sh" $cont1 $cont2 >> $fhome"1.sh"
-		echo $fhome"to-config.sh" $cont3 $cont4 >> $fhome"1.sh"
-		chmod +rx $fhome"1.sh"
-		$fhome"1.sh" &
-		com6=6
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			echo "#!/bin/bash" > $fhome"1.sh"
+			echo $fhome"to-config.sh" $cont1 $cont2 >> $fhome"1.sh"
+			echo $fhome"to-config.sh" $cont3 $cont4 >> $fhome"1.sh"
+			chmod +rx $fhome"1.sh"
+			$fhome"1.sh" &
+			com6=6
+		fi
 	fi
 	if [ "$com6" -eq "5" ]; then
-		$fhome"to-config.sh" $cont1 $cont2 &
-		com6=6
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			$fhome"to-config.sh" $cont1 $cont2 &
+			com6=6
+		fi
 	fi
 
 
@@ -617,37 +689,47 @@ if [[ "$text" == "/$com_mutej"* ]]; then		#|on|off|mask *
 	#/mutej mask *
 	[ "$com2" == "mask" ] && ! [ -z "$com3" ] && com12=3
 	fi
-
+	
+	
 	#/mutej on
 	if [ "$com12" -eq "1" ]; then
-		echo "#!/bin/bash" > $fhome"1.sh"
-		echo $fhome"to-config.sh" 67 1 >> $fhome"1.sh"
-		chmod +rx $fhome"1.sh"
-		$fhome"1.sh" &
-		echo "Mute jobs ON " > $fhome"mutesj.txt"
-		com12=4
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			echo "#!/bin/bash" > $fhome"1.sh"
+			echo $fhome"to-config.sh" 67 1 >> $fhome"1.sh"
+			chmod +rx $fhome"1.sh"
+			$fhome"1.sh" &
+			echo "Mute jobs ON " > $fhome"mutesj.txt"
+			com12=4
+		fi
 	fi
 	#/mutej off
 	if [ "$com12" -eq "2" ]; then
-		echo "#!/bin/bash" > $fhome"1.sh"
-		echo $fhome"to-config.sh" 67 0 >> $fhome"1.sh"
-		chmod +rx $fhome"1.sh"
-		$fhome"1.sh" &
-		echo "Mute jobs OFF " > $fhome"mutesj.txt"
-		com12=4
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			echo "#!/bin/bash" > $fhome"1.sh"
+			echo $fhome"to-config.sh" 67 0 >> $fhome"1.sh"
+			chmod +rx $fhome"1.sh"
+			$fhome"1.sh" &
+			echo "Mute jobs OFF " > $fhome"mutesj.txt"
+			com12=4
+		fi
 	fi
 	#/mute mask *
 	if [ "$com12" -eq "3" ]; then
-		cont2=$com3" "$com4" "$com5" "$com6" "$com7" "$com8" "$com9" "$com10" "$com11
-		cont2=$(echo $cont2 | sed 's/[ \t]*$//')
-		echo "Mute jobs mask ["$cont2"]" > $fhome"mutesj.txt"
-		
-		echo "#!/bin/bash" > $fhome"1.sh"
-		echo $fhome"to-config.sh" 49 $cont2 >> $fhome"1.sh"
-		chmod +rx $fhome"1.sh"
-		$fhome"1.sh" &
-		
-		com12=4
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			cont2=$com3" "$com4" "$com5" "$com6" "$com7" "$com8" "$com9" "$com10" "$com11
+			cont2=$(echo $cont2 | sed 's/[ \t]*$//')
+			echo "Mute jobs mask ["$cont2"]" > $fhome"mutesj.txt"
+			
+			echo "#!/bin/bash" > $fhome"1.sh"
+			echo $fhome"to-config.sh" 49 $cont2 >> $fhome"1.sh"
+			chmod +rx $fhome"1.sh"
+			$fhome"1.sh" &
+			
+			com12=4
+		fi
 	fi
 
 	if [ "$com12" -eq "4" ]; then
@@ -720,24 +802,33 @@ if [[ "$text" == "/$com_health"* ]]; then						#on|off|mute >0 mute on|off
 	[ "$com1" == "mute" ] && [ "$com2" == "off" ] && echo "Auto health mute OFF" > $fhome"hc.txt" && com6=4 && cont1=18 && cont11="0"
 	
 	if [ "$com6" -eq "1" ]; then
-		echo "#!/bin/bash" > $fhome"2.sh"
-		echo $fhome"to-config.sh" $cont1 $cont11 >> $fhome"2.sh"
-		echo $fhome"to-config.sh" $cont2 $cont22  >> $fhome"2.sh"
-		chmod +rx $fhome"2.sh"
-		$fhome"2.sh" &
-		com6=5
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			echo "#!/bin/bash" > $fhome"2.sh"
+			echo $fhome"to-config.sh" $cont1 $cont11 >> $fhome"2.sh"
+			echo $fhome"to-config.sh" $cont2 $cont22  >> $fhome"2.sh"
+			chmod +rx $fhome"2.sh"
+			$fhome"2.sh" &
+			com6=5
+		fi
 	fi
 	
 	if [ "$com6" -eq "4" ]; then
-		$fhome"to-config.sh" $cont1 $cont11 &
-		com6=5
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			$fhome"to-config.sh" $cont1 $cont11 &
+			com6=5
+		fi
 	fi
 	
 	if [ "$com6" -eq "5" ]; then
-		otv=$fhome"hc.txt"
-		s_mute=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
-		send_def
-		send;
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			otv=$fhome"hc.txt"
+			s_mute=$(sed -n 18"p" $ftb"sett.conf" | tr -d '\r')
+			send_def
+			send;
+		fi
 	fi
 	if [ "$com6" -eq "0" ]; then
 		echo "no commands" > $fhome"hc.txt"
@@ -811,32 +902,41 @@ if [[ "$text" == "/$com_papi"* ]]; then					#on|off|mute >0 mute on|off
 	[ "$com1" == "mute" ] && [ "$com2" == "off" ] && echo "Prometheus API alert mute OFF" > $fhome"papis.txt" && com6=4 && cont1=29 && cont11="0"
 	
 	if [ "$com6" -eq "1" ]; then
-		echo "#!/bin/bash" > $fhome"2.sh"
-		echo $fhome"to-config.sh" $cont1 $cont11 >> $fhome"2.sh"
-		echo $fhome"to-config.sh" $cont2 $cont22  >> $fhome"2.sh"
-		chmod +rx $fhome"2.sh"
-		$fhome"2.sh" &
-		com6=5
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			echo "#!/bin/bash" > $fhome"2.sh"
+			echo $fhome"to-config.sh" $cont1 $cont11 >> $fhome"2.sh"
+			echo $fhome"to-config.sh" $cont2 $cont22  >> $fhome"2.sh"
+			chmod +rx $fhome"2.sh"
+			$fhome"2.sh" &
+			com6=5
+		fi
 	fi
 
 	if [ "$com6" -eq "4" ]; then
-		$fhome"to-config.sh" $cont1 $cont11 &
-		com6=5
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			$fhome"to-config.sh" $cont1 $cont11 &
+			com6=5
+		fi
 	fi
 
 	if [ "$com6" -eq "5" ]; then
-		otv=$fhome"papis.txt"
-		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
-		send_def
-		send;
+		are_you_an_admin;
+		if [ "$goa" == "ok" ]; then
+			otv=$fhome"papis.txt"
+			s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
+			send_def
+			send;
+		fi
 	fi
-	if [ "$com6" -eq "0" ]; then
-		echo "no commands" > $fhome"papis.txt"
-		otv=$fhome"papis.txt"
-		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
-		send_def
-		send;
-	fi
+#	if [ "$com6" -eq "0" ]; then
+#		echo "no commands" > $fhome"papis.txt"
+#		otv=$fhome"papis.txt"
+#		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
+#		send_def
+#		send;
+#	fi
 fi
 
 
@@ -857,30 +957,39 @@ fi
 #fi
 
 if [ "$text" == "/$com_on" ]; then
-	$fhome"to-config.sh" 3 1 &
-	echo "Alerting mode ON" > $fhome"regim.txt"
-	otv=$fhome"regim.txt"
-	s_mute=$(sed -n 28"p" $fhome"sett.conf" | tr -d '\r')
-	send_def
-	send;
+	are_you_an_admin;
+	if [ "$goa" == "ok" ]; then
+		$fhome"to-config.sh" 3 1 &
+		echo "Alerting mode ON" > $fhome"regim.txt"
+		otv=$fhome"regim.txt"
+		s_mute=$(sed -n 28"p" $fhome"sett.conf" | tr -d '\r')
+		send_def
+		send;
+	fi
 fi
 
 if [ "$text" == "/$com_off" ]; then
-	$fhome"to-config.sh" 3 0 &
-	echo "Alerting mode OFF" > $fhome"regim.txt"
-	otv=$fhome"regim.txt"
-	s_mute=$(sed -n 28"p" $fhome"sett.conf" | tr -d '\r')
-	send_def
-	send;
+	are_you_an_admin;
+	if [ "$goa" == "ok" ]; then
+		$fhome"to-config.sh" 3 0 &
+		echo "Alerting mode OFF" > $fhome"regim.txt"
+		otv=$fhome"regim.txt"
+		s_mute=$(sed -n 28"p" $fhome"sett.conf" | tr -d '\r')
+		send_def
+		send;
+	fi
 fi
 
 if [ "$text" == "/testmail" ]; then
-	MSUBJ="Test abot2-"$bui" "$date1
-	MBODY="Testing send to mail"
-	smail;
-	s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
-	send_def
-	send;
+	are_you_an_admin;
+	if [ "$goa" == "ok" ]; then
+		MSUBJ="Test abot2-"$bui" "$date1
+		MBODY="Testing send to mail"
+		smail;
+		s_mute=$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')
+		send_def
+		send;
+	fi
 fi
 
 logger "roborob otv="$otv
@@ -1053,9 +1162,8 @@ for (( i=0;i<$mi_col;i++)); do
 			text=$(cat $ftb"in.txt" | jq ".result[$i].message.text" | sed 's/\"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//' | tr -d '\r')
 			[ "$lev_log" == "1" ] && logger "parse text="$text
 			#echo $text > $home_trbot"t.txt"
-			roborob;
-			
 			logger "parce ok"
+			roborob;
 		else
 			logger "parce dont! chat_id="$chat_id" NOT OK"
 		fi
