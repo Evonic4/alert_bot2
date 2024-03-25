@@ -72,9 +72,15 @@ com_conf=$(sed -n 61"p" $ftb"sett.conf" | tr -d '\r')
 com_mutej=$(sed -n 62"p" $ftb"sett.conf" | tr -d '\r')
 
 admins=$(sed -n 68"p" $ftb"sett.conf" | tr -d '\r')
-! [ -z "$admins" ] && echo $admins | tr " " "\n" > $fhome"admins.txt"
-[ "$lev_log" == "1" ] && logger "Init admins="$admins
-cat $fhome"admins.txt"
+rm -f $fhome"admins.txt"
+if ! [ -z "$admins" ]; then
+	for x in $admins
+	do
+		echo $x"_" >> $fhome"admins.txt"
+	done
+	[ "$lev_log" == "1" ] && logger "Init admins="$admins
+	cat $fhome"admins.txt"
+fi
 
 kkik=0
 snu=0	#номер файла sender_queue
@@ -313,7 +319,7 @@ goa=""
 local admtest1=0
 
 if ! [ -z "$admins" ]; then
-	admtest1=$(cat $fhome"admins.txt" | grep -cE $username)
+	admtest1=$(cat $fhome"admins.txt" | grep -cE $username"_")
 	[ "$admtest1" -gt "0" ] && goa="ok"
 else
 	goa="ok"
