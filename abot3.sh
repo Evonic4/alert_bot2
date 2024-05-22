@@ -667,12 +667,12 @@ if [ "$sm" == "1" ]; then
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_start="$mdt_start
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
-		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]) || ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]); then
+		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \> "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]) || ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \< "$mdt_end" ]) || ([ "$mdt_start" \= "$mdt_end" ])	|| ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]); then
 			silent_mode="on"
 		fi
 		vivod=$(sed -n 69"p" $ftb"sett.conf" | tr -d '\r')		#выводить нерезолвные алерты за время тихого режима
 		[ "$silent_mode2" == "on" ] && [ "$silent_mode" == "off" ] && [ "$vivod" == "1" ] && $fhome"job2.sh" && otv=$fhome"job2.txt" && send_def && send2	#вывод в бота alerts4.txt
-		[ "$silent_mode2" == "off" ] && [ "$silent_mode" == "on" ] && rm -f $fhome"alerts3.txt" && touch $fhome"alerts3.txt" && rm -f $fhome"alerts4.txt" && touch $fhome"alerts4.txt"
+		[ "$silent_mode2" == "off" ] && [ "$silent_mode" == "on" ] && rm -f $fhome"alerts3.txt" && rm -f $fhome"alerts4.txt"
 fi
 logger "silent_mode="$silent_mode
 

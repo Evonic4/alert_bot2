@@ -1012,7 +1012,7 @@ if [ "$sm" == "1" ]; then
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_start="$mdt_start
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
-		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]) || ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]); then
+		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \> "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]) || ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \< "$mdt_end" ]) || ([ "$mdt_start" \= "$mdt_end" ])	|| ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]); then
 			silent_mode="on"
 		fi
 fi
