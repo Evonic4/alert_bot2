@@ -79,7 +79,7 @@ kkik=0
 sendok=$(sed -n 1"p" $fstat"stat_tok_out.txt" | tr -d '\r')
 senderr=$(sed -n 1"p" $fstat"stat_terr_out.txt" | tr -d '\r')
 
-#integrity;		#только под рутом(
+integrity;		#только под рутом(
 }
 
 

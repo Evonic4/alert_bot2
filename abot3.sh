@@ -552,8 +552,8 @@ function resolv_alerts34_mail()
 {
 idfp=$(grep $finger $fhome"alerts3.txt" | awk '{print $1}' | tr -d '\r')
 numfp1=$(grep -n $finger $fhome"alerts3.txt" | awk -F':' '{print $1}' | tr -d '\r')
-numfp2=$(grep -n $idfp $fhome"alerts4.txt" | awk -F':' '{print $1}' | tr -d '\r')
-#numfp2=$numfp1
+#numfp2=$(grep -n $idfp $fhome"alerts4.txt" | awk -F':' '{print $1}' | tr -d '\r')
+numfp2=$numfp1
 [ "$lev_log" == "1" ] && logger "resolv_alerts34_mail finger="$finger" idfp="$idfp" numfp1="$numfp1" numfp2="$numfp2
 
 if ! [ -z "$numfp1" ] && ! [ -z "$numfp2" ]; then
