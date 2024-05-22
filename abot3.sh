@@ -61,6 +61,9 @@ chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
 #mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
 #mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
 
+rm -f $fhome"alerts3.txt"
+rm -f $fhome"alerts4.txt"
+
 kkik=0
 kkik1=0
 bic="0"
@@ -308,6 +311,8 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		[ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts2.txt"
 		[ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc4 >> $fhome"alerts2.txt"
 		
+		[ "$regim" == "1" ] && [ "$silent_mode" == "on" ] && ! [ "$severity" == "high" ] && ! [ "$severity" == "disaster" ] && add_alerts34;
+		
 		[ "$bicons" == "0" ] && [ "$sty" == "0" ] && echo "[ALERT] "$newid1" "$desc$desc3 >> $f_send
 		[ "$bicons" == "0" ] && [ "$sty" == "1" ] && echo "[ALERT] "$newid1" "$desc$desc3 >> $f_send
 		[ "$bicons" == "0" ] && [ "$sty" == "2" ] && echo "[ALERT] "$newid1" "$desc$severity1$desc3 >> $f_send
@@ -323,7 +328,7 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		cat $fhome"alerts_mail.txt"
 		
 		#silent_mode
-		silent_mode;
+		#silent_mode;
 		s_url=$urler
 		if [ "$silent_mode" == "on" ]; then
 		[ "$severity" == "high" ] && s_mute=$(sed -n 30"p" $ftb"sett.conf" | tr -d '\r') && to_send;
@@ -472,7 +477,7 @@ for (( i=1;i<=$str_col;i++)); do
 		
 		
 		#silent_mode
-		silent_mode;
+		#silent_mode;
 		if [ "$silent_mode" == "on" ]; then
 		logger "comm_vessels resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
 		! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && s_mute=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r') && to_send;
@@ -496,6 +501,7 @@ for (( i=1;i<=$str_col;i++)); do
 		tail -n $((str_col2-num2)) $fhome"alerts2.txt" >> $fhome"alerts2_tmp.txt"
 		cp -f $fhome"alerts2_tmp.txt" $fhome"alerts2.txt"
 		
+		resolv_alerts34;
 	else
 		[ "$lev_log" == "1" ] && logger "comm_vessels check "$test" in newalerts.txt detected"
 	fi
@@ -503,6 +509,75 @@ for (( i=1;i<=$str_col;i++)); do
 done
 
 echo "" > $fhome"newalerts.txt"
+}
+
+
+function add_alerts34()
+{
+[ "$lev_log" == "1" ] && logger "add_alerts34 "$newid1" "$finger
+echo $newid1" "$finger >> $fhome"alerts3.txt"
+[ "$sty" == "0" ] && echo $newid1" "$desc$desc4 >> $fhome"alerts4.txt"
+[ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts4.txt"
+[ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc4 >> $fhome"alerts4.txt"
+}
+function resolv_alerts34()
+{
+[ "$lev_log" == "1" ] && logger "resolv_alerts34"
+
+if [ "$regim" == "1" ] && [ "$silent_mode" == "on" ]; then
+num1=$(grep -n "$test" $fhome"alerts3.txt" | awk -F":" '{print $1}')
+#num1id=$(grep "$test" $fhome"alerts3.txt" | awk -F":" '{print $1}')
+#num2=$(grep -n "$num1id" $fhome"alerts4.txt" | awk -F":" '{print $1}')
+num2=$num1
+[ "$lev_log" == "1" ] && logger "resolv_alerts34 test="$test" num1="$num1" num2="$num2
+
+if ! [ -z "$num1" ] && ! [ -z "$num2" ]; then
+		#resolved---
+		
+		str_col11=$(grep -c '' $fhome"alerts3.txt")
+		str_col2=$(grep -c '' $fhome"alerts4.txt")
+		[ "$lev_log" == "1" ] && logger "resolv_alerts34 str_col11="$str_col11" str_col2="$str_col2
+		
+		head -n $((num1-1)) $fhome"alerts3.txt" > $fhome"alerts3_tmp.txt"
+		tail -n $((str_col11-num1)) $fhome"alerts3.txt" >> $fhome"alerts3_tmp.txt"
+		cp -f $fhome"alerts3_tmp.txt" $fhome"alerts3.txt"
+		
+		head -n $((num2-1)) $fhome"alerts4.txt" > $fhome"alerts4_tmp.txt"
+		tail -n $((str_col2-num2)) $fhome"alerts4.txt" >> $fhome"alerts4_tmp.txt"
+		cp -f $fhome"alerts4_tmp.txt" $fhome"alerts4.txt"
+fi
+fi
+}
+function resolv_alerts34_mail()
+{
+idfp=$(grep $finger $fhome"alerts3.txt" | awk '{print $1}' | tr -d '\r')
+numfp1=$(grep -n $finger $fhome"alerts3.txt" | awk -F':' '{print $1}' | tr -d '\r')
+numfp2=$(grep -n $idfp $fhome"alerts4.txt" | awk -F':' '{print $1}' | tr -d '\r')
+#numfp2=$numfp1
+[ "$lev_log" == "1" ] && logger "resolv_alerts34_mail finger="$finger" idfp="$idfp" numfp1="$numfp1" numfp2="$numfp2
+
+if ! [ -z "$numfp1" ] && ! [ -z "$numfp2" ]; then
+	#resolved---
+	
+	col1=$(grep -c '' $fhome"alerts3.txt")
+	col2=$(grep -c '' $fhome"alerts4.txt")
+	[ "$lev_log" == "1" ] && logger "resolv_alerts34_mail col1="$col1" col2="$col2
+	
+	head -n $((numfp1-1)) $fhome"alerts3.txt" > $fhome"alerts3_tmp.txt"
+	tail -n $((col1-numfp1)) $fhome"alerts3.txt" >> $fhome"alerts3_tmp.txt"
+	cp -f $fhome"alerts3_tmp.txt" $fhome"alerts3.txt"
+	
+	head -n $((numfp2-1)) $fhome"alerts4.txt" > $fhome"alerts4_tmp.txt"
+	tail -n $((col2-numfp2)) $fhome"alerts4.txt" >> $fhome"alerts4_tmp.txt"
+	cp -f $fhome"alerts4_tmp.txt" $fhome"alerts4.txt"
+	
+fi
+}
+send_def ()
+{
+s_url=""
+s_sty=0
+s_bic=0
 }
 
 
@@ -543,7 +618,7 @@ if [ "$(grep -c $finger $fhome"alerts.txt")" -gt "0" ]; then
 	[ "$em" == "1" ] && MSUBJ="[OK] Resolved "$idprob$severity2 && MBODY="[OK] "$desc4$descrip2 && smail;
 	
 	#silent_mode
-	silent_mode;
+	#silent_mode;
 	if [ "$silent_mode" == "on" ]; then
 	logger "resolved_mail resolved smt1="$smt1", smt2="$smt2", smt3="$smt3", smt4="$smt4
 	! [ -z "$smt1" ] || ! [ -z "$smt2" ] || ! [ -z "$smt3" ] || ! [ -z "$smt4" ] && s_mute=$(sed -n 31"p" $ftb"sett.conf" | tr -d '\r') && to_send;
@@ -560,13 +635,14 @@ if [ "$(grep -c $finger $fhome"alerts.txt")" -gt "0" ]; then
 	head -n $((numfp1-1)) $fhome"alerts.txt" > $fhome"alerts1_tmp.txt"
 	tail -n $((col1-numfp1)) $fhome"alerts.txt" >> $fhome"alerts1_tmp.txt"
 	cp -f $fhome"alerts1_tmp.txt" $fhome"alerts.txt"
-		
+	
 	head -n $((numfp2-1)) $fhome"alerts2.txt" > $fhome"alerts2_tmp.txt"
 	tail -n $((col2-numfp2)) $fhome"alerts2.txt" >> $fhome"alerts2_tmp.txt"
 	cp -f $fhome"alerts2_tmp.txt" $fhome"alerts2.txt"
 	
 	sed -i "/$finger/d" $fhome"alerts_mail.txt"
 	
+	[ "$regim" == "1" ] && [ "$silent_mode" == "on" ] && resolv_alerts34_mail;
 else
 	logger "resolved_mail ERROR id finger not found"
 fi
@@ -578,17 +654,25 @@ fi
 silent_mode ()
 {
 local sm=0
+local vivod=0
+local silent_mode2=""
+silent_mode2=$silent_mode
+
 silent_mode="off"
+
 [ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
-sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')			#тихий режим по ночам 0-выключен, 1-включен
 if [ "$sm" == "1" ]; then
 		mdt1=$(date '+%H:%M:%S' | sed 's/\://g' | tr -d '\r')
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_start="$mdt_start
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
-		if [ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]; then
+		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]) || ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]); then
 			silent_mode="on"
 		fi
+		vivod=$(sed -n 69"p" $ftb"sett.conf" | tr -d '\r')		#выводить нерезолвные алерты за время тихого режима
+		[ "$silent_mode2" == "on" ] && [ "$silent_mode" == "off" ] && [ "$vivod" == "1" ] && $fhome"job2.sh" && otv=$fhome"job2.txt" && send_def && send2	#вывод в бота alerts4.txt
+		[ "$silent_mode2" == "off" ] && [ "$silent_mode" == "on" ] && rm -f $fhome"alerts3.txt" && touch $fhome"alerts3.txt" && rm -f $fhome"alerts4.txt" && touch $fhome"alerts4.txt"
 fi
 logger "silent_mode="$silent_mode
 
@@ -728,10 +812,10 @@ if [ "$dl" -gt "4000" ]; then
 	echo "sv="$sv
 	$ftb"rex3.sh" $otv
 	logger "obrezka3"
-	for (( i=1;i<=$sv;i++)); do
-		otv=$fhome"rez3"$i".txt"
+	for (( i4=1;i4<=$sv;i4++)); do
+		otv=$fhome"rez3"$i4".txt"
 		send1;
-		rm -f $fhome"rez3"$i".txt"
+		rm -f $fhome"rez3"$i4".txt"
 	done
 	
 else
@@ -812,6 +896,7 @@ Init;
 while true
 do
 sleep $ssec
+silent_mode;
 alert_bot;
 
 [ "$chm" -eq "1" ] && check_mail;

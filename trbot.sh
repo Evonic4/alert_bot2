@@ -1,6 +1,6 @@
 #!/bin/bash
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
-ver="v0.68"
+ver="v0.69"
 
 
 fhome=/usr/share/abot2/
@@ -205,13 +205,10 @@ regim=$(sed -n 3"p" $ftb"sett.conf" | tr -d '\r')
 [ "$regim" -eq "0" ] && echo "Alerting mode OFF" >> $fhome"ss.txt"
 
 #silent_mode
-sm1=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
-sm2=$(sed -n 26"p" $ftb"sett.conf" | tr -d '\r')
-sm3=$(sed -n 27"p" $ftb"sett.conf" | tr -d '\r')
-[ "$silent_mode" == "on" ] && echo "Silent mode ON "$sm2" - "$sm3 >> $fhome"ss.txt"
-[ "$silent_mode" == "off" ] && echo "Silent mode OFF" >> $fhome"ss.txt"
-if [ "$sm1" -eq "1" ]; then
-	silent_mode;
+silent_mode;
+[ "$sm" -eq "1" ] && echo "Silent mode ON "$(sed -n 26"p" $ftb"sett.conf" | tr -d '\r')" - "$(sed -n 27"p" $ftb"sett.conf" | tr -d '\r') >> $fhome"ss.txt"
+[ "$sm" -eq "0" ] && echo "Silent mode OFF" >> $fhome"ss.txt"
+if [ "$sm" -eq "1" ]; then
 	[ "$silent_mode" == "on" ] && echo "Now silent mode working" >> $fhome"ss.txt"
 	[ "$silent_mode" == "off" ] && echo "Now silent mode not working" >> $fhome"ss.txt"
 else
@@ -1007,12 +1004,15 @@ silent_mode ()
 silent_mode="off"
 [ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
 sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
+mdt_start=$(sed -n 26"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
+mdt_end=$(sed -n 27"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
+
 if [ "$sm" == "1" ]; then
 		mdt1=$(date '+%H:%M:%S' | sed 's/\://g' | tr -d '\r')
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt1="$mdt1
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_start="$mdt_start
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
-		if [ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]; then
+		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]) || ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ]); then
 			silent_mode="on"
 		fi
 fi
