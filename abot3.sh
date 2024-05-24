@@ -17,7 +17,8 @@ fpost_new=/home/en/fetchmail/mail/new/
 fpost_cur=/home/en/fetchmail/mail/cur/
 fpost_tmp=/home/en/fetchmail/mail/tmp/
 col_alert_in=$(sed -n 1"p" $fstat"stat_alert_in.txt" | tr -d '\r')		#stat alert in
-
+rm -f $fhome"alerts3.txt"
+rm -f $fhome"alerts4.txt"
 
 
 function Init() 
@@ -61,8 +62,6 @@ chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
 #mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
 #mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
 
-rm -f $fhome"alerts3.txt"
-rm -f $fhome"alerts4.txt"
 
 kkik=0
 kkik1=0
