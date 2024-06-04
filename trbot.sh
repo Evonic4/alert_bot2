@@ -1,6 +1,6 @@
 #!/bin/bash
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
-ver="v0.69"
+ver="v0.691"
 
 
 fhome=/usr/share/abot2/

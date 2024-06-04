@@ -826,10 +826,10 @@ fi
 
 autohcheck ()
 {
-autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed')
+autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed|Could not resolve')
 echo $autohcheck_rez > $ftb"prom_api_status.txt"
 
-if [ "$autohcheck_rez" -eq "1" ]; then
+if [ "$autohcheck_rez" -gt "0" ]; then
   logger "autohcheck prom api Failed"
   pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
   [ "$pappi" -eq "0" ] && pappi1=0
