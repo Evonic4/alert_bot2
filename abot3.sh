@@ -221,12 +221,15 @@ severity=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.severity' | sed
 urler=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 desc=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum')
+script=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.script')
 
 webhook=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.webhook' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_url=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_text=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_text' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_tag=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_tag' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_atoken=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_atoken' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+annot_scenv=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_scenv' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+
 
 [ "$urler" == "null" ] && urler=""
 [ "$webhook" == "null" ] && webhook=""
@@ -234,6 +237,8 @@ annot_atoken=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_atoke
 [ "$annot_text" == "null" ] && annot_text=""
 [ "$annot_tag" == "null" ] && annot_tag=""
 [ "$annot_atoken" == "null" ] && annot_atoken=""
+[ "$script" == "null" ] && script=""
+[ "$annot_scenv" == "null" ] && annot_scenv=""
 
 [ "$lev_log" == "1" ] && logger "redka i1="$i1
 [ "$lev_log" == "1" ] && logger "redka alertname="$alertname
@@ -250,6 +255,10 @@ annot_atoken=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_atoke
 [ "$lev_log" == "1" ] && logger "redka annot_text="$annot_text
 [ "$lev_log" == "1" ] && logger "redka annot_tag="$annot_tag
 [ "$lev_log" == "1" ] && logger "redka annot_atoken="$annot_atoken
+
+[ "$lev_log" == "1" ] && logger "redka script="$script
+[ "$lev_log" == "1" ] && logger "redka annot_scenv="$annot_scenv
+
 
 #-----------------процедура-------
 fromm="t"
@@ -322,6 +331,7 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		[ "$em" == "1" ] && MSUBJ="[ALERT] Problem "$newid1$severity2 && MBODY="[ALERT] "$newid1" "$desc$desc3 && smail;
 		! [ -z "$webhook" ] && webhooker;
 		! [ -z "$annot_url" ] && annoter;
+		! [ -z "$script" ] && scripter;
 		
 		[ "$fromm" == "m" ] && echo $finger >> $fhome"alerts_mail.txt"
 		cat $fhome"alerts_mail.txt"
@@ -372,6 +382,13 @@ cp -f $fhome"0.sh" $fhome"wh/webhooker_"$finger".sh"
 echo "curl -s -L -k -m 13 "$webhook" 1>"$fhome"wh/webhooker_"$finger".log 2>>"$fhome"wh/webhooker_"$finger".log" >> $fhome"wh/webhooker_"$finger".sh"
 chmod +rx $fhome"wh/webhooker_"$finger".sh"
 $fhome"wh/webhooker_"$finger".sh" &
+}
+
+
+scripter()
+{
+logger "scripter finger="$finger" start"$fhome"sc/"$script" "$annot_scenv
+$fhome"sc/"$script" "$annot_scenv &
 }
 
 
