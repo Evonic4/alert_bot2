@@ -19,6 +19,7 @@ fpost_tmp=/home/en/fetchmail/mail/tmp/
 col_alert_in=$(sed -n 1"p" $fstat"stat_alert_in.txt" | tr -d '\r')		#stat alert in
 rm -f $fhome"alerts3.txt"
 rm -f $fhome"alerts4.txt"
+$fhome"sc/setup.sh"
 
 
 function Init() 
@@ -220,16 +221,16 @@ jober=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.job' | sed 's/"/ /
 severity=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.severity' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 urler=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 desc=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
-unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum')
-script=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.script')
+unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 webhook=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.webhook' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_url=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_text=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_text' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_tag=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_tag' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_atoken=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_atoken' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
-annot_scenv=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_scenv' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
+script=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.script' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+annot_scenv=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.annot_scenv' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 [ "$urler" == "null" ] && urler=""
 [ "$webhook" == "null" ] && webhook=""
@@ -388,7 +389,9 @@ $fhome"wh/webhooker_"$finger".sh" &
 scripter()
 {
 logger "scripter finger="$finger" start"$fhome"sc/"$script" "$annot_scenv
-$fhome"sc/"$script" "$annot_scenv &
+export scenv=$annot_scenv
+$fhome"sc/"$script &
+#$fhome"sc/"$script" "$annot_scenv &
 }
 
 

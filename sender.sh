@@ -14,7 +14,7 @@ fpost_home=/home/en/fetchmail/
 fpost_new=/home/en/fetchmail/mail/new/
 fpost_cur=/home/en/fetchmail/mail/cur/
 fpost_tmp=/home/en/fetchmail/mail/tmp/
-chmod +rx $fhome"sc/*"
+$fhome"sc/setup.sh"
 
 function Init2() 
 {
