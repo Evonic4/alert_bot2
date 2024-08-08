@@ -390,7 +390,7 @@ scripter()
 {
 logger "scripter finger="$finger" start"$fhome"sc/"$script" "$annot_scenv
 export scenv=$annot_scenv
-$fhome"sc/"$script &
+$fhome"sc/"$script 1>>$fhome"sc/"$script".log" 2>>&1 &
 #$fhome"sc/"$script" "$annot_scenv &
 }
 
