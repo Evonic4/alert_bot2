@@ -97,7 +97,7 @@ if [ "$autohcheck_rez" -eq "0" ]; then
 [ "$lev_log" == "1" ] && cat $fhome"a3.txt"
 if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
 logger "alert_bot GET status success"
-str_col=$(grep -cv "^---" $fhome"a3.txt")
+str_col=$(grep -c '' $fhome"a3.txt")
 logger "alert_bot bot api str_col="$str_col
 
 if [ "$str_col" -gt "6" ]; then
@@ -106,7 +106,7 @@ echo "" > $fhome"newalerts.txt"
 redka;
 fi
 
-[ "$str_col" -gt "6" ] && comm_vessels;
+[ "$str_col" -gt "5" ] && comm_vessels; #если по нулям
 fi
 fi
 
