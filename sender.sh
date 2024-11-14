@@ -274,7 +274,7 @@ Init2;
 
 pushg_port=$(echo $pushg | awk -F ":" '{ print $2 }'| tr -d '\r')
 logger "sender pushg_port="$pushg_port
-if [ "$pushg_port" == "9044" ] || [ "$pushg_port" == "9045" ] || [ "$pushg_port" == "9046" ] || [ "$pushg_port" == "9047" ] || [ "$pushg_port" == "9048" ] || [ "$pushg_port" == "9049" ] || [ "$pushg_port" == "9050" ]; then
+if [ "$pushg_port" == "9044" ]; then
 	logger "sender start local pushgateway"
 	cp -f $fhome"0.sh" $fhome"start_pg.sh"
 	echo "su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:${pushg_port}' -s /bin/bash 1>/dev/null 2>/dev/null &" >> $fhome"start_pg.sh"
