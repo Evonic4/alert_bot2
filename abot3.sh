@@ -318,9 +318,9 @@ if ! [ "$(grep $finger $fhome"alerts.txt")" ]; then
 		echo $newid1" "$finger >> $fhome"alerts.txt"
 		logger "redka2 newid1="$newid1
 		
-		[ "$sty" == "0" ] && echo $newid1" "$desc$desc4 >> $fhome"alerts2.txt"
-		[ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts2.txt"
-		[ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc4 >> $fhome"alerts2.txt"
+		[ "$sty" == "0" ] && echo $newid1" "$desc$desc4 >> $fhome"alerts2.txt" && echo $newid1" "$desc$desc4 >> $fhome"alerts2_arh.txt"
+		[ "$sty" == "1" ] && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts2.txt" && echo $code2$newid1" "$desc$desc4 >> $fhome"alerts2_arh.txt"
+		[ "$sty" == "2" ] && echo $newid1" "$desc$severity1$desc4 >> $fhome"alerts2.txt" && echo $newid1" "$desc$severity1$desc4 >> $fhome"alerts2_arh.txt"
 		
 		[ "$regim" == "1" ] && [ "$silent_mode" == "on" ] && ! [ "$severity" == "high" ] && ! [ "$severity" == "disaster" ] && add_alerts34;	#если silent mode включен
 		
@@ -560,12 +560,16 @@ logger "comm_vessels2 start"
 
 consistency2 ()
 {
+local count_fstr=0
 logger "consistency2 start"
 
 if [ -f $fhome"alerts1_tmp_cons_id.txt" ]; then
 	for x in $(cat $fhome"alerts1_tmp_cons_id.txt"|grep -v \#| awk '{print $1}' | tr -d '\r')
 	do
-		echo '<b><a href="https://bdolife.ru/wp-content/uploads/2021/08/1cprog.jpg" target="_blank">&#128309;</a></b>'$x' Problem (abot), Started at 2024-01-01 00:00:00' >> $fhome"alerts2.txt"
+		count_fstr=$(grep -c $x $fhome"alerts2_arh.txt"| tr -d '\r')
+		[ "$count_fstr" -eq "0" ] && local date3=$(date '+ %Y-%m-%d %H:%M:%S') && echo '<b><a href="https://bdolife.ru/wp-content/uploads/2021/08/1cprog.jpg" target="_blank">&#128309;</a></b>'$x' Problem (abot), Started at '$date3 >> $fhome"alerts2.txt"
+		[ "$count_fstr" -eq "1" ] && local astr=$(grep $x $fhome"alerts2_arh.txt"| tr -d '\r') && echo $astr >> $fhome"alerts2.txt"
+		[ "$count_fstr" -gt "1" ] && local astr=$(grep $x $fhome"alerts2_arh.txt"| tail -1 | tr -d '\r') && echo $astr >> $fhome"alerts2.txt"
 	done
 	rm -f $fhome"alerts1_tmp_cons_id.txt"
 else
