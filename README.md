@@ -1,7 +1,7 @@
 # Abot2  
 Сontrolled telegram bot for prometheus  
   
-Use docker image evonic/abot2:latest  
+Use docker image evonic/abot2:vers  
 Configure settings in settings.conf  
   
 added receiving alerts from emails, structure:  
