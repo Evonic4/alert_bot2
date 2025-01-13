@@ -60,6 +60,7 @@ mdt_end=$(sed -n 27"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
 
 chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
 severity4=$(sed -n 70"p" $ftb"sett.conf" | tr -d '\r')
+unic4=$(sed -n 70"p" $ftb"sett.conf" | tr -d '\r')
 #mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
 #mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
 
@@ -224,7 +225,8 @@ jober=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.job' | sed 's/"/ /
 severity=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${severity4}'' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 urler=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 desc=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.description' | sed 's/"/ /g' | sed 's/UTC/ /g' | sed 's/+0000/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
-unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.'${unic4}'' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
+#unic=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].annotations.unicum' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 webhook=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.webhook' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
 annot_url=$(cat $fhome"a3.txt" | jq '.data.alerts['${i1}'].labels.annot_url' | sed 's/"/ /g' | sed 's/^[ \t]*//;s/[ \t]*$//')
