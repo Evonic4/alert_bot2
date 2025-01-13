@@ -60,7 +60,7 @@ mdt_end=$(sed -n 27"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
 
 chm=$(sed -n 40"p" $ftb"sett.conf" | tr -d '\r')
 severity4=$(sed -n 70"p" $ftb"sett.conf" | tr -d '\r')
-unic4=$(sed -n 70"p" $ftb"sett.conf" | tr -d '\r')
+unic4=$(sed -n 71"p" $ftb"sett.conf" | tr -d '\r')
 #mutejf=$(sed -n 49"p" $ftb"sett.conf" | tr -d '\r')
 #mutej_onof=$(sed -n 67"p" $ftb"sett.conf" | tr -d '\r')
 
