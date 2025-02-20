@@ -373,10 +373,11 @@ echo "  -H 'Authorization: Bearer "$annot_atoken"' \\" >> $fhome"annot/annot_"$f
 echo "--data '{" >> $fhome"annot/annot_"$finger".sh"
 echo "\"text\": \""$annot_text"\"," >> $fhome"annot/annot_"$finger".sh"
 echo "\"tags\": [\""$annot_tag"\"]" >> $fhome"annot/annot_"$finger".sh"
-echo "  }' 1>"$fhome"annot/annot_"$finger".log 2>>"$fhome"annot/annot_"$finger".log" >> $fhome"annot/annot_"$finger".sh"
+echo "  }' 1>"$fhome"annot/annot_"$finger".log 2>&1" >> $fhome"annot/annot_"$finger".sh"
 
+perl -pi -e "s/\r\n/\n/" $fhome"annot/annot_"$finger".sh"
 chmod +rx $fhome"annot/annot_"$finger".sh"
-$fhome"annot/annot_"$finger".sh" &
+$fhome"annot/annot_"$finger".sh" 1>$fhome"annot/"$finger".log" 2>&1 &
 }
 
 
@@ -384,17 +385,22 @@ webhooker()
 {
 logger "webhooker start "$finger
 cp -f $fhome"0.sh" $fhome"wh/webhooker_"$finger".sh"
-echo "curl -s -L -k -m 13 "$webhook" 1>"$fhome"wh/webhooker_"$finger".log 2>>"$fhome"wh/webhooker_"$finger".log" >> $fhome"wh/webhooker_"$finger".sh"
+echo "curl -L -k -m 13 "$webhook" 1>"$fhome"wh/webhooker_"$finger".log 2>&1" >> $fhome"wh/webhooker_"$finger".sh"
+
+perl -pi -e "s/\r\n/\n/" $fhome"wh/webhooker_"$finger".sh"
 chmod +rx $fhome"wh/webhooker_"$finger".sh"
-$fhome"wh/webhooker_"$finger".sh" &
+$fhome"wh/webhooker_"$finger".sh" 1>$fhome"wh/"$finger".log" 2>&1 &
 }
 
 
 scripter()
 {
-logger "scripter finger="$finger" start"$fhome"sc/"$script" "$annot_scenv
+logger "scripter finger="$finger" start "$fhome"sc/"$script" "$annot_scenv
 export scenv=$annot_scenv
-$fhome"sc/"$script 1>/tmp/script.log 2>&1 &
+
+perl -pi -e "s/\r\n/\n/" $fhome"sc/"$script
+chmod +rx $fhome"sc/"$script
+$fhome"sc/"$script 1>$fhome"sc/"$finger".log" 2>&1 &
 }
 
 

@@ -39,3 +39,18 @@ use webhook in alert:
       unicum: '{{ $labels.job }}'  
       description: 'Service {{ $labels.instance }} ({{ $labels.job }}) down (ne)'  
   
+use script in alert:  
+- name: nexp  
+  rules:  
+  - alert: service_down1  
+    expr: up{instance=~"1.2.3.4:9001"} == 0  
+    for: 0m  
+    labels:  
+      severity2: disaster  
+      groupp: admins1  
+      script: 'test.sh' 
+    annotations:  
+      unicum: '{{ $labels.job }}'  
+      description: 'Service {{ $labels.instance }} ({{ $labels.job }}) down (ne)'  
+  
+  
