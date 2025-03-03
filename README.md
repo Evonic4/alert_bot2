@@ -5,7 +5,7 @@ Use docker image evonic/abot2:vers
 Configure settings in settings.conf  
   
 added receiving alerts from emails, structure:  
-start|alertname|group|instance|job|severity|urler|description|unic  
+start|alertname|groupp|instance|job|severity|urler|description|unic|webhook|annot_url|annot_text|annot_tag|annot_atoken|script|annot_scenv  
   
 ---->  
 use annotations for grafana:  
@@ -20,7 +20,7 @@ use annotations for grafana:
           annot_url: 'http://grafana.svc.cluster.local:80/api/annotations'  
           annot_text: 'Accident: k8s no <a href=https://grafana.com/d/9PHBOsO4z/kubernetes>health</a>'  
           annot_tag: accident  
-          annot_atoken: glsa_S9RTxMDq654654625hA851oFkM7HSLI_9698c2c3  
+          annot_atoken: glsa_S9RTxMDq654654625hA811oFkM7HSLI_9698c2c3  
         annotations:  
           unicum: '{{$labels.job}}'  
           description: 'Accident (gr_anno)'  

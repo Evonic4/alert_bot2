@@ -1,5 +1,6 @@
 #!/bin/bash
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+ver="0.76"
 
 #переменные
 fhome=/usr/share/abot2/
@@ -15,6 +16,8 @@ fpost_new=/home/en/fetchmail/mail/new/
 fpost_cur=/home/en/fetchmail/mail/cur/
 fpost_tmp=/home/en/fetchmail/mail/tmp/
 $fhome"sc/setup.sh"
+echo $ver > $fstat"ver.txt"
+
 
 function Init2() 
 {
@@ -22,6 +25,7 @@ logger "Init2"
 #rm -rf $fhsender
 mkdir -p $fhsender1
 mkdir -p $fhsender2
+cp -f $fhome"settings.conf" $fhome"sett.conf"
 
 em=$(sed -n 8"p" $fhome"sett.conf" | tr -d '\r')
 if [ "$em" -eq "1" ]; then
@@ -46,7 +50,7 @@ sty=$(sed -n 20"p" $fhome"sett.conf" | tr -d '\r')
 ssec=$(sed -n 12"p" $fhome"sett.conf" | tr -d '\r')
 progons=$(sed -n 13"p" $fhome"sett.conf" | tr -d '\r')
 chat_id=$(sed -n "2p" $fhome"sett.conf" | sed 's/z/-/g' | tr -d '\r')
-pushg=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
+reinit_progons=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
 
 chm=$(sed -n 40"p" $fhome"sett.conf" | tr -d '\r')
 local fpool=$(sed -n 42"p" $fhome"sett.conf" | tr -d '\r')
@@ -111,8 +115,7 @@ logger "integrity<<<<<<<<<<<<<<<<<<<"
 local ab3p=""
 local trbp=""
 local hcp=""
-#ab3p=$(ps af | grep $(sed -n 1"p" $fhome"abot3_pid.txt" | tr -d '\r') | grep abot3.sh | awk '{ print $1 }')
-#trbp=$(ps af | grep $(sed -n 1"p" $fhome"trbot_pid.txt" | tr -d '\r') | grep trbot.sh | awk '{ print $1 }')
+
 ab3p=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"abot3_pid.txt"))
 trbp=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"trbot_pid.txt"))
 hcp=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"hchecker_pid.txt"))
@@ -253,6 +256,83 @@ cat $fhome"out2_err.txt"
 }
 
 
+to_health ()
+{
+logger "to_health start"
+local ver=$(sed -n "1p" $fstat"ver.txt" | tr -d '\r')
+local opov=$(sed -n 7"p" $fhome"sett.conf" | tr -d '\r')
+#col_jobs
+local tmprbs2=$(cat $fhome"alerts2.txt" | wc -l)
+local tmprbs3=$(cat $fhome"alerts2.txt" | wc -c)
+[ "$tmprbs2" -gt "0" ] && [ "$tmprbs3" -lt "8" ] && tmprbs2=0
+#Alerting mode alert_mode
+local regim=$(sed -n 3"p" $fhome"sett.conf" | tr -d '\r')
+#silent_mode
+local sm=$(sed -n "1p" $fstat"silent_mode.txt" | tr -d '\r')
+
+#prom_api_status
+local pasn=""
+local pasn1=""
+local a5=0
+for ((a5=0;a5<=5;a5++)); do
+	pasn=""
+	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
+		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
+		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
+			pasn="1"
+		else
+			pasn="0"
+		fi
+		pasn1=$pasn1$pasn
+	fi
+done
+
+#Admins bot
+local bot_adm=$(sed -n 68"p" $ftb"sett.conf" | tr -d '\r')
+[ -z "$bot_adm" ] && bot_adm="all"
+
+#telegram
+local so=$(sed -n "1p" $fstat"stat_tok_out.txt" | tr -d '\r')
+local ser=$(sed -n "1p" $fstat"stat_terr_out.txt" | tr -d '\r')
+local tier=$(sed -n "1p" $fstat"stat_terr_in.txt" | tr -d '\r')
+
+
+#общий статус
+local status="UP"		#WARN ERROR
+local ab3p2=""
+local trbp2=""
+local hcp2=""
+[ -f $fhome"abot3_pid.txt" ] && ab3p2=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"abot3_pid.txt"))
+[ -f $fhome"trbot_pid.txt" ] && trbp2=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"trbot_pid.txt"))
+[ -f $fhome"hchecker_pid.txt" ] && hcp2=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"hchecker_pid.txt"))
+if [ -z "$trbp2" ]; then
+	local stat_check_trbot=0
+else
+	local stat_check_trbot=1
+fi
+if [ -z "$ab3p2" ]; then
+	local stat_check_abot3=0
+else
+	local stat_check_abot3=1
+fi
+if [ -z "$hcp2" ]; then
+	local stat_check_hc=0
+else
+	local stat_check_hc=1
+fi
+[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -eq "0" ] && status="ERROR"
+[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -lt "3" ] && status="WARN"
+[ "$((stat_check_abot3))" -eq "0" ] && status="ERROR"
+[ "$(echo $pasn | grep -c '0')" -gt "0" ] && status="WARN"
+[ "$ser" -gt "0" ] || [ "$tier" -gt "0" ] && status="WARN"
+[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -eq "3" ] && status="UP"
+
+
+local date3=$(date '+ %Y-%m-%d %H:%M:%S'|sed 's/^[ \t]*//;s/[ \t]*$//')
+echo "{\"version\": \"${ver}\",\"app\": \"abot2\",\"name\": \"${bui}\",\"status\": \"${status}\",\"func_pred\": \"${opov}\",\"col_jobs\": \"${tmprbs2}\",\"alert_mode\": \"${regim}\",\"silent_mode\": \"${sm}\",\"prom_api_status\": \"${pasn1}\",\"check_trbot\": \"${stat_check_trbot}\",\"check_abot3\": \"${stat_check_abot3}\",\"check_hc\": \"${stat_check_hc}\",\"bot_adm\": \"${bot_adm}\",\"t_send_ok\": \"${so}\",\"t_send_err\": \"${ser}\",\"t_in_err\": \"${ser}\",\"time\": \"${date3}\"}" > ${fhome}h1.json
+cp -f ${fhome}h1.json ${fhome}h.json
+
+}
 
 
 
@@ -262,33 +342,52 @@ cat $fhome"out2_err.txt"
 PID=$$
 echo $PID > $fPID
 logger "sender start"
-cp -f $fhome"settings.conf" $fhome"sett.conf"
 
 #stat init
-echo 0 > $fstat"stat_alert_in.txt"
+echo 0 > $fstat"prom_api_status0.txt"
+echo 0 > $fstat"silent_mode.txt"
 echo 0 > $fstat"stat_terr_in.txt"
 echo 0 > $fstat"stat_terr_out.txt"
 echo 0 > $fstat"stat_tok_out.txt"
 
 Init2;
+to_health;
+${fhome}health.sh 1>/dev/null 2>&1 &
 
-pushg_port=$(echo $pushg | awk -F ":" '{ print $2 }'| tr -d '\r')
-logger "sender pushg_port="$pushg_port
-if [ "$pushg_port" == "9044" ]; then
-	logger "sender start local pushgateway"
-	cp -f $fhome"0.sh" $fhome"start_pg.sh"
-	echo "su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:${pushg_port}' -s /bin/bash 1>/dev/null 2>/dev/null &" >> $fhome"start_pg.sh"
-	chmod +rx $fhome"start_pg.sh"
-	$fhome"start_pg.sh"
-fi
+
+#start local pushgateway
+logger "sender start local pushgateway"
+cp -f $fhome"0.sh" $fhome"start_pg.sh"
+echo "su pushgateway -c '/usr/local/bin/pushgateway --web.listen-address=0.0.0.0:9044' -s /bin/bash 1>/dev/null 2>/dev/null &" >> $fhome"start_pg.sh"
+chmod +rx $fhome"start_pg.sh"
+$fhome"start_pg.sh"
+
 sleep 1
 
+kkik2=0
+kkik3=0
+
+logger "sender go"
 while true
 do
 sleep 1
 sender;
 kkik=$(($kkik+1))
+kkik2=$(($kkik2+1))
+kkik3=$(($kkik3+1))
+
 [ "$kkik" -ge "$progons" ] && Init2
+
+if [ "$kkik3" -gt "100" ]; then
+	kkik3=0
+	to_health &
+fi
+
+if [ "$kkik2" -gt "$reinit_progons" ]; then
+	kkik2=0;
+	[ -f $fhome"h_pid.txt" ] && cpid=$(sed -n 1"p" $fhome"h_pid.txt" | tr -d '\r') && kill -9 $cpid && ${fhome}health.sh 1>/dev/null 2>&1 &
+	! [ -f $fhome"h_pid.txt" ] && logger "sender h_pid.txt not found" && ${fhome}health.sh 1>/dev/null 2>&1 &
+fi
 
 done
 

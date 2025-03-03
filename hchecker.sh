@@ -20,7 +20,7 @@ logger "Init2"
 bui=$(sed -n 11"p" $fhome"sett.conf" | tr -d '\r')
 startid=$(sed -n 9"p" $fhome"sett.conf" | tr -d '\r')
 lev_log=$(sed -n 14"p" $fhome"sett.conf" | tr -d '\r')
-pushg=$(sed -n 48"p" $fhome"sett.conf" | tr -d '\r')
+pushg="127.0.0.1:9044"
 }
 
 
@@ -57,14 +57,22 @@ while true
 do
 sleep 10
 
-#check_api
-if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
-	logger "check_api OK"
-	stat_check_api="1"
-else
-	logger "check_api ERR"
-	stat_check_api="0"
-fi
+#prom_api_status
+pasn=""
+pasn1=""
+for ((a5=0;a5<=5;a5++)); do
+	pasn=""
+	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
+		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
+		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
+			pasn="1"
+		else
+			pasn="0"
+		fi
+		pasn1=$pasn1$pasn
+	fi
+done
+stat_check_api=$pasn1
 
 ab3p=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"abot3_pid.txt"))
 trbp=$(ps axu| awk '{ print $2 }' | grep $(sed -n 1"p" $fhome"trbot_pid.txt"))

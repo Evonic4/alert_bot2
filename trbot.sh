@@ -1,6 +1,5 @@
 #!/bin/bash
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
-ver="v0.75"
 
 
 fhome=/usr/share/abot2/
@@ -19,7 +18,6 @@ mkdir -p /var/log/trbot/
 lev_log=$(sed -n 14"p" $ftb"sett.conf" | tr -d '\r')
 starten=1
 tinp_err=$(sed -n 1"p" $fstat"stat_terr_in.txt" | tr -d '\r')
-
 
 
 function Init2() 
@@ -85,6 +83,7 @@ fi
 kkik=0
 snu=0	#номер файла sender_queue
 tinp_ok=0
+tinp_err=0
 tohelpness;
 }
 
@@ -196,6 +195,7 @@ tmprbs3=$(cat $fhome"alerts2.txt" | wc -c)
 #tmprbs5=$(cat $fhome"delete.txt" | wc -c)
 #[ "$tmprbs4" -gt "0" ] && [ "$tmprbs5" -lt "8" ] && tmprbs4=0
 #echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.txt"
+ver=$(sed -n 3"p" $fstat"ver.txt" | tr -d '\r')
 echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2 > $fhome"ss.txt"
 
 #Alerting mode
@@ -215,13 +215,23 @@ else
 	echo "Now silent mode not working" >> $fhome"ss.txt"
 fi
 
-#Prom API
-autohcheck_rez=$(sed -n "1p" $fhome"prom_api_status.txt" | tr -d '\r')
-if [ "$autohcheck_rez" -eq "0" ]; then
-	echo "Prom API UP" >> $fhome"ss.txt"
-else
-	echo "Prom API DOWN" >> $fhome"ss.txt"
-fi
+#prom_api_status
+local pasn=""
+local pasn1=""
+for ((a5=0;a5<=5;a5++)); do
+	pasn=""
+	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
+		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
+		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
+			pasn="1"
+		else
+			pasn="0"
+		fi
+		pasn1=$pasn1$pasn
+	fi
+done
+echo "Prom API State "$pasn1" (1-up,0-down)" >> $fhome"ss.txt"
+
 
 #health check
 mute_health_on=$(sed -n 18"p" $fhome"sett.conf" | tr -d '\r')
@@ -1001,6 +1011,7 @@ logger "roborob otv="$otv
 
 silent_mode ()
 {
+local sm222=0
 silent_mode="off"
 [ "$lev_log" == "1" ] && logger "--------------silent_mode------------------"
 sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
@@ -1014,11 +1025,13 @@ if [ "$sm" == "1" ]; then
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
 		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \> "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]) || ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \< "$mdt_end" ]) || ([ "$mdt_start" \= "$mdt_end" ])	|| ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]); then
 			silent_mode="on"
+			sm222=1
 		fi
 fi
 logger "silent_mode="$silent_mode
-
+echo $sm222 > $fstat"silent_mode.txt"
 }
+
 
 sender_queue ()
 {
@@ -1293,6 +1306,8 @@ if [ "$kkik" -ge "$progons" ]; then
 	#sumi=$((tinp_ok+tinp_err))
 	#echo $(echo "scale=2; $tinp_err/$sumi * 100" | bc) >> $fhome"err_accept.txt"
 fi
+
+echo $tinp_err > $fstat"stat_terr_in.txt"
 
 done
 rm -f $fPID

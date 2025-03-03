@@ -16,7 +16,6 @@ fpost_home=/home/en/fetchmail/
 fpost_new=/home/en/fetchmail/mail/new/
 fpost_cur=/home/en/fetchmail/mail/cur/
 fpost_tmp=/home/en/fetchmail/mail/tmp/
-col_alert_in=$(sed -n 1"p" $fstat"stat_alert_in.txt" | tr -d '\r')		#stat alert in
 rm -f $fhome"alerts3.txt"
 rm -f $fhome"alerts4.txt"
 $fhome"sc/setup.sh"
@@ -45,14 +44,16 @@ tst=$(sed -n 16"p" $fhome"sett.conf" | tr -d '\r')
 bicons=$(sed -n 19"p" $ftb"sett.conf" | tr -d '\r')
 sty=$(sed -n 20"p" $ftb"sett.conf" | tr -d '\r')
 
-promapi=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
+#promapi_list=$(sed -n 21"p" $ftb"sett.conf" | tr -d '\r')
+echo $(sed -n 21"p" $ftb"sett.conf" | tr -d '\r') > $fhome"promapi_list.txt"
+
 label1=$(sed -n 22"p" $ftb"sett.conf" | tr -d '\r')
 groupp=$(sed -n 23"p" $ftb"sett.conf" | tr -d '\r')
 
 #sm=$(sed -n 24"p" $ftb"sett.conf" | tr -d '\r')
 pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
-pappi1=0	#1-уже сработал, 0-не сработал
-pappiOK=0	#сообщение о восстановлении pappi
+
+
 special_mute=0
 
 mdt_start=$(sed -n 26"p" $ftb"sett.conf" | sed 's/\://g' | tr -d '\r')
@@ -84,8 +85,8 @@ echo $date1" abot3_"$bui": "$1
 
 function alert_bot()
 {
-logger "alert_bot"
-local str_col=0
+logger "alert_bot "$promapi
+str_col_p=0
 #[ "$lev_log" == "1" ] && logger "prom api checks"
 
 autohcheck;
@@ -95,25 +96,25 @@ if [ "$autohcheck_rez" -eq "0" ]; then
 	else
 		curl -k -s -m 4 --proxy $proxy "$promapi" | jq '.' > $fhome"a3.txt"
 	fi
-[ "$lev_log" == "1" ] && cat $fhome"a3.txt"
-if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
-logger "alert_bot GET status success"
-str_col=$(grep -c '' $fhome"a3.txt")
-logger "alert_bot bot api str_col="$str_col
+	[ "$lev_log" == "1" ] && cat $fhome"a3.txt"
+	if [ $(grep -c '\"status\"\: \"success\"' $fhome"a3.txt" ) -eq "1" ]; then
+		logger "alert_bot GET status success"
+		str_col_p=$(grep -c '' $fhome"a3.txt")
+		logger "alert_bot bot api str_col_p="$str_col_p
 
-if [ "$str_col" -gt "6" ]; then
-num_alerts=$(grep -c 'alertname' $fhome"a3.txt" )
-echo "" > $fhome"newalerts.txt"
-redka;
+		if [ "$str_col_p" -gt "6" ]; then
+			num_alerts=$(grep -c 'alertname' $fhome"a3.txt")
+			#echo "" > $fhome"newalerts.txt"
+			redka;
+		fi
+	
+	[ "$str_col_p" -gt "5" ] && str_col_p_all=$((str_col_p_all+1)); 	#если по нулям
+	fi
+else
+	logger "alert_bot GET status ERROR"
 fi
-
-[ "$str_col" -gt "5" ] && comm_vessels; #если по нулям
-fi
-fi
-
 
 #[ "$lev_log" == "1" ] && logger "prom api checks end"
-
 }
 
 
@@ -161,6 +162,14 @@ if [ "$str_col11" -gt "0" ]; then
 	urler=$(echo $tmp1 | awk -F'|' '{print $7}' | tr -d '\r')
 	desc=$(echo $tmp1 | awk -F'|' '{print $8}' | tr -d '\r')
 	unic=$(echo $tmp1 | awk -F'|' '{print $9}' | tr -d '\r')
+	
+	webhook=$(echo $tmp1 | awk -F'|' '{print $10}' | tr -d '\r')
+	annot_url=$(echo $tmp1 | awk -F'|' '{print $11}' | tr -d '\r')
+	annot_text=$(echo $tmp1 | awk -F'|' '{print $12}' | tr -d '\r')
+	annot_tag=$(echo $tmp1 | awk -F'|' '{print $13}' | tr -d '\r')
+	annot_atoken=$(echo $tmp1 | awk -F'|' '{print $14}' | tr -d '\r')
+	script=$(echo $tmp1 | awk -F'|' '{print $15}' | tr -d '\r')
+	annot_scenv=$(echo $tmp1 | awk -F'|' '{print $16}' | tr -d '\r')
 	#finger=$(echo -n $alertname$inst$jober$severity$unic | md5sum | awk '{print $1}')
 	
 	[ "$a" -eq "1" ] && logger "check_mail [ALERT]"
@@ -175,6 +184,15 @@ if [ "$str_col11" -gt "0" ]; then
 	logger "check_mail urler="$urler
 	logger "check_mail desc="$desc
 	logger "check_mail unic="$unic
+	
+	logger "check_mail webhook="$webhook
+	logger "check_mail annot_url="$annot_url
+	logger "check_mail annot_text="$annot_text
+	logger "check_mail annot_tag="$annot_tag
+	logger "check_mail annot_atoken="$annot_atoken
+	logger "check_mail script="$script
+	logger "check_mail annot_scenv="$annot_scenv
+	
 	#logger "check_mail finger="$finger
 	
 	[ "$a" -eq "1" ] && fromm="m" && redka2;
@@ -682,6 +700,7 @@ fi
 silent_mode ()
 {
 local sm=0
+local sm2=0
 local vivod=0
 local silent_mode2=""
 silent_mode2=$silent_mode
@@ -697,12 +716,14 @@ if [ "$sm" == "1" ]; then
 		[ "$lev_log" == "1" ] && logger "silent_mode mdt_end="$mdt_end
 		if ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \> "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]) || ([ "$mdt1" \> "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \< "$mdt_end" ]) || ([ "$mdt_start" \= "$mdt_end" ])	|| ([ "$mdt1" \< "$mdt_start" ] && [ "$mdt1" \< "$mdt_end" ] && [ "$mdt_start" \> "$mdt_end" ]); then
 			silent_mode="on"
+			sm2=1
 		fi
 		vivod=$(sed -n 69"p" $ftb"sett.conf" | tr -d '\r')		#выводить нерезолвные алерты за время тихого режима
 		[ "$silent_mode2" == "on" ] && [ "$silent_mode" == "off" ] && [ "$vivod" == "1" ] && $fhome"job2.sh" && otv=$fhome"job2.txt" && send_def && send2	#вывод в бота alerts4.txt
 		[ "$silent_mode2" == "off" ] && [ "$silent_mode" == "on" ] && rm -f $fhome"alerts3.txt" && rm -f $fhome"alerts4.txt"
 fi
 logger "silent_mode="$silent_mode
+echo $sm2 > $fstat"silent_mode.txt"
 
 }
 
@@ -859,34 +880,43 @@ fi
 
 autohcheck ()
 {
+local pappi=0
 autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed|Could not resolve')
-echo $autohcheck_rez > $ftb"prom_api_status.txt"
+echo $autohcheck_rez > $fstat"prom_api_status"$k".txt"
+pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 
 if [ "$autohcheck_rez" -gt "0" ]; then
   logger "autohcheck prom api Failed"
-  pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
-  [ "$pappi" -eq "0" ] && pappi1=0
+  #pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
+  [ "$pappi" -eq "0" ] && echo 0 > $fhome"pappi1_"$k".txt"		#pappi1=0
   
   if [ "$pappi" -gt "0" ]; then
 	logger "pappi>0"
+	pappi1=$(sed -n 1"p" $fhome"pappi1_"$k".txt" | tr -d '\r')
 	if [ "$pappi1" -eq "0" ]; then
-		dtna=$(date -d "$RTIME $pappi min" '+ %Y%m%d%H%M%S')
-		echo $dtna > $fhome"napip.txt"
-		pappi1=1
+		#dtna=$(date -d "$RTIME $pappi min" '+ %Y%m%d%H%M%S')
+		echo $(date -d "$RTIME $pappi min" '+ %Y%m%d%H%M%S') > $fhome"napip"$k".txt"
+		#echo $(date -d "$RTIME 10 sec" '+ %Y%m%d%H%M%S') > $fhome"napip_default"$k".txt"
+		#pappi1=1
+		echo 1 > $fhome"pappi1_"$k".txt"
 		logger "pappi1=1"
 	else
 		logger "pappi1>0"
 		dtna1=$(echo $(date '+ %Y%m%d%H%M%S') | sed 's/z/-/g' | tr -d '\r')
-		#echo $(date '+ %Y%m%d%H%M%S') > $fhome"napip1.txt"
-		#dtna1=$(sed -n 1"p" $fhome"napip1.txt" | sed 's/z/-/g' | tr -d '\r')
-		dtna=$(sed -n 1"p" $fhome"napip.txt" | sed 's/z/-/g' | tr -d '\r')
+		dtna=$(sed -n 1"p" $fhome"napip"$k".txt" | sed 's/z/-/g' | tr -d '\r')
 		logger "dtna="$dtna
 		logger "dtna1="$dtna1
 	
 		if [ "$dtna1" -gt "$dtna" ]; then
 			logger "dtna1="$dtna1" > dtna="$dtna
-			echo "Prom API down "$pappi" min" > $fhome"pappi.txt"
-			pappi1=0
+			! [ -f $fhome"pappi_sum_time_"$k".txt" ] && echo $pappi > $fhome"pappi_sum_time_"$k".txt"
+			local pappi_sum_time=$(sed -n 1"p" $fhome"pappi_sum_time_"$k".txt" | tr -d '\r')
+			local promapi_vision=$(echo $promapi|sed 's/\/api\/v1\/alerts//g')
+			echo "Prom API "$promapi_vision" down "$pappi_sum_time" min" > $fhome"pappi.txt"
+			pappi_sum_time=$((pappi_sum_time+pappi))
+			echo $pappi_sum_time > $fhome"pappi_sum_time_"$k".txt"
+			#pappi1=0
+			echo 0 > $fhome"pappi1_"$k".txt"
 			logger "pappi1=0"
 			#echo > $fhome"alerts.txt"
 			#echo > $fhome"alerts2.txt"
@@ -896,7 +926,8 @@ if [ "$autohcheck_rez" -gt "0" ]; then
 			#sys
 			[ "$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 			send;
-			pappiOK=1
+			#pappiOK=1
+			echo 1 > $fhome"pappiOK_"$k".txt"
 		else 
 			logger ">"
 		fi
@@ -904,16 +935,21 @@ if [ "$autohcheck_rez" -gt "0" ]; then
   fi
 else
 	logger "autohcheck prom api OK"
-	pappi1=0
+	#pappi1=0
+	echo 0 > $fhome"pappi1_"$k".txt"
+	pappiOK=$(sed -n 1"p" $fhome"pappiOK_"$k".txt" | tr -d '\r')
 	if [ "$pappiOK" -eq "1" ]; then
-		echo "Prom API up" > $fhome"pappi.txt"
+		local promapi_vision=$(echo $promapi|sed 's/\/api\/v1\/alerts//g')
+		echo "Prom API "$promapi_vision" up" > $fhome"pappi.txt"
+		echo $pappi > $fhome"pappi_sum_time_"$k".txt"
 		otv=$fhome"pappi.txt"
 		[ "$bicons" == "1" ] && bic="2"
 		s_mute=$(sed -n 29"p" $ftb"sett.conf" | tr -d '\r')
 		#sys
 		[ "$(sed -n 28"p" $ftb"sett.conf" | tr -d '\r')" == "1" ] && s_mute="1"
 		send;
-		pappiOK=0
+		#pappiOK=0
+		echo 0 > $fhome"pappiOK_"$k".txt"
 	fi
 fi
 
@@ -925,11 +961,29 @@ echo $PID > $fPID
 logger "start abot3"
 Init;
 
+#promapi_list
+unset pri; 
+declare -a pri;
+pri=( $(cat $fhome"promapi_list.txt") )
+echo "pri="${pri[@]}
+
+
+
 while true
 do
 sleep $ssec
 silent_mode;
-alert_bot;
+
+echo "" > $fhome"newalerts.txt"
+str_col_p_all=0
+for k in ${!pri[*]}; do
+    logger "promapi k="$k"  -  "${pri[${k}]}
+	promapi=${pri[${k}]}
+	#logger "promapi="$promapi
+	alert_bot
+done
+[ "$str_col_p_all" -gt "0" ] && comm_vessels;
+
 
 [ "$chm" -eq "1" ] && check_mail;
 
