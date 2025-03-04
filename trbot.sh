@@ -195,7 +195,7 @@ tmprbs3=$(cat $fhome"alerts2.txt" | wc -c)
 #tmprbs5=$(cat $fhome"delete.txt" | wc -c)
 #[ "$tmprbs4" -gt "0" ] && [ "$tmprbs5" -lt "8" ] && tmprbs4=0
 #echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2",delete:"$tmprbs4 > $fhome"ss.txt"
-ver=$(sed -n 3"p" $fstat"ver.txt" | tr -d '\r')
+ver=$(sed -n 1"p" $fstat"ver.txt" | tr -d '\r')
 echo $tmprbs1" bot "$bui" "$ver" jobs:"$tmprbs2 > $fhome"ss.txt"
 
 #Alerting mode
