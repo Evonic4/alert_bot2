@@ -888,7 +888,7 @@ pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 if [ "$autohcheck_rez" -gt "0" ]; then
   logger "autohcheck prom api Failed"
   #pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
-  [ "$pappi" -eq "0" ] && echo 0 > $fhome"pappi1_"$k".txt" && echo 0 > $fhome"pappiOK_"$k".txt"		#pappi1=0
+  [ "$pappi" -eq "0" ] && echo 0 > $fhome"pappi1_"$k".txt"		#pappi1=0
   
   if [ "$pappi" -gt "0" ]; then
 	logger "pappi>0"
@@ -937,6 +937,7 @@ else
 	logger "autohcheck prom api OK"
 	#pappi1=0
 	echo 0 > $fhome"pappi1_"$k".txt"
+	! [ -f $fhome"pappiOK_"$k".txt" ] && echo 0 > $fhome"pappiOK_"$k".txt"
 	pappiOK=$(sed -n 1"p" $fhome"pappiOK_"$k".txt" | tr -d '\r')
 	if [ "$pappiOK" -eq "1" ]; then
 		local promapi_vision=$(echo $promapi|sed 's/\/api\/v1\/alerts//g')
