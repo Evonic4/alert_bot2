@@ -882,8 +882,8 @@ autohcheck ()
 {
 local pappi=0
 autohcheck_rez=$(curl -I -k -m 4 "$promapi" 2>&1 | grep -cE 'Failed|Could not resolve')
-[ "$autohcheck_rez" -eq "0" ] && echo 1 > $fstat"prom_api_status"$k".txt"
-[ "$autohcheck_rez" -gt "0" ] && echo 0 > $fstat"prom_api_status"$k".txt"
+[ "$autohcheck_rez" -eq "0" ] && echo "U" > $fstat"prom_api_status"$k".txt"
+[ "$autohcheck_rez" -gt "0" ] && echo "D" > $fstat"prom_api_status"$k".txt"
 #echo $autohcheck_rez > $fstat"prom_api_status"$k".txt"
 pappi=$(sed -n 25"p" $ftb"sett.conf" | tr -d '\r')
 

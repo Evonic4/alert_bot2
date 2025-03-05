@@ -278,10 +278,10 @@ for ((a5=0;a5<=5;a5++)); do
 	pasn=""
 	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
 		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
-		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
-			pasn="0"
+		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "D" ]; then
+			pasn="D"
 		else
-			pasn="1"
+			pasn="U"
 		fi
 		pasn1=$pasn1$pasn
 	fi
@@ -321,12 +321,13 @@ if [ -z "$hcp2" ]; then
 else
 	local stat_check_hc=1
 fi
-[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -eq "0" ] && status="ERROR"
-[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -lt "3" ] && status="WARN"
-[ "$((stat_check_abot3))" -eq "0" ] && status="ERROR"
-[ "$(echo $pasn | grep -c '0')" -gt "0" ] && status="WARN"
-[ "$ser" -gt "0" ] || [ "$tier" -gt "0" ] && status="WARN"
 [ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -eq "3" ] && status="UP"
+[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -lt "3" ] && status="WARN"
+[ "$(echo $pasn1 | grep -c 'D')" -gt "0" ] && status="WARN"
+#[ "$ser" -gt "0" ] || [ "$tier" -gt "0" ] && status="WARN"
+[ "$((stat_check_trbot+stat_check_abot3+stat_check_hc))" -eq "0" ] && status="ERROR"
+[ "$((stat_check_abot3))" -eq "0" ] && status="ERROR"
+
 
 
 local date3=$(date '+ %Y-%m-%d %H:%M:%S'|sed 's/^[ \t]*//;s/[ \t]*$//')

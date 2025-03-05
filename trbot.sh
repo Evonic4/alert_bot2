@@ -222,15 +222,15 @@ for ((a5=0;a5<=5;a5++)); do
 	pasn=""
 	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
 		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
-		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
-			pasn="0"
+		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "D" ]; then
+			pasn="D"
 		else
-			pasn="1"
+			pasn="U"
 		fi
 		pasn1=$pasn1$pasn
 	fi
 done
-echo "Prom API State "$pasn1" (1-up,0-down)" >> $fhome"ss.txt"
+echo "Prom API State "$pasn1" (U-up,D-down)" >> $fhome"ss.txt"
 
 
 #health check
