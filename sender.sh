@@ -279,9 +279,9 @@ for ((a5=0;a5<=5;a5++)); do
 	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
 		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
 		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
-			pasn="1"
-		else
 			pasn="0"
+		else
+			pasn="1"
 		fi
 		pasn1=$pasn1$pasn
 	fi
@@ -292,9 +292,9 @@ local bot_adm=$(sed -n 68"p" $ftb"sett.conf" | tr -d '\r')
 [ -z "$bot_adm" ] && bot_adm="all"
 
 #telegram
-local so=$(sed -n "1p" $fstat"stat_tok_out.txt" | tr -d '\r')
-local ser=$(sed -n "1p" $fstat"stat_terr_out.txt" | tr -d '\r')
-local tier=$(sed -n "1p" $fstat"stat_terr_in.txt" | tr -d '\r')
+#local so=$(sed -n "1p" $fstat"stat_tok_out.txt" | tr -d '\r')
+#local ser=$(sed -n "1p" $fstat"stat_terr_out.txt" | tr -d '\r')
+#local tier=$(sed -n "1p" $fstat"stat_terr_in.txt" | tr -d '\r')
 
 local proms=$(sed -n 21"p" $fhome"sett.conf" | tr -d '\r')
 
@@ -330,7 +330,7 @@ fi
 
 
 local date3=$(date '+ %Y-%m-%d %H:%M:%S'|sed 's/^[ \t]*//;s/[ \t]*$//')
-echo "{\"version\": \"${ver}\",\"app\": \"abot2\",\"name\": \"${bui}\",\"status\": \"${status}\",\"func_pred\": \"${opov}\",\"col_jobs\": \"${tmprbs2}\",\"alert_mode\": \"${regim}\",\"silent_mode\": \"${sm}\",\"prom_api_status\": \"${pasn1}\",\"proms\": \"${proms}\",\"check_trbot\": \"${stat_check_trbot}\",\"check_abot3\": \"${stat_check_abot3}\",\"check_hc\": \"${stat_check_hc}\",\"bot_adm\": \"${bot_adm}\",\"t_send_ok\": \"${so}\",\"t_send_err\": \"${ser}\",\"t_in_err\": \"${ser}\",\"time\": \"${date3}\"}" > ${fhome}h1.json
+echo "{\"version\": \"${ver}\",\"app\": \"abot2\",\"name\": \"${bui}\",\"status\": \"${status}\",\"func_pred\": \"${opov}\",\"col_jobs\": \"${tmprbs2}\",\"alert_mode\": \"${regim}\",\"silent_mode\": \"${sm}\",\"prom_api_status\": \"${pasn1}\",\"proms\": \"${proms}\",\"check_trbot\": \"${stat_check_trbot}\",\"check_abot3\": \"${stat_check_abot3}\",\"check_hc\": \"${stat_check_hc}\",\"bot_adm\": \"${bot_adm}\",\"time\": \"${date3}\"}" > ${fhome}h1.json
 cp -f ${fhome}h1.json ${fhome}h.json
 
 }

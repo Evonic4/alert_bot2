@@ -223,9 +223,9 @@ for ((a5=0;a5<=5;a5++)); do
 	if [ -f $fstat"prom_api_status"$a5".txt" ]; then
 		pasn=$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')
 		if [ "$(sed -n "1p" $fstat"prom_api_status"$a5".txt" | tr -d '\r')" == "0" ]; then
-			pasn="1"
-		else
 			pasn="0"
+		else
+			pasn="1"
 		fi
 		pasn1=$pasn1$pasn
 	fi
