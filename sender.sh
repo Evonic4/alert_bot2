@@ -379,7 +379,7 @@ kkik3=$(($kkik3+1))
 
 [ "$kkik" -ge "$progons" ] && Init2
 
-if [ "$kkik3" -gt "100" ]; then
+if [ "$kkik3" -gt "10" ]; then
 	kkik3=0
 	to_health &
 fi
